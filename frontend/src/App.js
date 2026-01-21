@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import '@/App.css';
@@ -24,13 +24,19 @@ import ControlPanel from './components/ControlPanel';
 import UserMenu from './components/UserMenu';
 import SocialTrading from './components/SocialTrading';
 import PortfolioAnalytics from './components/PortfolioAnalytics';
-import PaperTradingPanel, { PaperTradingProvider, usePaperTrading } from './components/PaperTrading';
+import PaperTradingPanel, { PaperTradingProvider } from './components/PaperTrading';
+import PriceAlerts from './components/PriceAlerts';
+import AdvancedOrders from './components/AdvancedOrders';
+import NewsFeed from './components/NewsFeed';
+import AutoTrading from './components/AutoTrading';
+import UserWallet from './components/UserWallet';
 import axios from 'axios';
 
 // Icons
 import { 
-  Mic, Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
-  LayoutDashboard, Users, PieChart, Banknote, Settings
+  Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
+  LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
+  Newspaper, Bot, Wallet, Menu, X
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -38,9 +44,14 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 // Navigation Tabs
 const NAV_TABS = [
   { id: 'dashboard', label: 'Trading', icon: LayoutDashboard },
+  { id: 'orders', label: 'Orders', icon: Layers },
+  { id: 'alerts', label: 'Alerts', icon: Bell },
+  { id: 'auto', label: 'Auto', icon: Bot },
+  { id: 'news', label: 'News', icon: Newspaper },
   { id: 'social', label: 'Social', icon: Users },
   { id: 'portfolio', label: 'Portfolio', icon: PieChart },
-  { id: 'paper', label: 'Paper Trade', icon: Banknote },
+  { id: 'wallet', label: 'Wallet', icon: Wallet },
+  { id: 'paper', label: 'Paper', icon: Banknote },
 ];
 
 // Main Dashboard Component
@@ -54,16 +65,15 @@ const Dashboard = () => {
   const [showMarkets, setShowMarkets] = useState(true);
   const [systemMessages, setSystemMessages] = useState([]);
   const [marketPrices, setMarketPrices] = useState({});
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Fetch market prices for paper trading
+  // Fetch market prices
   useEffect(() => {
     const fetchPrices = async () => {
       try {
         const response = await axios.get(`${API}/market/prices`);
         const prices = {};
-        response.data.forEach(item => {
-          prices[item.symbol] = item.price;
-        });
+        response.data.forEach(item => { prices[item.symbol] = item.price; });
         setMarketPrices(prices);
       } catch (error) {
         console.error('Error fetching prices:', error);
@@ -109,120 +119,174 @@ const Dashboard = () => {
 
   return (
     <PaperTradingProvider initialBalance={100000}>
-      <div className="min-h-screen bg-[#050505] overflow-hidden" data-testid="main-dashboard">
+      <div className="min-h-screen bg-[#050505] overflow-x-hidden" data-testid="main-dashboard">
         <MatrixBackground />
 
-        <div className="relative z-10 min-h-screen pb-24">
+        <div className="relative z-10 min-h-screen pb-20 md:pb-16">
           {/* Header */}
-          <header className="sticky top-0 z-40 border-b border-white/5 bg-black/40 backdrop-blur-2xl">
-            <div className="max-w-[1920px] mx-auto px-6 py-3">
+          <header className="sticky top-0 z-40 border-b border-white/5 bg-black/60 backdrop-blur-2xl">
+            <div className="max-w-[1920px] mx-auto px-3 md:px-6 py-2 md:py-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500/20 to-transparent border border-teal-500/30 flex items-center justify-center">
-                      <Zap className="text-teal-400" size={18} />
+                <div className="flex items-center gap-3 md:gap-6">
+                  {/* Mobile Menu Button */}
+                  <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="md:hidden p-2 text-slate-400 hover:text-white"
+                    data-testid="mobile-menu-btn"
+                  >
+                    {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                  </button>
+
+                  {/* Logo */}
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-teal-500/20 to-transparent border border-teal-500/30 flex items-center justify-center">
+                      <Zap className="text-teal-400" size={16} />
                     </div>
-                    <div>
-                      <h1 className="font-heading text-lg font-bold uppercase tracking-wider text-white">Cognitive Oracle</h1>
-                      <p className="text-[10px] text-slate-500 font-mono">AI Trading Platform</p>
+                    <div className="hidden sm:block">
+                      <h1 className="font-heading text-base md:text-lg font-bold uppercase tracking-wider text-white">Oracle</h1>
+                      <p className="text-[10px] text-slate-500 font-mono hidden md:block">AI Trading</p>
                     </div>
                   </div>
 
-                  {/* Navigation Tabs */}
-                  <nav className="hidden md:flex items-center gap-1 ml-6">
+                  {/* Desktop Navigation */}
+                  <nav className="hidden lg:flex items-center gap-1">
                     {NAV_TABS.map((tab) => (
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-mono transition-all ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
                           activeTab === tab.id
                             ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
                             : 'text-slate-500 hover:text-white hover:bg-white/5'
                         }`}
                         data-testid={`nav-${tab.id}`}
                       >
-                        <tab.icon size={16} />
+                        <tab.icon size={14} />
                         {tab.label}
                       </button>
                     ))}
                   </nav>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <StatusBadge variant="active" pulse><Activity size={12} />Live</StatusBadge>
-                  <StatusBadge variant={currentMood === 'FOCUSED' ? 'active' : currentMood === 'STRESSED' ? 'danger' : 'warning'}>
-                    <Brain size={12} />{currentMood}
+                <div className="flex items-center gap-2 md:gap-3">
+                  <StatusBadge variant="active" pulse className="hidden sm:flex"><Activity size={10} />Live</StatusBadge>
+                  <StatusBadge variant={currentMood === 'FOCUSED' ? 'active' : currentMood === 'STRESSED' ? 'danger' : 'warning'} className="hidden md:flex">
+                    <Brain size={10} />{currentMood}
                   </StatusBadge>
                   {isAuthenticated ? <UserMenu /> : (
                     <NeonButton onClick={loginWithGoogle} variant="teal" size="sm" data-testid="header-login-btn">
-                      <LogIn size={14} />Sign In
+                      <LogIn size={14} /><span className="hidden sm:inline">Sign In</span>
                     </NeonButton>
                   )}
                 </div>
               </div>
             </div>
+
+            {/* Mobile Navigation Drawer */}
+            <AnimatePresence>
+              {mobileMenuOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="lg:hidden border-t border-white/5 bg-black/80"
+                >
+                  <div className="grid grid-cols-3 gap-2 p-3">
+                    {NAV_TABS.map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => { setActiveTab(tab.id); setMobileMenuOpen(false); }}
+                        className={`flex flex-col items-center gap-1 p-3 rounded-lg text-xs font-mono transition-all ${
+                          activeTab === tab.id
+                            ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
+                            : 'bg-white/5 text-slate-500 border border-white/10'
+                        }`}
+                      >
+                        <tab.icon size={18} />
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </header>
 
           {/* Main Content */}
-          <main className="max-w-[1920px] mx-auto px-6 py-6">
+          <main className="max-w-[1920px] mx-auto px-3 md:px-6 py-4 md:py-6">
             <AnimatePresence mode="wait">
               {/* Trading Dashboard */}
               {activeTab === 'dashboard' && (
-                <motion.div
-                  key="dashboard"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="grid grid-cols-1 lg:grid-cols-12 gap-6"
-                >
-                  {/* Left Column */}
-                  <div className="lg:col-span-3 space-y-6">
+                <motion.div key="dashboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+                  {/* Left */}
+                  <div className="lg:col-span-3 space-y-4 md:space-y-6">
                     <TensorFlowFacialRecognition onMoodChange={handleMoodChange} onMoodDetected={handleMoodDetected} />
                     <VoicePanel onCommand={(cmd) => addSystemMessage(`Voice: ${cmd.action} ${cmd.symbol || ''}`)} />
                   </div>
-
-                  {/* Center Column */}
-                  <div className="lg:col-span-6 space-y-6">
+                  {/* Center */}
+                  <div className="lg:col-span-6 space-y-4 md:space-y-6">
                     {showMarkets && <LiveMarketsRealtime onClose={() => setShowMarkets(false)} symbols={['BTC', 'ETH', 'SPY']} />}
-                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <CandlestickChart symbol="BTC" title="Bitcoin / USD" />
                       <CandlestickChart symbol="ETH" title="Ethereum / USD" />
                     </div>
-
-                    {/* System Messages */}
                     <AnimatePresence>
                       {systemMessages.map((msg) => (
-                        <motion.div key={msg.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="glass-teal rounded-xl px-5 py-3">
+                        <motion.div key={msg.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="glass-teal rounded-xl px-4 py-2">
                           <div className="flex items-center gap-3">
-                            <Zap size={16} className="text-teal-400" />
-                            <p className="text-sm text-white font-mono">{msg.text}</p>
-                            <span className="text-xs text-slate-500 ml-auto">{msg.timestamp.toLocaleTimeString()}</span>
+                            <Zap size={14} className="text-teal-400" />
+                            <p className="text-sm text-white font-mono flex-1">{msg.text}</p>
+                            <span className="text-xs text-slate-500">{msg.timestamp.toLocaleTimeString()}</span>
                           </div>
                         </motion.div>
                       ))}
                     </AnimatePresence>
-
-                    {/* Speed Trading */}
                     <GlassCard title="Speed Trading" icon="⚡" accent="teal">
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="text-center"><p className="text-xs font-mono text-slate-500 mb-1">Symbol</p><p className="text-xl font-heading font-bold text-white">AAPL</p></div>
-                        <div className="text-center"><p className="text-xs font-mono text-slate-500 mb-1">Qty</p><p className="text-xl font-heading font-bold text-white">1,000</p></div>
-                        <div className="text-center"><p className="text-xs font-mono text-slate-500 mb-1">Type</p><p className="text-xl font-heading font-bold text-teal-400">MARKET</p></div>
+                      <div className="grid grid-cols-3 gap-3 mb-4">
+                        <div className="text-center"><p className="text-xs font-mono text-slate-500">Symbol</p><p className="text-lg md:text-xl font-heading font-bold text-white">AAPL</p></div>
+                        <div className="text-center"><p className="text-xs font-mono text-slate-500">Qty</p><p className="text-lg md:text-xl font-heading font-bold text-white">1,000</p></div>
+                        <div className="text-center"><p className="text-xs font-mono text-slate-500">Type</p><p className="text-lg md:text-xl font-heading font-bold text-teal-400">MARKET</p></div>
                       </div>
-                      <div className="flex gap-3 mt-4">
+                      <div className="flex gap-3">
                         <NeonButton variant="teal" className="flex-1" data-testid="quick-buy-btn"><TrendingUp size={16} />BUY</NeonButton>
                         <NeonButton variant="rose" className="flex-1" data-testid="quick-sell-btn"><TrendingDown size={16} />SELL</NeonButton>
                       </div>
                     </GlassCard>
                   </div>
-
-                  {/* Right Column */}
-                  <div className="lg:col-span-3 space-y-6">
+                  {/* Right */}
+                  <div className="lg:col-span-3 space-y-4 md:space-y-6">
                     <GestureRecognition onGesture={(g) => addSystemMessage(`Gesture: ${g.name}`)} />
                     <AgentConsensus tradeRequest={{ action: 'BUY', symbol: 'AAPL', quantity: 1000, price: 248.50 }} />
                     <OracleMemory symbol="AAPL" action="BUY" />
                   </div>
+                </motion.div>
+              )}
+
+              {/* Advanced Orders */}
+              {activeTab === 'orders' && (
+                <motion.div key="orders" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-3xl mx-auto">
+                  <AdvancedOrders currentPrices={marketPrices} />
+                </motion.div>
+              )}
+
+              {/* Price Alerts */}
+              {activeTab === 'alerts' && (
+                <motion.div key="alerts" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
+                  <PriceAlerts currentPrices={marketPrices} />
+                </motion.div>
+              )}
+
+              {/* Auto Trading */}
+              {activeTab === 'auto' && (
+                <motion.div key="auto" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-3xl mx-auto">
+                  <AutoTrading currentPrices={marketPrices} onTrade={(t) => addSystemMessage(`Auto: ${t.side} ${t.symbol}`)} />
+                </motion.div>
+              )}
+
+              {/* News Feed */}
+              {activeTab === 'news' && (
+                <motion.div key="news" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-3xl mx-auto">
+                  <NewsFeed />
                 </motion.div>
               )}
 
@@ -240,15 +304,21 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* User Wallet */}
+              {activeTab === 'wallet' && (
+                <motion.div key="wallet" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
+                  <UserWallet currentPrices={marketPrices} />
+                </motion.div>
+              )}
+
               {/* Paper Trading */}
               {activeTab === 'paper' && (
                 <motion.div key="paper" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
                   <div className="mb-6">
-                    <h2 className="font-heading text-2xl font-bold text-white flex items-center gap-3">
-                      <Banknote className="text-amber-400" />
-                      Paper Trading Mode
+                    <h2 className="font-heading text-xl md:text-2xl font-bold text-white flex items-center gap-3">
+                      <Banknote className="text-amber-400" />Paper Trading
                     </h2>
-                    <p className="text-slate-500 text-sm font-mono mt-1">Practice trading with virtual funds - no real money at risk</p>
+                    <p className="text-slate-500 text-sm font-mono mt-1">Practice with $100,000 virtual funds</p>
                   </div>
                   <PaperTradingPanel currentPrices={marketPrices} />
                 </motion.div>
@@ -256,8 +326,8 @@ const Dashboard = () => {
             </AnimatePresence>
           </main>
 
-          {/* Status Bar */}
-          <div className="fixed bottom-20 left-0 right-0 z-30 px-6">
+          {/* Status Bar - Hidden on mobile to save space */}
+          <div className="hidden md:block fixed bottom-14 left-0 right-0 z-30 px-6">
             <StatusBar voiceActive={voiceActive} gestureReady={gestureReady} mood={currentMood} riskLevel="LOW" />
           </div>
 
