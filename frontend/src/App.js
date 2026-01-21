@@ -64,6 +64,7 @@ const NAV_TABS = [
 // Main Dashboard Component
 const Dashboard = () => {
   const { isAuthenticated, loginWithGoogle } = useAuth();
+  const { t } = useTranslation();
   const [showSplash, setShowSplash] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [voiceActive, setVoiceActive] = useState(false);
