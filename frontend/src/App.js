@@ -45,6 +45,9 @@ import SocialSignals from './components/SocialSignals';
 import TradingPlayground from './components/TradingPlayground';
 import AutonomousBot from './components/AutonomousBot';
 import TrainingCenter from './components/TrainingCenter';
+import MLPredictions from './components/MLPredictions';
+import TradingCompetitions from './components/TradingCompetitions';
+import BenzingaNews from './components/BenzingaNews';
 import axios from 'axios';
 
 // Icons
