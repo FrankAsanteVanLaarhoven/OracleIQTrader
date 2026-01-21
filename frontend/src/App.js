@@ -1,31 +1,37 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import '@/App.css';
 
 // Components
 import MatrixBackground from './components/MatrixBackground';
 import SplashScreen from './components/SplashScreen';
+import LoginPage from './components/LoginPage';
+import AuthCallback from './components/AuthCallback';
 import GlassCard from './components/GlassCard';
 import StatusBadge from './components/StatusBadge';
 import NeonButton from './components/NeonButton';
-import LiveMarkets from './components/LiveMarkets';
+import LiveMarketsRealtime from './components/LiveMarketsRealtime';
 import VoicePanel from './components/VoicePanel';
-import FacialRecognition from './components/FacialRecognition';
+import WebcamFacialRecognition from './components/WebcamFacialRecognition';
 import GestureRecognition from './components/GestureRecognition';
 import AgentConsensus from './components/AgentConsensus';
 import OracleMemory from './components/OracleMemory';
 import TradingChart from './components/TradingChart';
 import StatusBar from './components/StatusBar';
 import ControlPanel from './components/ControlPanel';
+import UserMenu from './components/UserMenu';
 
 // Icons
 import { 
   Mic, Hand, Brain, Shield, Activity, 
-  TrendingUp, TrendingDown, Zap, Target,
-  ChevronRight
+  TrendingUp, TrendingDown, Zap, LogIn
 } from 'lucide-react';
 
-function App() {
+// Main Dashboard Component
+const Dashboard = () => {
+  const { isAuthenticated, loginWithGoogle } = useAuth();
   const [showSplash, setShowSplash] = useState(true);
   const [voiceActive, setVoiceActive] = useState(false);
   const [gestureReady, setGestureReady] = useState(true);
@@ -34,67 +40,53 @@ function App() {
   const [lastCommand, setLastCommand] = useState(null);
   const [systemMessages, setSystemMessages] = useState([]);
 
-  // Handle voice command
   const handleVoiceCommand = useCallback((command) => {
     setLastCommand(command);
-    addSystemMessage(`Voice command: ${command.action} ${command.quantity || ''} ${command.symbol || ''}`);
+    addSystemMessage(`Voice: ${command.action} ${command.quantity || ''} ${command.symbol || ''}`);
   }, []);
 
-  // Handle gesture
   const handleGesture = useCallback((gesture) => {
-    addSystemMessage(`Gesture detected: ${gesture.name} - ${gesture.action}`);
+    addSystemMessage(`Gesture: ${gesture.name} - ${gesture.action}`);
   }, []);
 
-  // Handle mood change
   const handleMoodChange = useCallback((newMood) => {
     setCurrentMood(newMood);
-    addSystemMessage(`Mood updated: ${newMood}`);
   }, []);
 
-  // Add system message (ephemeral)
+  const handleMoodDetected = useCallback((moodResult) => {
+    addSystemMessage(`Mood detected: ${moodResult.state} (${(moodResult.confidence * 100).toFixed(0)}%)`);
+  }, []);
+
   const addSystemMessage = (message) => {
-    const newMsg = {
-      id: Date.now(),
-      text: message,
-      timestamp: new Date()
-    };
+    const newMsg = { id: Date.now(), text: message, timestamp: new Date() };
     setSystemMessages(prev => [...prev, newMsg]);
-    
-    // Auto-remove after 5 seconds
     setTimeout(() => {
       setSystemMessages(prev => prev.filter(m => m.id !== newMsg.id));
     }, 5000);
   };
 
-  // Control handlers
   const handleVoiceToggle = () => {
     setVoiceActive(!voiceActive);
-    addSystemMessage(voiceActive ? 'Voice deactivated' : 'Voice activated - listening...');
+    addSystemMessage(voiceActive ? 'Voice deactivated' : 'Voice activated');
   };
 
-  const handleGestureToggle = () => {
-    addSystemMessage('Gesture recognition triggered');
-  };
-
+  const handleGestureToggle = () => addSystemMessage('Gesture recognition triggered');
+  
   const handleMoodToggle = () => {
     const moods = ['FOCUSED', 'STRESSED', 'FATIGUED', 'CONFIDENT'];
-    const currentIdx = moods.indexOf(currentMood);
-    const nextMood = moods[(currentIdx + 1) % moods.length];
+    const nextMood = moods[(moods.indexOf(currentMood) + 1) % moods.length];
     setCurrentMood(nextMood);
-    addSystemMessage(`Mood changed to: ${nextMood}`);
+    addSystemMessage(`Mood: ${nextMood}`);
   };
 
-  const handleOracleQuery = () => {
-    addSystemMessage('Querying oracle memory...');
-  };
-
+  const handleOracleQuery = () => addSystemMessage('Querying oracle memory...');
+  
   const handleNewMessage = () => {
     const messages = [
-      'Market volatility increasing - consider hedging',
-      'Bullish signal detected on NVDA',
+      'Market volatility increasing',
+      'Bullish signal on NVDA',
       'Risk parameters updated',
-      'Portfolio rebalancing recommended',
-      'New trading opportunity identified'
+      'Portfolio rebalancing recommended'
     ];
     addSystemMessage(messages[Math.floor(Math.random() * messages.length)]);
   };
@@ -109,16 +101,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#050505] overflow-hidden" data-testid="main-dashboard">
-      {/* Matrix Background */}
       <MatrixBackground />
 
-      {/* Main Content */}
       <div className="relative z-10 min-h-screen pb-24">
         {/* Header */}
         <header className="sticky top-0 z-40 border-b border-white/5 bg-black/40 backdrop-blur-2xl">
           <div className="max-w-[1920px] mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              {/* Logo & Title */}
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-transparent border border-teal-500/30 flex items-center justify-center">
                   <Zap className="text-teal-400" size={20} />
@@ -127,20 +116,29 @@ function App() {
                   <h1 className="font-heading text-xl font-bold uppercase tracking-wider text-white">
                     Cognitive Oracle
                   </h1>
-                  <p className="text-xs text-slate-500 font-mono">AI-Powered Trading & Academic Intelligence Platform</p>
+                  <p className="text-xs text-slate-500 font-mono">AI-Powered Trading Platform</p>
                 </div>
               </div>
 
-              {/* Status Indicators */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <StatusBadge variant="active" pulse>
                   <Activity size={12} />
                   Voice Active
                 </StatusBadge>
                 <StatusBadge variant={currentMood === 'FOCUSED' ? 'active' : currentMood === 'STRESSED' ? 'danger' : 'warning'}>
                   <Brain size={12} />
-                  Mood: {currentMood}
+                  {currentMood}
                 </StatusBadge>
+                
+                {/* User Menu or Login */}
+                {isAuthenticated ? (
+                  <UserMenu />
+                ) : (
+                  <NeonButton onClick={loginWithGoogle} variant="teal" size="sm" data-testid="header-login-btn">
+                    <LogIn size={14} />
+                    Sign In
+                  </NeonButton>
+                )}
               </div>
             </div>
           </div>
@@ -150,34 +148,32 @@ function App() {
         <main className="max-w-[1920px] mx-auto px-6 py-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            {/* Left Column - Voice & Face */}
+            {/* Left Column */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Facial Recognition */}
-              <FacialRecognition 
-                mood={currentMood} 
+              <WebcamFacialRecognition 
                 onMoodChange={handleMoodChange}
+                onMoodDetected={handleMoodDetected}
               />
-              
-              {/* Voice Panel */}
               <VoicePanel onCommand={handleVoiceCommand} />
             </div>
 
-            {/* Center Column - Charts & Markets */}
+            {/* Center Column */}
             <div className="lg:col-span-6 space-y-6">
-              {/* Live Markets */}
               <AnimatePresence>
                 {showMarkets && (
-                  <LiveMarkets onClose={() => setShowMarkets(false)} />
+                  <LiveMarketsRealtime 
+                    onClose={() => setShowMarkets(false)}
+                    symbols={['BTC', 'ETH', 'SPY']}
+                  />
                 )}
               </AnimatePresence>
 
-              {/* Trading Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TradingChart symbol="BTC" title="Bitcoin / USD" />
                 <TradingChart symbol="ETH" title="Ethereum / USD" />
               </div>
 
-              {/* System Messages (Ephemeral) */}
+              {/* System Messages */}
               <AnimatePresence>
                 {systemMessages.map((msg) => (
                   <motion.div
@@ -186,7 +182,6 @@ function App() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.98 }}
                     className="glass-teal rounded-xl px-5 py-3"
-                    data-testid="system-message"
                   >
                     <div className="flex items-center gap-3">
                       <Zap size={16} className="text-teal-400" />
@@ -199,7 +194,7 @@ function App() {
                 ))}
               </AnimatePresence>
 
-              {/* Quick Trade Panel */}
+              {/* Speed Trading */}
               <GlassCard title="Speed Trading" icon="⚡" accent="teal">
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center">
@@ -228,22 +223,10 @@ function App() {
               </GlassCard>
             </div>
 
-            {/* Right Column - Agents & Oracle */}
+            {/* Right Column */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Gesture Recognition */}
               <GestureRecognition onGesture={handleGesture} />
-              
-              {/* Agent Consensus */}
-              <AgentConsensus 
-                tradeRequest={{
-                  action: 'BUY',
-                  symbol: 'AAPL',
-                  quantity: 1000,
-                  price: 248.50
-                }}
-              />
-              
-              {/* Oracle Memory */}
+              <AgentConsensus tradeRequest={{ action: 'BUY', symbol: 'AAPL', quantity: 1000, price: 248.50 }} />
               <OracleMemory symbol="AAPL" action="BUY" />
             </div>
           </div>
@@ -251,12 +234,7 @@ function App() {
 
         {/* Status Bar */}
         <div className="fixed bottom-20 left-0 right-0 z-30 px-6">
-          <StatusBar 
-            voiceActive={voiceActive}
-            gestureReady={gestureReady}
-            mood={currentMood}
-            riskLevel="LOW"
-          />
+          <StatusBar voiceActive={voiceActive} gestureReady={gestureReady} mood={currentMood} riskLevel="LOW" />
         </div>
 
         {/* Control Panel */}
@@ -270,6 +248,37 @@ function App() {
         />
       </div>
     </div>
+  );
+};
+
+// App Router with Auth handling
+const AppRouter = () => {
+  const location = useLocation();
+  
+  // Handle auth callback synchronously during render
+  if (location.hash?.includes('session_id=')) {
+    return <AuthCallback />;
+  }
+
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/*" element={<Dashboard />} />
+    </Routes>
+  );
+};
+
+// Main App
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <div className="App">
+          <AppRouter />
+        </div>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
