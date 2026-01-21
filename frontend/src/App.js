@@ -42,6 +42,9 @@ import NotificationManager from './components/NotificationManager';
 import TradingJournal from './components/TradingJournal';
 import PortfolioLeaderboard from './components/PortfolioLeaderboard';
 import SocialSignals from './components/SocialSignals';
+import TradingPlayground from './components/TradingPlayground';
+import AutonomousBot from './components/AutonomousBot';
+import TrainingCenter from './components/TrainingCenter';
 import axios from 'axios';
 
 // Icons
