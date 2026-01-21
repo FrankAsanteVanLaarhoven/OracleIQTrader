@@ -7,7 +7,7 @@ import {
 import NeonButton from './NeonButton';
 import GlassCard from './GlassCard';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
 const TrainingCenter = () => {
   const [content, setContent] = useState({ tutorials: [], lessons: [], scenarios: [] });
