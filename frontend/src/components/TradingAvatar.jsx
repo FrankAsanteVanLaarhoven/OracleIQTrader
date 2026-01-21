@@ -218,8 +218,8 @@ const AnimatedFaceMesh = ({ emotion, speaking, confidence, webcamFace = null }) 
           />
           {/* Pupil */}
           <circle 
-            cx={36 + Math.sin(time * 0.5) * 2} 
-            cy="48" 
+            cx={36 + lookX} 
+            cy={48 + lookY} 
             r="2.5" 
             fill={color}
           />
@@ -237,8 +237,8 @@ const AnimatedFaceMesh = ({ emotion, speaking, confidence, webcamFace = null }) 
           />
           {/* Pupil */}
           <circle 
-            cx={64 + Math.sin(time * 0.5) * 2} 
-            cy="48" 
+            cx={64 + lookX} 
+            cy={48 + lookY} 
             r="2.5" 
             fill={color}
           />
