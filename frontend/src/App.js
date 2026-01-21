@@ -325,11 +325,25 @@ const Dashboard = () => {
                 <motion.div key="paper" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
                   <div className="mb-6">
                     <h2 className="font-heading text-xl md:text-2xl font-bold text-white flex items-center gap-3">
-                      <Banknote className="text-amber-400" />Paper Trading
+                      <Banknote className="text-amber-400" />{t('nav.paper')} Trading
                     </h2>
                     <p className="text-slate-500 text-sm font-mono mt-1">Practice with $100,000 virtual funds</p>
                   </div>
                   <PaperTradingPanel currentPrices={marketPrices} />
+                </motion.div>
+              )}
+
+              {/* Trade Crawler / Signals */}
+              {activeTab === 'crawler' && (
+                <motion.div key="crawler" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-3xl mx-auto">
+                  <TradeCrawler />
+                </motion.div>
+              )}
+
+              {/* Export Panel */}
+              {activeTab === 'export' && (
+                <motion.div key="export" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
+                  <ExportPanel />
                 </motion.div>
               )}
             </AnimatePresence>
