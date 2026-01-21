@@ -64,6 +64,7 @@ const NAV_TABS = [
   { id: 'wallet', label: 'Wallet', icon: Wallet, labelKey: 'nav.wallet' },
   { id: 'paper', label: 'Paper', icon: Banknote, labelKey: 'nav.paper' },
   { id: 'export', label: 'Export', icon: Download, labelKey: 'common.export' },
+  { id: 'settings', label: 'Settings', icon: Settings, labelKey: 'common.settings' },
 ];
 
 // Main Dashboard Component
