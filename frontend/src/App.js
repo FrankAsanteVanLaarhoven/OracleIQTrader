@@ -170,16 +170,17 @@ const Dashboard = () => {
                         data-testid={`nav-${tab.id}`}
                       >
                         <tab.icon size={14} />
-                        {tab.label}
+                        {tab.labelKey ? t(tab.labelKey) : tab.label}
                       </button>
                     ))}
                   </nav>
                 </div>
 
                 <div className="flex items-center gap-2 md:gap-3">
-                  <StatusBadge variant="active" pulse className="hidden sm:flex"><Activity size={10} />Live</StatusBadge>
+                  <LanguageSelector variant="compact" />
+                  <StatusBadge variant="active" pulse className="hidden sm:flex"><Activity size={10} />{t('status.live')}</StatusBadge>
                   <StatusBadge variant={currentMood === 'FOCUSED' ? 'active' : currentMood === 'STRESSED' ? 'danger' : 'warning'} className="hidden md:flex">
-                    <Brain size={10} />{currentMood}
+                    <Brain size={10} />{t(`status.${currentMood.toLowerCase()}`)}
                   </StatusBadge>
                   {isAuthenticated ? <UserMenu /> : (
                     <NeonButton onClick={loginWithGoogle} variant="teal" size="sm" data-testid="header-login-btn">
