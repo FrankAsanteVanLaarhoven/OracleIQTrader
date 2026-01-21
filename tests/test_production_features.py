@@ -555,9 +555,16 @@ class TestTrainingSystem:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
+        # Either success or already completed
+        if data.get("success") == True:
+            print(f"✓ Lesson completed: {lesson_id}")
+        else:
+            assert data.get("message") == "Lesson already completed"
+            print(f"✓ Lesson already completed: {lesson_id}")
         
-        print(f"✓ Lesson completed: {lesson_id}")
+        # Verify lesson is in completed list
+        progress = requests.get(f"{BASE_URL}/api/training/progress").json()
+        assert lesson_id in progress["completed_lessons"]
         print(f"  Quiz score: 85%")
         
     def test_run_backtest(self):
