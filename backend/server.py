@@ -139,6 +139,77 @@ class UserSession(BaseModel):
     expires_at: datetime
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# ============ P4 MODELS ============
+
+class PriceAlert(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: Optional[str] = None
+    symbol: str
+    condition: str  # "above" or "below"
+    target_price: float
+    current_price: float = 0
+    triggered: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    triggered_at: Optional[datetime] = None
+
+class PriceAlertCreate(BaseModel):
+    symbol: str
+    condition: str
+    target_price: float
+
+class WhaleTransaction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    blockchain: str
+    from_address: str
+    to_address: str
+    amount: float
+    symbol: str
+    usd_value: float
+    timestamp: datetime
+    tx_hash: str
+    exchange_flow: Optional[str] = None  # "inflow", "outflow", or None
+
+class NewsItem(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    source: str
+    url: str
+    sentiment: str  # "bullish", "bearish", "neutral"
+    impact: str  # "high", "medium", "low"
+    symbols: List[str]
+    timestamp: datetime
+    summary: Optional[str] = None
+
+class SocialSignal(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    platform: str  # "twitter", "reddit"
+    content: str
+    author: str
+    sentiment: str
+    symbols: List[str]
+    engagement: int
+    timestamp: datetime
+    url: str
+
+class OrderBookSignal(BaseModel):
+    symbol: str
+    exchange: str
+    bid_volume: float
+    ask_volume: float
+    large_orders: List[Dict[str, Any]]
+    imbalance: float  # positive = more bids, negative = more asks
+    timestamp: datetime
+
+class CrawlerSignal(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    signal_type: str  # "whale", "news", "social", "orderbook"
+    urgency: str  # "critical", "high", "medium", "low"
+    symbol: str
+    message: str
+    data: Dict[str, Any]
+    timestamp: datetime
+    action_suggested: Optional[str] = None
+
 # ============ COINGECKO INTEGRATION ============
 
 COINGECKO_IDS = {
