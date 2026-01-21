@@ -598,8 +598,36 @@ const TradingAvatar = ({ marketData = {}, onInsight, onTradeCommand }) => {
         
         {/* Animated Face Mesh */}
         <div className="w-full h-full pt-16 pb-32">
-          <AnimatedFaceMesh emotion={emotion} speaking={isSpeaking} confidence={confidence} />
+          <AnimatedFaceMesh 
+            emotion={emotion} 
+            speaking={isSpeaking} 
+            confidence={confidence}
+            webcamFace={webcamFace}
+          />
         </div>
+        
+        {/* Webcam Face Tracking Panel */}
+        <AnimatePresence>
+          {showWebcamPanel && (
+            <motion.div
+              initial={{ opacity: 0, x: 300 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 300 }}
+              className="absolute top-16 right-4 w-72 z-20 p-4 rounded-xl bg-black/80 backdrop-blur-lg border border-white/10"
+            >
+              <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                <Camera size={16} className="text-teal-400" />
+                Face Mirror Mode
+              </h3>
+              <p className="text-xs text-slate-400 mb-3">
+                Your facial expressions will be mirrored onto the avatar in real-time.
+              </p>
+              <WebcamFaceTracker 
+                onFaceData={setWebcamFace}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
         
         {/* Bottom Controls */}
         <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/90 to-transparent">
