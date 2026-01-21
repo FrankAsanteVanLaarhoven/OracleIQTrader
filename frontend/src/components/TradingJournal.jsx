@@ -26,11 +26,19 @@ const TradingJournal = () => {
   // Fetch daily summary
   const fetchDailySummary = useCallback(async () => {
     setLoading(true);
+    console.log('Fetching daily summary for date:', selectedDate);
+    console.log('API URL:', API);
     try {
-      const response = await fetch(`${API}/journal/daily-summary?date=${selectedDate}`);
+      const url = `${API}/journal/daily-summary?date=${selectedDate}`;
+      console.log('Full URL:', url);
+      const response = await fetch(url);
+      console.log('Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
+        console.log('Journal data received:', data);
         setDailySummary(data);
+      } else {
+        console.error('Response not OK:', response.status);
       }
     } catch (error) {
       console.error('Error fetching daily summary:', error);
