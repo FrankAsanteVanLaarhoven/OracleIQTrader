@@ -336,16 +336,24 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
-              {/* Paper Trading */}
-              {activeTab === 'paper' && (
-                <motion.div key="paper" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
-                  <div className="mb-6">
-                    <h2 className="font-heading text-xl md:text-2xl font-bold text-white flex items-center gap-3">
-                      <Banknote className="text-amber-400" />{t('nav.paper')} Trading
-                    </h2>
-                    <p className="text-slate-500 text-sm font-mono mt-1">Practice with $100,000 virtual funds</p>
-                  </div>
-                  <PaperTradingPanel currentPrices={marketPrices} />
+              {/* Trading Playground */}
+              {activeTab === 'playground' && (
+                <motion.div key="playground" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
+                  <TradingPlayground />
+                </motion.div>
+              )}
+
+              {/* AI Trading Bot */}
+              {activeTab === 'bot' && (
+                <motion.div key="bot" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-4xl mx-auto">
+                  <AutonomousBot />
+                </motion.div>
+              )}
+
+              {/* Training Center */}
+              {activeTab === 'training' && (
+                <motion.div key="training" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
+                  <TrainingCenter />
                 </motion.div>
               )}
 
