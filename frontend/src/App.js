@@ -471,6 +471,9 @@ const Dashboard = () => {
                         <LanguageSelector />
                       </div>
                     </GlassCard>
+                    
+                    {/* Exchange API Keys */}
+                    <ExchangeSettings />
                   </div>
                 </motion.div>
               )}
