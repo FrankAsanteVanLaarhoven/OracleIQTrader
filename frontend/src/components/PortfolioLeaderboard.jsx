@@ -112,6 +112,12 @@ const PortfolioLeaderboard = () => {
       </div>
 
       {/* Leaderboard Table */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin h-8 w-8 border-2 border-teal-500 border-t-transparent rounded-full" />
+          <span className="ml-3 text-slate-400">Loading leaderboard...</span>
+        </div>
+      ) : (
       <div className="overflow-hidden rounded-2xl bg-black/40 border border-white/10">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -127,7 +133,14 @@ const PortfolioLeaderboard = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredPortfolios.map((portfolio, index) => (
+              {filteredPortfolios.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
+                    <Trophy size={48} className="mx-auto mb-4 opacity-50" />
+                    <p>No traders found</p>
+                  </td>
+                </tr>
+              ) : filteredPortfolios.map((portfolio, index) => (
                 <motion.tr
                   key={portfolio.id}
                   initial={{ opacity: 0, y: 10 }}
