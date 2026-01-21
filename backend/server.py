@@ -2002,7 +2002,7 @@ class JournalEntry(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 @api_router.get("/journal/daily-summary")
-async def get_daily_summary(date: Optional[str] = None, request: Request = None):
+async def get_daily_summary(date: Optional[str] = None, include_audio: bool = False, request: Request = None):
     """Get trading journal summary for a specific day"""
     user = await get_current_user(request) if request else None
     
