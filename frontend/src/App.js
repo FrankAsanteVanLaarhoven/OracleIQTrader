@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
+import './i18n';
 import '@/App.css';
 
 // Components
@@ -30,13 +32,16 @@ import AdvancedOrders from './components/AdvancedOrders';
 import NewsFeed from './components/NewsFeed';
 import AutoTrading from './components/AutoTrading';
 import UserWallet from './components/UserWallet';
+import TradeCrawler from './components/TradeCrawler';
+import LanguageSelector from './components/LanguageSelector';
+import ExportPanel from './components/ExportPanel';
 import axios from 'axios';
 
 // Icons
 import { 
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
-  Newspaper, Bot, Wallet, Menu, X
+  Newspaper, Bot, Wallet, Menu, X, Radar, Download
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
