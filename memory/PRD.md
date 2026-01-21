@@ -157,21 +157,28 @@ Build a state-of-the-art Cognitive Oracle Trading Platform - an enterprise-level
 - All WebSocket endpoints functional
 
 ### P5 - AI Avatar & Personalization (Complete - Jan 21, 2026)
-- [x] **3D Trading Avatar** - Interactive 68-point facial mesh with Three.js
+- [x] **3D Trading Avatar** - Interactive 68-point facial mesh with SVG
   - Real-time facial expressions (neutral, happy, excited, concerned, focused)
   - Voice synthesis via OpenAI TTS (7 voices: alloy, nova, shimmer, onyx, sage, echo, fable)
   - Market-responsive mood (changes based on BTC price changes)
   - Voice command recognition via Web Speech API
   - "Get Insight" button generates market commentary with audio
+- [x] **Voice-Activated Trading Commands** - Say "Buy 2 BTC", "Sell 100 ETH"
+  - Parses buy/sell commands with quantity and symbol
+  - Price check commands ("check BTC price")
+  - Alert setting ("set alert BTC above 100000")
+  - Audio response for all commands
+- [x] **Trade Announcements** - Avatar speaks when trades execute
+  - Profit announcements with excited emotion
+  - Loss announcements with concerned emotion
+  - Stores trades in database and broadcasts via WebSocket
+- [x] **Real Whale Transactions** - blockchain.info API integration
+  - Real BTC transactions >10 BTC
+  - Block height tracking
+- [x] **Real Crypto News** - CryptoPanic API with fallback
 - [x] **Theme Toggle** - Dark/Light/Matrix themes with localStorage persistence
 - [x] **Push Notifications** - Service Worker at /sw.js with browser notification API
-  - Permission management UI
-  - Price alert triggers
-  - Whale alert notifications
 - [x] **Settings Page** - Unified preferences panel
-  - Appearance section (theme toggle)
-  - Notifications section (push notification manager)
-  - Language section (5-language selector)
 
 ## P5 API Endpoints
 - Avatar: `/api/avatar/speak` (POST - generate speech), `/api/avatar/insight` (POST - generate trading insight), `/api/avatar/voices` (GET - list TTS voices)
