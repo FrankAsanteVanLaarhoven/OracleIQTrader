@@ -3116,6 +3116,89 @@ async def get_symbol_news(symbol: str, limit: int = 10):
     articles = await get_news_feed(symbols=[symbol.upper()], limit=limit)
     return {"articles": articles}
 
+# ============ EXCHANGE MANAGEMENT ENDPOINTS ============
+
+from modules.additional_exchanges import get_exchange_status, get_exchange_adapter
+
+@api_router.get("/exchanges/status")
+async def get_all_exchange_status():
+    """Get configuration status of all exchanges"""
+    return get_exchange_status()
+
+@api_router.get("/exchanges/{exchange}/balance")
+async def get_exchange_balance(exchange: str):
+    """Get balance from a specific exchange"""
+    try:
+        adapter = get_exchange_adapter(exchange)
+        if not adapter:
+            return {"error": f"{exchange} not configured", "configured": False}
+        
+        balances = await adapter.get_account_balance()
+        return {
+            "exchange": exchange,
+            "balances": [b.__dict__ if hasattr(b, '__dict__') else b for b in balances],
+            "configured": True
+        }
+    except Exception as e:
+        return {"error": str(e), "configured": False}
+
+@api_router.post("/exchanges/{exchange}/order")
+async def place_exchange_order(
+    exchange: str,
+    symbol: str,
+    side: str,
+    quantity: float,
+    price: Optional[float] = None,
+    order_type: str = "market"
+):
+    """Place an order on a specific exchange"""
+    try:
+        adapter = get_exchange_adapter(exchange)
+        if not adapter:
+            raise HTTPException(status_code=400, detail=f"{exchange} not configured")
+        
+        from modules.exchange_integration import OrderSide
+        order_side = OrderSide.BUY if side.lower() == "buy" else OrderSide.SELL
+        
+        if order_type == "market":
+            result = await adapter.place_market_order(symbol.upper(), order_side, quantity)
+        else:
+            if not price:
+                raise HTTPException(status_code=400, detail="Price required for limit orders")
+            result = await adapter.place_limit_order(symbol.upper(), order_side, quantity, price)
+        
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/exchanges/{exchange}/orders")
+async def get_exchange_orders(exchange: str, symbol: Optional[str] = None):
+    """Get open orders from a specific exchange"""
+    try:
+        adapter = get_exchange_adapter(exchange)
+        if not adapter:
+            return {"error": f"{exchange} not configured", "orders": []}
+        
+        orders = await adapter.get_open_orders(symbol.upper() if symbol else None)
+        return {"exchange": exchange, "orders": orders}
+    except Exception as e:
+        return {"error": str(e), "orders": []}
+
+@api_router.delete("/exchanges/{exchange}/order/{order_id}")
+async def cancel_exchange_order(exchange: str, order_id: str, symbol: str = "BTC"):
+    """Cancel an order on a specific exchange"""
+    try:
+        adapter = get_exchange_adapter(exchange)
+        if not adapter:
+            raise HTTPException(status_code=400, detail=f"{exchange} not configured")
+        
+        result = await adapter.cancel_order(symbol.upper(), order_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router
 app.include_router(api_router)
 
