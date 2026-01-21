@@ -2467,10 +2467,12 @@ async def websocket_crawler(websocket: WebSocket):
 # Include the router
 app.include_router(api_router)
 
+# CORS configuration - handle all origins dynamically
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "https://oracle-trading-2.preview.emergentagent.com"],
+    allow_origin_regex=r"https://.*\.preview\.emergentagent\.com",
     allow_methods=["*"],
     allow_headers=["*"],
 )
