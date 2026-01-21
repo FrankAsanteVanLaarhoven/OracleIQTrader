@@ -3037,6 +3037,85 @@ async def finalize_competition(competition_id: str):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+# ============ ML TRAINING ENDPOINTS ============
+
+from modules.ml_training import get_training_status, start_training, get_prediction, ml_trainer
+
+@api_router.get("/ml/training/status")
+async def get_ml_training_status():
+    """Get ML training status and available models"""
+    return get_training_status()
+
+@api_router.get("/ml/training/models")
+async def list_trained_models():
+    """List all trained ML models"""
+    return {"models": ml_trainer.list_models()}
+
+@api_router.post("/ml/training/train")
+async def train_ml_model(
+    symbol: str,
+    model_type: str = "direction",
+    data: List[Dict] = None
+):
+    """Start training a new ML model"""
+    if not data:
+        # Use mock data for demo
+        return {"error": "Training data required. Provide OHLCV data."}
+    
+    result = start_training(symbol, model_type, data)
+    return result
+
+@api_router.post("/ml/training/predict")
+async def ml_trained_predict(
+    symbol: str,
+    model_type: str = "direction",
+    features: List[float] = None
+):
+    """Get prediction from custom trained model"""
+    if not features:
+        return {"error": "Features required for prediction"}
+    
+    return get_prediction(symbol, model_type, features)
+
+# ============ BENZINGA NEWS ENDPOINTS ============
+
+from modules.benzinga_integration import get_news_feed, get_benzinga_client
+
+@api_router.get("/news/benzinga")
+async def get_benzinga_news(
+    symbols: Optional[str] = None,
+    category: Optional[str] = None,
+    limit: int = 20
+):
+    """Get news from Benzinga API"""
+    symbol_list = symbols.split(",") if symbols else None
+    articles = await get_news_feed(symbols=symbol_list, category=category, limit=limit)
+    
+    client = get_benzinga_client()
+    return {
+        "articles": articles,
+        "is_live": client.is_configured,
+        "source": "Benzinga" if client.is_configured else "Benzinga (Mock)"
+    }
+
+@api_router.get("/news/benzinga/crypto")
+async def get_crypto_news(limit: int = 20):
+    """Get cryptocurrency news from Benzinga"""
+    articles = await get_news_feed(category="crypto", limit=limit)
+    return {"articles": articles}
+
+@api_router.get("/news/benzinga/market-movers")
+async def get_market_movers_news(limit: int = 10):
+    """Get market-moving news from Benzinga"""
+    articles = await get_news_feed(category="market_movers", limit=limit)
+    return {"articles": articles}
+
+@api_router.get("/news/benzinga/symbol/{symbol}")
+async def get_symbol_news(symbol: str, limit: int = 10):
+    """Get news for a specific symbol"""
+    articles = await get_news_feed(symbols=[symbol.upper()], limit=limit)
+    return {"articles": articles}
+
 # Include the router
 app.include_router(api_router)
 
