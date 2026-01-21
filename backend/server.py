@@ -2465,6 +2465,416 @@ async def websocket_crawler(websocket: WebSocket):
     except WebSocketDisconnect:
         crawler.disconnect_crawler_ws(websocket)
 
+# ============ NEW PRODUCTION MODULES ============
+
+# Import new modules
+from modules.trading_playground import TradingPlaygroundEngine, PlaygroundOrder
+from modules.autonomous_bot import AutonomousBotEngine, TradingStrategy, BotMode
+from modules.training_system import TrainingEngine, BacktestConfig
+from modules.exchange_integration import ExchangeManager, ExchangeType, OrderSide, OrderType
+from modules.social_integration import SocialManager
+
+# Initialize module engines
+playground_engine = TradingPlaygroundEngine(db)
+bot_engine = AutonomousBotEngine(db, playground_engine)
+training_engine = TrainingEngine(db)
+exchange_manager = ExchangeManager(db)
+social_manager = SocialManager(db)
+
+# ============ TRADING PLAYGROUND ENDPOINTS ============
+
+@api_router.post("/playground/account")
+async def create_playground_account(initial_balance: float = 100000.0, request: Request = None):
+    """Create a new paper trading account"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else None
+    
+    # Check if user already has an account
+    if user_id:
+        existing = await playground_engine.get_user_account(user_id)
+        if existing:
+            return existing.model_dump()
+    
+    account = await playground_engine.create_account(user_id, initial_balance)
+    return account.model_dump()
+
+@api_router.get("/playground/account/{account_id}")
+async def get_playground_account(account_id: str):
+    """Get playground account details"""
+    result = await playground_engine.update_positions(account_id)
+    if not result.get("success"):
+        raise HTTPException(status_code=404, detail="Account not found")
+    return result["account"]
+
+@api_router.get("/playground/account")
+async def get_my_playground_account(request: Request):
+    """Get current user's playground account"""
+    user = await get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    account = await playground_engine.get_user_account(user["id"])
+    if not account:
+        # Create one automatically
+        account = await playground_engine.create_account(user["id"])
+    
+    await playground_engine.update_positions(account.id)
+    return account.model_dump()
+
+@api_router.post("/playground/order")
+async def place_playground_order(
+    account_id: str,
+    symbol: str,
+    side: str,
+    order_type: str = "market",
+    quantity: float = 0.01,
+    price: Optional[float] = None,
+    stop_loss: Optional[float] = None,
+    take_profit: Optional[float] = None
+):
+    """Place an order in the playground"""
+    order = PlaygroundOrder(
+        account_id=account_id,
+        symbol=symbol.upper(),
+        side=side.lower(),
+        order_type=order_type.lower(),
+        quantity=quantity,
+        price=price,
+        stop_loss_price=stop_loss,
+        take_profit_price=take_profit
+    )
+    
+    if order_type.lower() == "market":
+        result = await playground_engine.execute_market_order(order)
+    else:
+        result = await playground_engine.execute_limit_order(order)
+    
+    return result
+
+@api_router.post("/playground/reset/{account_id}")
+async def reset_playground_account(account_id: str, initial_balance: float = 100000.0):
+    """Reset playground account to initial state"""
+    result = await playground_engine.reset_account(account_id, initial_balance)
+    return result
+
+@api_router.get("/playground/leaderboard")
+async def get_playground_leaderboard(limit: int = 10):
+    """Get top performing playground traders"""
+    leaderboard = await playground_engine.get_leaderboard(limit)
+    return {"leaderboard": leaderboard}
+
+# ============ AUTONOMOUS BOT ENDPOINTS ============
+
+@api_router.post("/bot/create")
+async def create_trading_bot(
+    account_id: str,
+    strategy: str = "moderate",
+    trading_pairs: List[str] = None,
+    request: Request = None
+):
+    """Create a new autonomous trading bot"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    strategy_enum = TradingStrategy(strategy.lower())
+    bot = await bot_engine.create_bot(
+        user_id=user_id,
+        account_id=account_id,
+        strategy=strategy_enum,
+        trading_pairs=trading_pairs or ["BTC", "ETH", "SOL"]
+    )
+    return bot.model_dump()
+
+@api_router.get("/bot/{bot_id}")
+async def get_bot(bot_id: str):
+    """Get bot details"""
+    bot = await bot_engine.get_bot(bot_id)
+    if not bot:
+        raise HTTPException(status_code=404, detail="Bot not found")
+    return bot.model_dump()
+
+@api_router.get("/bot/user/bots")
+async def get_user_bots(request: Request):
+    """Get all bots for current user"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    bots = await bot_engine.get_user_bots(user_id)
+    return {"bots": [b.model_dump() for b in bots]}
+
+@api_router.post("/bot/{bot_id}/mode")
+async def set_bot_mode(bot_id: str, mode: str):
+    """Set bot operating mode (full_auto, semi_auto, paused)"""
+    try:
+        mode_enum = BotMode(mode.lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid mode. Use: full_auto, semi_auto, paused")
+    
+    result = await bot_engine.update_bot_mode(bot_id, mode_enum)
+    return result
+
+@api_router.get("/bot/{bot_id}/performance")
+async def get_bot_performance(bot_id: str):
+    """Get bot performance statistics"""
+    performance = await bot_engine.get_bot_performance(bot_id)
+    return performance
+
+@api_router.get("/bot/{bot_id}/signals")
+async def get_pending_signals(bot_id: str):
+    """Get pending signals for semi-auto mode"""
+    signals = await bot_engine.get_pending_signals(bot_id)
+    return {"signals": signals}
+
+@api_router.post("/bot/signal/{signal_id}/approve")
+async def approve_signal(signal_id: str):
+    """Approve a pending signal"""
+    result = await bot_engine.approve_signal(signal_id)
+    return result
+
+@api_router.post("/bot/signal/{signal_id}/reject")
+async def reject_signal(signal_id: str):
+    """Reject a pending signal"""
+    result = await bot_engine.reject_signal(signal_id)
+    return result
+
+@api_router.post("/bot/{bot_id}/analyze")
+async def trigger_analysis(bot_id: str, symbol: str = "BTC"):
+    """Manually trigger market analysis"""
+    bot = await bot_engine.get_bot(bot_id)
+    if not bot:
+        raise HTTPException(status_code=404, detail="Bot not found")
+    
+    analysis = await bot_engine.analyze_market(symbol)
+    
+    # Get current price (simulated)
+    current_price = await playground_engine.get_current_price(symbol)
+    
+    # Generate signal
+    signal = await bot_engine.generate_signal(bot, symbol, analysis, current_price)
+    
+    return {
+        "analysis": analysis,
+        "signal": signal.model_dump()
+    }
+
+# ============ TRAINING SYSTEM ENDPOINTS ============
+
+@api_router.get("/training/content")
+async def get_training_content():
+    """Get all available training content"""
+    content = await training_engine.get_all_content()
+    return content
+
+@api_router.get("/training/progress")
+async def get_user_progress(request: Request):
+    """Get user's training progress"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    progress = await training_engine.get_user_progress(user_id)
+    return progress.model_dump()
+
+@api_router.post("/training/tutorial/{tutorial_id}/complete")
+async def complete_tutorial(tutorial_id: str, request: Request):
+    """Mark tutorial as completed"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    result = await training_engine.complete_tutorial(user_id, tutorial_id)
+    return result
+
+@api_router.post("/training/lesson/{lesson_id}/complete")
+async def complete_lesson(lesson_id: str, quiz_score: int = 0, request: Request = None):
+    """Mark lesson as completed"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    result = await training_engine.complete_lesson(user_id, lesson_id, quiz_score)
+    return result
+
+@api_router.post("/training/scenario/{scenario_id}/complete")
+async def complete_scenario(
+    scenario_id: str, 
+    final_balance: float,
+    max_drawdown: float,
+    request: Request = None
+):
+    """Complete a trading scenario"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    result = await training_engine.complete_scenario(
+        user_id, scenario_id, final_balance, max_drawdown
+    )
+    return result
+
+@api_router.post("/training/backtest")
+async def run_backtest(
+    symbol: str = "BTC",
+    start_date: str = "2024-01-01",
+    end_date: str = "2024-12-31",
+    strategy_type: str = "sma_cross",
+    initial_capital: float = 10000.0,
+    request: Request = None
+):
+    """Run a strategy backtest"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    config = BacktestConfig(
+        user_id=user_id,
+        symbol=symbol,
+        start_date=start_date,
+        end_date=end_date,
+        strategy_type=strategy_type,
+        initial_capital=initial_capital
+    )
+    
+    results = await training_engine.run_backtest(config)
+    return {"config": config.model_dump(), "results": results}
+
+# ============ EXCHANGE INTEGRATION ENDPOINTS ============
+
+@api_router.get("/exchange/supported")
+async def get_supported_exchanges():
+    """Get list of supported exchanges"""
+    exchanges = await exchange_manager.get_supported_exchanges()
+    return {"exchanges": exchanges}
+
+@api_router.post("/exchange/connect")
+async def connect_exchange(
+    exchange: str,
+    api_key: str,
+    api_secret: str,
+    is_testnet: bool = True,
+    request: Request = None
+):
+    """Connect an exchange account"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    try:
+        exchange_type = ExchangeType(exchange.lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Unsupported exchange")
+    
+    result = await exchange_manager.save_credentials(
+        user_id=user_id,
+        exchange=exchange_type,
+        api_key=api_key,
+        api_secret=api_secret,
+        is_testnet=is_testnet
+    )
+    
+    return result
+
+@api_router.post("/exchange/{exchange}/test")
+async def test_exchange_connection(exchange: str, request: Request):
+    """Test exchange connection"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    try:
+        exchange_type = ExchangeType(exchange.lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Unsupported exchange")
+    
+    result = await exchange_manager.test_connection(user_id, exchange_type)
+    return result
+
+@api_router.get("/exchange/{exchange}/balances")
+async def get_exchange_balances(exchange: str, request: Request):
+    """Get exchange account balances"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    try:
+        exchange_type = ExchangeType(exchange.lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Unsupported exchange")
+    
+    balances = await exchange_manager.get_balances(user_id, exchange_type)
+    return {"balances": [b.model_dump() for b in balances]}
+
+@api_router.post("/exchange/{exchange}/order")
+async def place_exchange_order(
+    exchange: str,
+    symbol: str,
+    side: str,
+    order_type: str,
+    quantity: float,
+    price: Optional[float] = None,
+    request: Request = None
+):
+    """Place an order on exchange"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    try:
+        exchange_type = ExchangeType(exchange.lower())
+        side_enum = OrderSide(side.lower())
+        type_enum = OrderType(order_type.lower())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    result = await exchange_manager.place_order(
+        user_id=user_id,
+        exchange=exchange_type,
+        symbol=symbol.upper(),
+        side=side_enum,
+        order_type=type_enum,
+        quantity=quantity,
+        price=price
+    )
+    
+    return result
+
+@api_router.get("/exchange/orders")
+async def get_my_orders(exchange: str = None, request: Request = None):
+    """Get user's order history"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    exchange_type = ExchangeType(exchange.lower()) if exchange else None
+    orders = await exchange_manager.get_user_orders(user_id, exchange_type)
+    return {"orders": orders}
+
+# ============ SOCIAL INTEGRATION ENDPOINTS ============
+
+@api_router.get("/social/status")
+async def get_social_status():
+    """Get social media integration status"""
+    status = await social_manager.get_configuration_status()
+    return status
+
+@api_router.post("/social/twitter/configure")
+async def configure_twitter(
+    bearer_token: str = None,
+    api_key: str = None,
+    api_secret: str = None
+):
+    """Configure Twitter API credentials"""
+    result = await social_manager.configure_twitter(bearer_token, api_key, api_secret)
+    return result
+
+@api_router.post("/social/reddit/configure")
+async def configure_reddit(client_id: str, client_secret: str):
+    """Configure Reddit API credentials"""
+    result = await social_manager.configure_reddit(client_id, client_secret)
+    return result
+
+@api_router.get("/social/sentiment/{symbol}")
+async def get_social_sentiment(symbol: str):
+    """Get social sentiment for a cryptocurrency"""
+    sentiment = await social_manager.get_symbol_sentiment(symbol.upper())
+    return sentiment.model_dump()
+
+@api_router.get("/social/trending")
+async def get_trending_crypto():
+    """Get trending cryptocurrencies on social media"""
+    trending = await social_manager.get_trending_crypto()
+    return {"trending": trending}
+
 # Include the router
 app.include_router(api_router)
 
