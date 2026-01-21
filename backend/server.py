@@ -16,10 +16,18 @@ import httpx
 import json
 import csv
 import io
+import base64
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
+
+# TTS Integration
+try:
+    from emergentintegrations.llm.openai import OpenAITextToSpeech
+    TTS_AVAILABLE = True
+except ImportError:
+    TTS_AVAILABLE = False
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -28,6 +36,13 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+# TTS Client
+tts_client = None
+if TTS_AVAILABLE:
+    emergent_key = os.environ.get('EMERGENT_LLM_KEY')
+    if emergent_key:
+        tts_client = OpenAITextToSpeech(api_key=emergent_key)
 
 # Create the main app
 app = FastAPI(title="Cognitive Oracle Trading Platform")
