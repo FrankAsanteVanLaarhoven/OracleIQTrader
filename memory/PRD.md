@@ -6,206 +6,181 @@ Build a state-of-the-art "Cognitive Oracle Trading Platform" with:
 - Voice-first interface, facial recognition, and gesture control
 - Multi-agent AI consensus system and "Oracle" memory for historical trade lookups
 - Production-ready trading capabilities with paper trading, AI bots, and training
-- Next-phase features: ML predictions, trading competitions, news alerts, mobile app
+- Mobile app with QR code scanner and biometric authentication
+- ML model training capabilities and Benzinga news integration
 
-## User Personas
-1. **Beginner Traders** - Users learning to trade through tutorials and paper trading
-2. **Active Traders** - Professional day traders seeking AI-assisted insights
-3. **Crypto Enthusiasts** - Users interested in market trends and social signals
-4. **Algorithmic Traders** - Users deploying autonomous AI trading bots
-5. **Competitive Traders** - Users participating in trading competitions
-6. **Mobile Traders** - Users trading on-the-go via mobile app
+## Current Status: P9 Complete ✅
 
-## Core Requirements
+## Core Requirements - All Phases Complete
 
-### Phase 1-6 ✅ COMPLETE (Previous)
+### Phase 1-7: Foundation & Production Features ✅
 - Dashboard, real-time market data, paper trading
 - Facial recognition, WebSocket, Google OAuth
 - Social trading, charts, portfolio analytics
 - Price alerts, advanced orders, newsfeed, auto-trading
-- Trading history export, multi-language support
-- 3D avatar, voice commands, theme toggle
 - Trading Journal, Leaderboard, Social Signals
+- Trading Playground, AI Bot, Training Center
+- ML Predictions, Trading Competitions, Benzinga News
 
-### Phase 7 ✅ COMPLETE (Jan 21, 2026)
-**Production-Ready Trading Platform**
+### Phase 8: Mobile App Foundation ✅
+- React Native + Expo scaffold
+- 5 core screens: Dashboard, Markets, Trade, Portfolio, Settings
+- Glassmorphism UI components
+- API integration with backend
 
-#### Trading Playground (Paper Trading 2.0)
-- Virtual $100,000 starting balance
-- Real-time order execution with slippage simulation
-- Position management with P&L tracking
-- Stop loss and take profit support
-- Trade history and account reset
-- Playground leaderboard
+### Phase 9: Advanced Features ✅ (Jan 21, 2026)
 
-#### Autonomous AI Trading Bot
-- Three strategy modes: Conservative, Moderate, Aggressive
-- Risk management: Max trade size, daily loss limits, stop loss/take profit
-- Operating modes: Full Auto, Semi Auto, Paused
-- Real-time market analysis with technical indicators
-- Signal generation with confidence scoring
+#### QR Code Scanner (Mobile)
+- Camera-based QR code scanning
+- Binance/Coinbase/Kraken API key import
+- JSON parsing for apiKey + secretKey
+- Visual scan area with corner markers
+- Permission handling
 
-#### Interactive Training System
-- Tutorials, Lessons, Scenarios, Backtesting
-- Progress tracking with XP, levels, and badges
-- Skill development across 5 areas
+#### Biometric Authentication (Mobile)
+- Face ID / Fingerprint support
+- Expo LocalAuthentication integration
+- Protection for sensitive operations:
+  - Viewing secret keys
+  - Saving API credentials
+  - Scanning QR codes
+- Fallback to device passcode
 
-### Phase 7.5 ✅ COMPLETE (Jan 21, 2026)
-**Next Phase Features - ML, Competitions, News**
+#### ML Model Training Module (Backend)
+- `/app/backend/modules/ml_training.py`
+- Scikit-learn based training scaffold
+- Model types: direction, volatility, trend, anomaly, ensemble
+- Feature engineering: RSI, MACD, Bollinger Bands, ATR, OBV
+- Model persistence (pickle)
+- API endpoints:
+  - GET `/api/ml/training/status`
+  - GET `/api/ml/training/models`
+  - POST `/api/ml/training/train`
+  - POST `/api/ml/training/predict`
 
-#### ML Predictions
-- Comprehensive predictions for BTC, ETH, SOL, XRP, ADA, DOGE
-- Time horizons: 1 Hour, 4 Hours, 24 Hours, 1 Week
-- Price Direction with confidence and targets
-- Volatility Forecast (very_low to extreme)
-- Trend Analysis (strong_bullish to strong_bearish)
-- AI Analysis with key factors and risks
-- Trade setup suggestions (entry, stop loss, take profit, position size)
-- Model accuracy statistics
+#### Benzinga News Integration (Backend)
+- `/app/backend/modules/benzinga_integration.py`
+- Real API client (when key provided)
+- Mock client for development
+- Sentiment analysis
+- Impact categorization
+- API endpoints:
+  - GET `/api/news/benzinga`
+  - GET `/api/news/benzinga/crypto`
+  - GET `/api/news/benzinga/market-movers`
+  - GET `/api/news/benzinga/symbol/{symbol}`
 
-#### Trading Competitions
-- Daily Challenges (24-hour highest return)
-- Weekly Tournaments (week-long competitions)
-- Themed Events: Bear Market Survival, Moon Mission, Steady Hands, Speed Trader
-- User tiers: Bronze, Silver, Gold, Platinum, Diamond
-- XP rewards and badges for top finishers
-- Global leaderboard by tier points
-
-#### Benzinga News Alerts (PLACEHOLDER)
-- Breaking news alerts with sentiment
-- Category filtering (ETF, Macro, Regulatory, Network, etc.)
-- Bullish/Bearish/High Impact filters
-- *Note: Uses simulated data until API key provided*
-
-### Phase 8 ✅ COMPLETE (Jan 21, 2026)
-**Mobile App & Exchange Settings**
-
-#### React Native Mobile App (`/app/mobile/`)
-- **Framework:** Expo + React Native
-- **Navigation:** Bottom tabs + Stack navigation
-- **Screens:**
-  - Dashboard - Portfolio overview, market summary, quick actions
-  - Markets - Live crypto & stock prices with search/filter
-  - Trade - Buy/Sell interface with order execution
-  - Portfolio - Holdings, positions, trade history
-  - Settings - Exchange API key management
-- **Components:**
-  - GlassCard - Glassmorphism cards
-  - NeonButton - Glowing buttons
-  - PriceCard - Market price display
-- **API:** Connects to same backend as web app
-- **Theme:** Dark theme matching web app
-
-#### Binance-Style Exchange Settings (Web)
-- Network Mode toggle (Testnet/Mainnet)
-- Exchange cards for Binance, Coinbase, Kraken
-- Key Type selection (HMAC/Ed25519 for Binance)
-- API Key and Secret Key inputs with visibility toggle
-- Test Connection functionality
-- Secure storage with encryption
-- Security information and documentation links
+#### App Store Build Configuration
+- `eas.json` - EAS Build profiles
+- Updated `app.json` with:
+  - iOS/Android permissions
+  - Camera usage descriptions
+  - Face ID descriptions
+  - App Store metadata fields
 
 ## Technical Architecture
 
-### Backend Structure
+### Backend Modules
 ```
-/app/backend/
-├── server.py                      # Main FastAPI app
-├── modules/
-│   ├── __init__.py
-│   ├── trading_playground.py      # Paper trading engine
-│   ├── autonomous_bot.py          # AI bot engine
-│   ├── training_system.py         # Training/education
-│   ├── exchange_integration.py    # Binance adapter
-│   ├── social_integration.py      # Twitter/Reddit
-│   ├── additional_exchanges.py    # Coinbase/Kraken (structure)
-│   ├── ml_prediction.py           # ML prediction engine
-│   └── trading_competition.py     # Competition engine
-└── tests/
-    ├── test_p6_features.py
-    ├── test_production_features.py
-    └── test_ml_competitions.py
-```
-
-### Frontend Structure
-```
-/app/frontend/src/components/
-├── MLPredictions.jsx         # ML predictions UI
-├── TradingCompetitions.jsx   # Competition UI
-├── BenzingaNews.jsx          # News alerts UI
-├── ExchangeSettings.jsx      # Exchange API key management
-├── TradingPlayground.jsx     # Paper trading UI
-├── AutonomousBot.jsx         # AI bot management
-├── TrainingCenter.jsx        # Training UI
-└── ... (50+ components)
+/app/backend/modules/
+├── ml_training.py           # ML model training scaffold
+├── benzinga_integration.py  # Benzinga news API client
+├── ml_prediction.py         # AI price predictions
+├── trading_competition.py   # Trading competitions
+├── trading_playground.py    # Paper trading
+├── autonomous_bot.py        # AI trading bot
+├── training_system.py       # User training
+├── exchange_integration.py  # Binance adapter
+├── additional_exchanges.py  # Coinbase/Kraken adapters
+└── social_integration.py    # Social media integration
 ```
 
 ### Mobile App Structure
 ```
 /app/mobile/
-├── App.js                    # Entry point
-├── app.json                  # Expo config
-├── package.json              # Dependencies
+├── App.js                   # Entry point
+├── app.json                 # App Store config
+├── eas.json                 # EAS Build config
 ├── src/
-│   ├── components/ui/        # GlassCard, NeonButton, PriceCard
-│   ├── navigation/           # AppNavigator (tabs + stack)
-│   ├── screens/              # Dashboard, Markets, Trade, Portfolio, Settings
-│   ├── services/api.js       # API service layer
-│   └── theme.js              # Design tokens
-└── README.md
+│   ├── components/
+│   │   ├── ui/              # GlassCard, NeonButton, PriceCard
+│   │   └── QRScanner.js     # QR code scanner
+│   ├── navigation/          # AppNavigator
+│   ├── screens/             # 5 main screens
+│   └── services/
+│       ├── api.js           # API client
+│       └── BiometricService.js # Biometrics
 ```
 
-### Key API Endpoints
+## API Endpoints Summary
 
-**ML Predictions:**
-- `GET /api/ml/predict/comprehensive/{symbol}` - Full prediction
-- `GET /api/ml/predict/direction/{symbol}` - Price direction
-- `GET /api/ml/predict/volatility/{symbol}` - Volatility forecast
-- `GET /api/ml/accuracy` - Model accuracy stats
+### ML Training
+- GET `/api/ml/training/status` - Training status
+- GET `/api/ml/training/models` - List models
+- POST `/api/ml/training/train` - Train model
+- POST `/api/ml/training/predict` - Get prediction
 
-**Trading Competitions:**
-- `GET /api/competition/active` - Active competitions
-- `POST /api/competition/create/daily` - Create daily challenge
-- `POST /api/competition/create/themed?theme={theme}` - Create themed event
-- `POST /api/competition/{id}/join` - Join competition
-- `GET /api/competition/{id}/leaderboard` - Competition leaderboard
+### Benzinga News
+- GET `/api/news/benzinga` - General news
+- GET `/api/news/benzinga/crypto` - Crypto news
+- GET `/api/news/benzinga/market-movers` - High impact
+- GET `/api/news/benzinga/symbol/{symbol}` - Symbol news
+
+### ML Predictions (existing)
+- GET `/api/ml/predict/comprehensive/{symbol}`
+- GET `/api/ml/predict/direction/{symbol}`
+- GET `/api/ml/predict/volatility/{symbol}`
+- GET `/api/ml/accuracy`
+
+### Trading Competitions (existing)
+- GET `/api/competition/active`
+- POST `/api/competition/create/daily`
+- POST `/api/competition/{id}/join`
+
+## Configuration Required
+
+### API Keys (when ready)
+1. **Benzinga API** - `BENZINGA_API_KEY` for real news
+2. **Coinbase API** - Exchange credentials
+3. **Kraken API** - Exchange credentials
+4. **Binance API** - Already supported (testnet ready)
+
+### App Store Deployment
+1. **Apple Developer** - $99/year
+2. **Google Play Console** - $25 one-time
+3. Update `eas.json` with credentials
+4. Update `app.json` with Team IDs
+
+## Mocked/Placeholder Features
+- **Benzinga News** - Mock client active (API key not provided)
+- **ML Training** - Scaffold ready (needs training data)
+- **Coinbase/Kraken** - Adapters ready (keys not provided)
+- **Social Media** - Simulated (Twitter/Reddit keys pending)
 
 ## Test Coverage
-- **Backend:** 96+ pytest tests (100% pass rate)
-- **Test Reports:** `/app/test_reports/iteration_*.json`
-- **Latest:** iteration_10.json (18 tests for ML/Competitions)
+- Backend: 96+ pytest tests
+- Latest report: `/app/test_reports/iteration_10.json`
 
-## Mocked/Simulated Features
-- **Benzinga News** - Simulated until API key provided
-- **ML Predictions** - Uses simulated technical indicators
-- **Social media signals** - Simulated until API keys provided
-- **Exchange trading** - Uses testnet by default
+## Future Roadmap
 
-## Configuration Required for Production
-1. **Benzinga API** - API key for real news feeds
-2. **Twitter API** - Bearer token for real tweets
-3. **Reddit API** - Client ID/secret for real posts
-4. **Binance API** - API key/secret for real trading (HMAC recommended)
-5. **Coinbase API** - API credentials
-6. **Kraken API** - API key/private key
-
-## Future Backlog (P9+)
-
-### Priority 1
-- Mobile app push notifications
-- Mobile biometric authentication
-- Real Coinbase/Kraken exchange adapters
-
-### Priority 2
-- Real ML model training (scikit-learn/pytorch)
-- Real Twitter/Reddit API integration
-- Benzinga API integration
-
-### Priority 3
-- App Store / Play Store deployment
+### P10 - Enhancements
 - WebSocket real-time prices on mobile
-- Offline support for mobile
+- Push notifications (Expo Notifications)
+- Offline mode with local caching
+- Widget support (iOS/Android)
+
+### P11 - Advanced ML
+- TensorFlow/PyTorch model training
+- Real-time model inference
+- Custom strategy backtesting
+- Sentiment-based trading signals
+
+### P12 - Social Features
+- Real Twitter/Reddit integration
+- Social copy trading
+- Community leaderboards
+- Trading signals sharing
 
 ---
 *Last Updated: January 21, 2026*
-*Status: P8 Complete - React Native mobile app scaffolded, Binance-style Exchange Settings UI added*
+*Status: P9 Complete - QR Scanner, Biometrics, ML Training, Benzinga Integration, App Store Configs*
