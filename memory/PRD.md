@@ -214,9 +214,3 @@ In production, these would connect to real APIs (Whale Alert, CryptoPanic, Twitt
 4. Enhanced ML facial expression model using webcam
 5. Voice-activated trading commands ("Buy 100 BTC")
 6. Portfolio rebalancing suggestions
-2. Dark/Light theme toggle
-3. Browser push notifications (Service Worker)
-4. Real blockchain API integration for whale tracking (Whale Alert API)
-5. Real news API integration (CryptoPanic, NewsAPI)
-6. Real social media API (Twitter/X, Reddit)
-7. Exchange WebSocket for order book data
