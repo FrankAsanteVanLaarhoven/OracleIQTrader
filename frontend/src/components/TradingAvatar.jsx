@@ -580,6 +580,14 @@ const TradingAvatar = ({ marketData = {}, onInsight, onTradeCommand }) => {
           
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowWebcamPanel(!showWebcamPanel)}
+              className={`p-2 rounded-lg transition-colors ${showWebcamPanel ? 'bg-teal-500/20 text-teal-400' : 'bg-white/10 text-white hover:bg-white/20'}`}
+              data-testid="avatar-webcam-btn"
+              title="Face Mirror Mode"
+            >
+              <Camera size={16} />
+            </button>
+            <button
               onClick={() => setIsMuted(!isMuted)}
               className={`p-2 rounded-lg transition-colors ${isMuted ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-white hover:bg-white/20'}`}
               data-testid="avatar-mute-btn"
