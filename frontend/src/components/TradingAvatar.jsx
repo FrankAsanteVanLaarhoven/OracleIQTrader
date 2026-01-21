@@ -444,18 +444,61 @@ const TradingAvatar = ({ marketData = {}, onInsight }) => {
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
+    recognition.lang = 'en-US';
     
-    recognition.onstart = () => setIsListening(true);
+    recognition.onstart = () => {
+      setIsListening(true);
+      setMessage('Listening... Say a command like "Buy 1 BTC"');
+    };
     recognition.onend = () => setIsListening(false);
     
-    recognition.onresult = (event) => {
+    recognition.onresult = async (event) => {
       const transcript = event.results[0][0].transcript;
-      setMessage(`You said: "${transcript}"`);
-      generateInsight();
+      setMessage(`Processing: "${transcript}"`);
+      
+      // Send to voice command API
+      try {
+        const response = await fetch(`${API}/voice/command`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript, context: marketData })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setMessage(data.response);
+          
+          // Play audio response
+          if (data.audio && !isMuted && audioRef.current) {
+            audioRef.current.src = `data:audio/mp3;base64,${data.audio}`;
+            setIsSpeaking(true);
+            audioRef.current.play().catch(console.error);
+            audioRef.current.onended = () => setIsSpeaking(false);
+          }
+          
+          // Handle action
+          if (data.action_data && onTradeCommand) {
+            onTradeCommand(data.action_data);
+          }
+        }
+      } catch (error) {
+        console.error('Voice command error:', error);
+        setMessage('Sorry, I had trouble processing that command.');
+      }
+    };
+    
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+      if (event.error === 'no-speech') {
+        setMessage("I didn't hear anything. Try again!");
+      } else {
+        setMessage('Voice recognition error. Please try again.');
+      }
     };
     
     recognition.start();
-  }, [isListening, generateInsight]);
+  }, [isListening, marketData, isMuted, onTradeCommand]);
   
   const emotionIcons = {
     excited: <TrendingUp className="text-emerald-400" size={16} />,
