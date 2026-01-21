@@ -201,6 +201,7 @@ const SocialSignals = () => {
           </GlassCard>
         </div>
       </div>
+      )}
 
       {/* Symbol Sentiment Detail */}
       {symbolSentiment && (
