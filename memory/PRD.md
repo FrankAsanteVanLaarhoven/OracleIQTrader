@@ -33,7 +33,7 @@ Build a state-of-the-art Cognitive Oracle Trading Platform - an enterprise-level
 - [x] Google OAuth Authentication
 - [x] CoinGecko Real Market Data
 
-### P2 - Advanced (Complete - Jan 21, 2025)
+### P2 - Advanced (Complete)
 - [x] **Social/Copy Trading** - eToro-style top traders (CryptoWhale, TechBull, QuantMaster, SteadyEddie)
 - [x] **Advanced Candlestick Charts** - RSI indicator, SMA7/SMA21 moving averages, timeframe selectors
 - [x] **Portfolio Analytics** - Performance charts, allocation pie chart, position tracking
@@ -57,6 +57,12 @@ Build a state-of-the-art Cognitive Oracle Trading Platform - an enterprise-level
 - PaperTradingPanel ($100k virtual)
 - AgentConsensus, OracleMemory, VoicePanel
 - GestureRecognition, StatusBar, ControlPanel
+- **P3 Components:**
+  - PriceAlerts (alert management)
+  - AdvancedOrders (limit, stop-loss orders)
+  - NewsFeed (live market news)
+  - AutoTrading (automated strategies)
+  - UserWallet (holdings, send/receive)
 
 ## Backend Endpoints
 - Market: `/api/market/prices`, `/api/market/{symbol}`, `/api/market/{symbol}/history`
