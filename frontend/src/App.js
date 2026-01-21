@@ -212,7 +212,7 @@ const Dashboard = () => {
                         }`}
                       >
                         <tab.icon size={18} />
-                        {tab.label}
+                        {tab.labelKey ? t(tab.labelKey) : tab.label}
                       </button>
                     ))}
                   </div>
