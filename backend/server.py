@@ -2901,6 +2901,10 @@ async def startup_event():
     # Start trade crawler background task
     asyncio.create_task(trade_crawler_task())
     logger.info("Trade crawler started")
+    
+    # Load social media credentials
+    await social_manager.load_credentials()
+    logger.info("Social manager initialized")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
