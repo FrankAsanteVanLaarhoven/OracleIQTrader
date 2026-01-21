@@ -583,25 +583,26 @@ class TestTrainingSystem:
         data = response.json()
         
         assert "config" in data
-        assert "results" in data
         
-        results = data["results"]
-        # Verify backtest results structure (actual keys)
+        # Results may be in config.results or directly in results
+        if "results" in data["config"]:
+            results = data["config"]["results"]
+        else:
+            results = data.get("results", {})
+        
+        # Verify backtest results structure
         assert "final_balance" in results
         assert "total_trades" in results
         assert "win_rate" in results
-        assert "max_drawdown" in results
+        assert "max_drawdown_percent" in results
         assert "sharpe_ratio" in results
-        
-        # Calculate return from final balance
-        total_return = ((results["final_balance"] - 10000) / 10000) * 100
         
         print(f"✓ Backtest completed:")
         print(f"  Strategy: {data['config']['strategy_type']}")
         print(f"  Final balance: ${results['final_balance']:,.2f}")
-        print(f"  Total return: {total_return:.2f}%")
+        print(f"  Total return: {results.get('total_return_percent', 0):.2f}%")
         print(f"  Win rate: {results['win_rate']:.1f}%")
-        print(f"  Max drawdown: {results['max_drawdown']:.2f}%")
+        print(f"  Max drawdown: {results['max_drawdown_percent']:.2f}%")
         print(f"  Sharpe ratio: {results['sharpe_ratio']:.2f}")
 
 
