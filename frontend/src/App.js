@@ -353,6 +353,90 @@ const Dashboard = () => {
                   <ExportPanel />
                 </motion.div>
               )}
+
+              {/* Trading Avatar */}
+              {activeTab === 'avatar' && (
+                <motion.div key="avatar" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-3xl mx-auto">
+                  <div className="mb-6">
+                    <h2 className="font-heading text-xl md:text-2xl font-bold text-white flex items-center gap-3">
+                      <User className="text-teal-400" />AI Trading Avatar
+                    </h2>
+                    <p className="text-slate-500 text-sm font-mono mt-1">Interactive voice assistant with real-time market insights</p>
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="aspect-square max-h-[400px]">
+                      <TradingAvatar marketData={{ btc_change: marketPrices.BTC?.change || 0 }} />
+                    </div>
+                    <div className="space-y-4">
+                      <GlassCard title="Avatar Features" icon="🤖" accent="teal">
+                        <ul className="space-y-2 text-sm text-slate-400">
+                          <li className="flex items-center gap-2">✓ 68-point facial mesh overlay</li>
+                          <li className="flex items-center gap-2">✓ Real-time emotional expressions</li>
+                          <li className="flex items-center gap-2">✓ Voice synthesis (OpenAI TTS)</li>
+                          <li className="flex items-center gap-2">✓ Market-responsive mood</li>
+                          <li className="flex items-center gap-2">✓ Voice command recognition</li>
+                        </ul>
+                      </GlassCard>
+                      <GlassCard title="Current Market Context" icon="📊" accent="blue">
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div className="p-2 rounded-lg bg-white/5">
+                            <p className="text-slate-500 text-xs">BTC Change</p>
+                            <p className={`font-mono ${(marketPrices.BTC?.change || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                              {(marketPrices.BTC?.change || 0).toFixed(2)}%
+                            </p>
+                          </div>
+                          <div className="p-2 rounded-lg bg-white/5">
+                            <p className="text-slate-500 text-xs">ETH Change</p>
+                            <p className={`font-mono ${(marketPrices.ETH?.change || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                              {(marketPrices.ETH?.change || 0).toFixed(2)}%
+                            </p>
+                          </div>
+                        </div>
+                      </GlassCard>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Settings */}
+              {activeTab === 'settings' && (
+                <motion.div key="settings" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
+                  <div className="mb-6">
+                    <h2 className="font-heading text-xl md:text-2xl font-bold text-white flex items-center gap-3">
+                      <Settings className="text-slate-400" />{t('common.settings')}
+                    </h2>
+                    <p className="text-slate-500 text-sm font-mono mt-1">Configure your trading experience</p>
+                  </div>
+                  <div className="space-y-6">
+                    {/* Theme Settings */}
+                    <GlassCard title="Appearance" icon="🎨" accent="purple">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                        <div>
+                          <p className="text-sm text-white">Theme</p>
+                          <p className="text-xs text-slate-500">Choose your preferred color scheme</p>
+                        </div>
+                        <ThemeToggle />
+                      </div>
+                    </GlassCard>
+                    
+                    {/* Notification Settings */}
+                    <GlassCard title="Notifications" icon="🔔" accent="amber">
+                      <NotificationManager />
+                    </GlassCard>
+                    
+                    {/* Language Settings */}
+                    <GlassCard title="Language" icon="🌍" accent="blue">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                        <div>
+                          <p className="text-sm text-white">Display Language</p>
+                          <p className="text-xs text-slate-500">Select your preferred language</p>
+                        </div>
+                        <LanguageSelector />
+                      </div>
+                    </GlassCard>
+                  </div>
+                </motion.div>
+              )}
             </AnimatePresence>
           </main>
 
