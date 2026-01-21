@@ -1,5 +1,5 @@
-// Settings Screen - API Keys & Preferences (Binance-style UI)
-import React, { useState } from 'react';
+// Settings Screen - API Keys & Preferences (Binance-style UI with QR Scanner + Biometrics)
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -9,12 +9,15 @@ import {
   Switch,
   Alert,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as SecureStore from 'expo-secure-store';
 import { GlassCard, NeonButton } from '../components/ui';
+import QRScanner from '../components/QRScanner';
+import BiometricService from '../services/BiometricService';
 import { colors, spacing, fontSize, borderRadius } from '../theme';
 
 const SettingsScreen = ({ navigation }) => {
@@ -31,13 +34,117 @@ const SettingsScreen = ({ navigation }) => {
   // Settings
   const [useTestnet, setUseTestnet] = useState(true);
   const [notifications, setNotifications] = useState(true);
-  const [biometrics, setBiometrics] = useState(false);
+  const [biometricsEnabled, setBiometricsEnabled] = useState(false);
+  const [biometricsAvailable, setBiometricsAvailable] = useState(false);
+  const [biometricTypes, setBiometricTypes] = useState([]);
   const [showSecrets, setShowSecrets] = useState(false);
+  
+  // QR Scanner
+  const [scannerVisible, setScannerVisible] = useState(false);
+  const [scanningExchange, setScanningExchange] = useState('Binance');
   
   // Save states
   const [saving, setSaving] = useState({});
 
+  useEffect(() => {
+    checkBiometrics();
+    loadSavedKeys();
+  }, []);
+
+  const checkBiometrics = async () => {
+    const available = await BiometricService.isAvailable();
+    setBiometricsAvailable(available);
+    
+    if (available) {
+      const types = await BiometricService.getBiometricTypes();
+      setBiometricTypes(types);
+      const enabled = await BiometricService.isEnabled();
+      setBiometricsEnabled(enabled);
+    }
+  };
+
+  const loadSavedKeys = async () => {
+    try {
+      const binanceKey = await SecureStore.getItemAsync('binance_api_key');
+      const binanceSecret = await SecureStore.getItemAsync('binance_secret_key');
+      if (binanceKey) setBinanceApiKey(binanceKey);
+      if (binanceSecret) setBinanceSecretKey(binanceSecret);
+      
+      const coinbaseKey = await SecureStore.getItemAsync('coinbase_api_key');
+      const coinbaseSecret = await SecureStore.getItemAsync('coinbase_secret_key');
+      if (coinbaseKey) setCoinbaseApiKey(coinbaseKey);
+      if (coinbaseSecret) setCoinbaseSecretKey(coinbaseSecret);
+      
+      const krakenKey = await SecureStore.getItemAsync('kraken_api_key');
+      const krakenSecret = await SecureStore.getItemAsync('kraken_secret_key');
+      if (krakenKey) setKrakenApiKey(krakenKey);
+      if (krakenSecret) setKrakenSecretKey(krakenSecret);
+    } catch (error) {
+      console.error('Failed to load keys:', error);
+    }
+  };
+
+  const handleBiometricToggle = async (value) => {
+    if (value) {
+      const result = await BiometricService.enable();
+      if (result.success) {
+        setBiometricsEnabled(true);
+        Alert.alert('Success', 'Biometric login enabled');
+      } else {
+        Alert.alert('Failed', result.error || 'Could not enable biometrics');
+      }
+    } else {
+      const result = await BiometricService.disable();
+      if (result.success) {
+        setBiometricsEnabled(false);
+      }
+    }
+  };
+
+  const openQRScanner = async (exchange) => {
+    // Require biometric auth if enabled
+    if (biometricsEnabled) {
+      const authResult = await BiometricService.authenticateForSensitiveOperation('scan API keys');
+      if (!authResult.success) {
+        Alert.alert('Authentication Required', authResult.error);
+        return;
+      }
+    }
+    setScanningExchange(exchange);
+    setScannerVisible(true);
+  };
+
+  const handleQRScan = (data) => {
+    const { apiKey, secretKey, exchange } = data;
+    
+    switch (exchange.toLowerCase()) {
+      case 'binance':
+        setBinanceApiKey(apiKey);
+        setBinanceSecretKey(secretKey);
+        break;
+      case 'coinbase':
+        setCoinbaseApiKey(apiKey);
+        setCoinbaseSecretKey(secretKey);
+        break;
+      case 'kraken':
+        setKrakenApiKey(apiKey);
+        setKrakenSecretKey(secretKey);
+        break;
+    }
+    
+    Alert.alert('Success', `${exchange} API keys imported successfully!`);
+  };
+
   const saveApiKey = async (exchange, apiKey, secretKey) => {
+    // Require biometric auth if enabled
+    if (biometricsEnabled) {
+      const authResult = await BiometricService.authenticateForSensitiveOperation('save API keys');
+      if (!authResult.success) {
+        Alert.alert('Authentication Required', authResult.error);
+        return;
+      }
+    }
+    
     setSaving(prev => ({ ...prev, [exchange]: true }));
     try {
       await SecureStore.setItemAsync(`${exchange}_api_key`, apiKey);
@@ -56,6 +163,17 @@ const SettingsScreen = ({ navigation }) => {
       `Testing ${exchange} connection...\n\nNote: Using ${useTestnet ? 'TESTNET' : 'MAINNET'} mode`,
       [{ text: 'OK' }]
     );
+  };
+
+  const toggleShowSecrets = async () => {
+    if (!showSecrets && biometricsEnabled) {
+      const authResult = await BiometricService.authenticateForSensitiveOperation('view secret keys');
+      if (!authResult.success) {
+        Alert.alert('Authentication Required', authResult.error);
+        return;
+      }
+    }
+    setShowSecrets(!showSecrets);
   };
 
   const ExchangeCard = ({ 
@@ -82,12 +200,9 @@ const SettingsScreen = ({ navigation }) => {
         </View>
         <View style={[
           styles.statusIndicator,
-          { backgroundColor: apiKey ? `${colors.success}20` : `${colors.textMuted}20` }
+          { backgroundColor: `${color}20` }
         ]}>
-          <Text style={[
-            styles.statusText,
-            { color: apiKey ? colors.success : colors.textMuted }
-          ]}>
+          <Text style={[styles.statusText, { color }]}>
             {useTestnet ? 'TESTNET' : 'MAINNET'}
           </Text>
         </View>
@@ -105,12 +220,6 @@ const SettingsScreen = ({ navigation }) => {
             autoCapitalize="none"
             autoCorrect={false}
           />
-          <TouchableOpacity 
-            style={styles.inputIcon}
-            onPress={() => setApiKey('')}
-          >
-            <Ionicons name="close-circle" size={18} color={colors.textMuted} />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -129,7 +238,7 @@ const SettingsScreen = ({ navigation }) => {
           />
           <TouchableOpacity 
             style={styles.inputIcon}
-            onPress={() => setShowSecrets(!showSecrets)}
+            onPress={toggleShowSecrets}
           >
             <Ionicons 
               name={showSecrets ? 'eye-off' : 'eye'} 
@@ -141,6 +250,14 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.exchangeActions}>
+        <NeonButton
+          variant="purple"
+          size="sm"
+          onPress={() => openQRScanner(name)}
+          style={styles.actionBtn}
+        >
+          <Ionicons name="qr-code" size={14} color="#fff" /> Scan QR
+        </NeonButton>
         <NeonButton
           variant="white"
           size="sm"
@@ -178,13 +295,46 @@ const SettingsScreen = ({ navigation }) => {
           <Text style={styles.title}>Settings</Text>
         </View>
 
+        {/* Security Settings */}
+        <Text style={styles.sectionTitle}>Security</Text>
+        
+        <GlassCard style={styles.section}>
+          {/* Biometric Auth */}
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <View style={styles.settingTitleRow}>
+                <Ionicons 
+                  name={Platform.OS === 'ios' ? 'scan' : 'finger-print'} 
+                  size={20} 
+                  color={colors.primary} 
+                />
+                <Text style={styles.settingTitle}>
+                  {biometricTypes.join(' / ') || 'Biometric Login'}
+                </Text>
+              </View>
+              <Text style={styles.settingDesc}>
+                {biometricsAvailable 
+                  ? 'Require biometrics for sensitive actions' 
+                  : 'Not available on this device'}
+              </Text>
+            </View>
+            <Switch
+              value={biometricsEnabled}
+              onValueChange={handleBiometricToggle}
+              disabled={!biometricsAvailable}
+              trackColor={{ false: colors.textMuted, true: colors.primary }}
+              thumbColor={biometricsEnabled ? colors.text : colors.textSecondary}
+            />
+          </View>
+        </GlassCard>
+
         {/* Network Mode */}
         <GlassCard title="Network Mode" icon="🌐" accent="amber" style={styles.section}>
           <View style={styles.settingRow}>
             <View style={styles.settingInfo}>
               <Text style={styles.settingTitle}>Use Testnet</Text>
               <Text style={styles.settingDesc}>
-                Trade with test funds (recommended for testing)
+                Trade with test funds (recommended)
               </Text>
             </View>
             <Switch
@@ -199,7 +349,7 @@ const SettingsScreen = ({ navigation }) => {
             <View style={styles.warningBox}>
               <Ionicons name="warning" size={20} color={colors.warning} />
               <Text style={styles.warningText}>
-                Mainnet mode uses real funds. Trade at your own risk.
+                Mainnet uses real funds. Trade at your own risk.
               </Text>
             </View>
           )}
@@ -242,7 +392,7 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={styles.sectionTitle}>App Settings</Text>
         
         <GlassCard style={styles.section}>
-          <View style={styles.settingRow}>
+          <View style={[styles.settingRow, { borderBottomWidth: 0 }]}>
             <View style={styles.settingInfo}>
               <Text style={styles.settingTitle}>Push Notifications</Text>
               <Text style={styles.settingDesc}>Price alerts and trade updates</Text>
@@ -254,32 +404,27 @@ const SettingsScreen = ({ navigation }) => {
               thumbColor={notifications ? colors.text : colors.textSecondary}
             />
           </View>
-
-          <View style={[styles.settingRow, { borderBottomWidth: 0 }]}>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingTitle}>Biometric Login</Text>
-              <Text style={styles.settingDesc}>Use Face ID or fingerprint</Text>
-            </View>
-            <Switch
-              value={biometrics}
-              onValueChange={setBiometrics}
-              trackColor={{ false: colors.textMuted, true: colors.primary }}
-              thumbColor={biometrics ? colors.text : colors.textSecondary}
-            />
-          </View>
         </GlassCard>
 
         {/* Info Box */}
         <View style={styles.infoBox}>
           <Ionicons name="shield-checkmark" size={20} color={colors.primary} />
           <Text style={styles.infoText}>
-            Your API keys are stored securely using device encryption. 
-            We never transmit or store your keys on external servers.
+            Your API keys are encrypted using device-level security. 
+            {biometricsEnabled && ' Biometric authentication protects all sensitive operations.'}
           </Text>
         </View>
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* QR Scanner Modal */}
+      <QRScanner
+        visible={scannerVisible}
+        onClose={() => setScannerVisible(false)}
+        onScan={handleQRScan}
+        exchange={scanningExchange}
+      />
     </View>
   );
 };
@@ -398,6 +543,11 @@ const styles = StyleSheet.create({
   settingInfo: {
     flex: 1,
     marginRight: spacing.md,
+  },
+  settingTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   settingTitle: {
     color: colors.text,
