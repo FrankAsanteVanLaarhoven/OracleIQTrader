@@ -48,6 +48,7 @@ import TrainingCenter from './components/TrainingCenter';
 import MLPredictions from './components/MLPredictions';
 import TradingCompetitions from './components/TradingCompetitions';
 import BenzingaNews from './components/BenzingaNews';
+import ExchangeSettings from './components/ExchangeSettings';
 import axios from 'axios';
 
 // Icons
