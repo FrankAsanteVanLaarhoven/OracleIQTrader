@@ -489,3 +489,81 @@ class KrakenAdapter(ExchangeAdapter):
             })
         
         return trades
+
+
+# ============ EXCHANGE FACTORY FUNCTIONS ============
+
+import os
+
+def get_binance_adapter():
+    """Create Binance adapter from environment variables"""
+    from .exchange_integration import BinanceAdapter
+    
+    api_key = os.environ.get("BINANCE_API_KEY")
+    secret_key = os.environ.get("BINANCE_SECRET_KEY")
+    testnet = os.environ.get("BINANCE_TESTNET", "true").lower() == "true"
+    
+    if not api_key or not secret_key:
+        logger.warning("Binance API keys not configured")
+        return None
+    
+    return BinanceAdapter(api_key, secret_key, testnet)
+
+
+def get_coinbase_adapter():
+    """Create Coinbase adapter from environment variables"""
+    api_key = os.environ.get("COINBASE_API_KEY")
+    secret_key = os.environ.get("COINBASE_SECRET_KEY")
+    passphrase = os.environ.get("COINBASE_PASSPHRASE", "")
+    testnet = os.environ.get("COINBASE_TESTNET", "true").lower() == "true"
+    
+    if not api_key or not secret_key:
+        logger.warning("Coinbase API keys not configured")
+        return None
+    
+    return CoinbaseProAdapter(api_key, secret_key, passphrase, testnet)
+
+
+def get_kraken_adapter():
+    """Create Kraken adapter from environment variables"""
+    api_key = os.environ.get("KRAKEN_API_KEY")
+    private_key = os.environ.get("KRAKEN_PRIVATE_KEY")
+    testnet = os.environ.get("KRAKEN_TESTNET", "true").lower() == "true"
+    
+    if not api_key or not private_key:
+        logger.warning("Kraken API keys not configured")
+        return None
+    
+    return KrakenAdapter(api_key, private_key, testnet)
+
+
+def get_exchange_adapter(exchange: str):
+    """Factory function to get exchange adapter by name"""
+    exchange = exchange.lower()
+    
+    if exchange == "binance":
+        return get_binance_adapter()
+    elif exchange == "coinbase":
+        return get_coinbase_adapter()
+    elif exchange == "kraken":
+        return get_kraken_adapter()
+    else:
+        raise ValueError(f"Unsupported exchange: {exchange}")
+
+
+def get_exchange_status():
+    """Get status of all configured exchanges"""
+    return {
+        "binance": {
+            "configured": bool(os.environ.get("BINANCE_API_KEY")),
+            "testnet": os.environ.get("BINANCE_TESTNET", "true").lower() == "true"
+        },
+        "coinbase": {
+            "configured": bool(os.environ.get("COINBASE_API_KEY")),
+            "testnet": os.environ.get("COINBASE_TESTNET", "true").lower() == "true"
+        },
+        "kraken": {
+            "configured": bool(os.environ.get("KRAKEN_API_KEY")),
+            "testnet": os.environ.get("KRAKEN_TESTNET", "true").lower() == "true"
+        }
+    }
