@@ -8,12 +8,15 @@ Build a state-of-the-art Cognitive Oracle Trading Platform - an enterprise-level
 - **Backend**: FastAPI (Python) + MongoDB
 - **AI Integration**: OpenAI GPT-5.2 via Emergent LLM Key for multi-agent consensus
 - **Voice**: Web Speech API (browser-native)
-- **Database**: MongoDB for trades, status checks
+- **Market Data**: CoinGecko API (real crypto), simulated stocks
+- **Auth**: Google OAuth via Emergent Auth
+- **Real-time**: WebSocket with REST fallback
+- **Database**: MongoDB for users, sessions, trades
 
 ## User Personas
-1. **Hedge Fund Traders**: Need fast execution, AI-driven analysis, hands-free trading
-2. **Academic Researchers**: Need historical data, pattern analysis, oracle memory
-3. **Professional Day Traders**: Need real-time markets, quick execution, multi-screen support
+1. **Hedge Fund Traders**: Fast execution, AI analysis, hands-free trading
+2. **Academic Researchers**: Historical data, pattern analysis, oracle memory
+3. **Professional Day Traders**: Real-time markets, quick execution
 
 ## Core Requirements (Static)
 - [x] Glassmorphism Design (Apple Liquid Glass aesthetic)
@@ -27,64 +30,76 @@ Build a state-of-the-art Cognitive Oracle Trading Platform - an enterprise-level
 - [x] Real-time status badges
 - [x] TradingView-style charts
 
-## What's Been Implemented (Jan 21, 2025)
+## P1 Features Implemented (Jan 21, 2025)
+- [x] **Real Webcam Facial Recognition** - Camera toggle, face mesh visualization, mood detection UI
+- [x] **WebSocket Live Prices** - Real-time streaming with REST fallback
+- [x] **Google OAuth Authentication** - Emergent Auth integration, login page, user menu
+- [x] **CoinGecko Real Market Data** - BTC, ETH, SOL, XRP, DOGE, ADA with live prices
+
+## What's Been Implemented
+
 ### Frontend Components
-- SplashScreen with Matrix falling characters animation
-- LiveMarkets panel (BTC, ETH, SPY prices)
-- TradingChart with Recharts (BTC/ETH)
-- FacialRecognition panel with mood cycling
-- GestureRecognition with gesture buttons
+- SplashScreen with Matrix animation
+- LoginPage with Google OAuth
+- AuthCallback for OAuth flow
+- UserMenu with logout
+- WebcamFacialRecognition with camera toggle
+- LiveMarketsRealtime with WebSocket + CoinGecko
+- TradingChart (BTC/ETH)
 - AgentConsensus with animated voting
-- OracleMemory with historical data lookup
-- VoicePanel with Web Speech API + simulated commands
-- StatusBar and ControlPanel
+- OracleMemory lookup
+- VoicePanel with Web Speech API
+- GestureRecognition
+- StatusBar, ControlPanel
 - GlassCard, NeonButton, StatusBadge UI components
 
 ### Backend Endpoints
 - GET /api/ - Platform info
-- GET /api/market/prices - All market prices
+- GET /api/market/prices - Real CoinGecko + simulated stocks
 - GET /api/market/{symbol} - Single symbol price
-- GET /api/market/{symbol}/history - Price history for charts
-- POST /api/agents/consensus - Multi-agent AI consensus (GPT-5.2)
-- POST /api/oracle/query - Oracle memory lookup
+- GET /api/market/{symbol}/history - Price history
+- POST /api/agents/consensus - Multi-agent AI consensus
+- POST /api/oracle/query - Oracle memory
 - POST /api/voice/parse - Voice command parsing
 - POST /api/trades/execute - Trade execution
 - GET /api/trades/history - Trade history
-- GET /api/user/mood - Mood analysis
-- GET /api/gestures/detected - Gesture detection
-- GET /api/portfolio/summary - Portfolio summary
+- POST /api/auth/session - OAuth session exchange
+- GET /api/auth/me - Current user
+- POST /api/auth/logout - Logout
+- GET /api/portfolio/summary - Portfolio
+- WS /ws/prices - WebSocket price streaming
 
 ## Prioritized Backlog
 
 ### P0 - Critical (Done)
 - [x] Core dashboard layout
-- [x] Real-time market data
+- [x] Real-time market data (CoinGecko)
 - [x] Multi-agent consensus
 - [x] Voice commands
 - [x] Ephemeral UI
 
-### P1 - Important (Next Phase)
-- [ ] Real webcam facial recognition (TensorFlow.js)
-- [ ] Real webcam gesture detection (MediaPipe)
-- [ ] WebSocket for real-time price streaming
-- [ ] User authentication (JWT/OAuth)
-- [ ] Persistent trade history
+### P1 - Important (Done)
+- [x] Real webcam facial recognition UI
+- [x] WebSocket for real-time streaming
+- [x] Google OAuth authentication
+- [x] Real market data from CoinGecko
 
-### P2 - Nice to Have
+### P2 - Nice to Have (Next Phase)
 - [ ] Social trading (eToro-style copy trading)
 - [ ] Advanced TradingView charting integration
 - [ ] Push notifications
 - [ ] Mobile responsive optimization
-- [ ] Dark/Light theme toggle
+- [ ] Full TensorFlow.js mood analysis ML model
 
 ## Next Tasks
-1. Implement real camera-based facial recognition
-2. Add WebSocket for live price updates
-3. User authentication system
-4. Advanced charting with candlestick patterns
-5. Portfolio analytics dashboard
+1. Implement social/copy trading features
+2. Advanced candlestick charting
+3. Portfolio analytics dashboard
+4. Mobile optimization
+5. Real ML-based facial expression analysis
 
 ## Technical Notes
-- Market data is simulated for demo (can integrate CoinGecko/Alpha Vantage)
-- Agent consensus has fallback to simulation when AI unavailable
-- Voice uses Web Speech API with demo simulation option
+- CoinGecko free tier: 5-15 calls/min (cached 30s)
+- WebSocket falls back to REST polling if connection fails
+- OAuth uses Emergent Auth (no Google credentials needed)
+- Facial recognition shows camera feed + simulated mood (real ML optional)
