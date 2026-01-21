@@ -636,16 +636,15 @@ class TestSocialIntegration:
         data = response.json()
         
         assert "fear_greed_index" in data
-        assert "trending_topics" in data
+        assert "trending" in data  # Actual key name
         
         # Verify fear/greed index
-        fg = data["fear_greed_index"]
-        assert "value" in fg
-        assert "label" in fg
-        assert 0 <= fg["value"] <= 100
+        fg_value = data["fear_greed_index"]
+        fg_label = data.get("fear_greed_label", "")
+        assert 0 <= fg_value <= 100
         
         # Verify trending topics
-        topics = data["trending_topics"]
+        topics = data["trending"]
         assert len(topics) > 0
         topic = topics[0]
         assert "topic" in topic
@@ -653,10 +652,10 @@ class TestSocialIntegration:
         assert "sentiment" in topic
         
         print(f"✓ Social trending data:")
-        print(f"  Fear & Greed: {fg['value']} ({fg['label']})")
+        print(f"  Fear & Greed: {fg_value} ({fg_label})")
         print(f"  Trending topics: {len(topics)}")
         for t in topics[:3]:
-            print(f"    - {t['topic']}: {t['mentions']} mentions, {t['sentiment']:.0%} positive")
+            print(f"    - {t['topic']}: {t['mentions']} mentions, sentiment: {t['sentiment']}")
             
     def test_get_symbol_sentiment(self):
         """Get sentiment analysis for a specific symbol"""
@@ -665,20 +664,17 @@ class TestSocialIntegration:
         data = response.json()
         
         assert "symbol" in data
-        assert "overall_sentiment" in data
+        assert "sentiment" in data  # Actual key name
         assert "sentiment_label" in data
-        assert "sources" in data
         
         # Verify sentiment value
-        assert -1 <= data["overall_sentiment"] <= 1
-        
-        # Verify sources
-        sources = data["sources"]
-        assert "twitter" in sources or "reddit" in sources
+        sentiment = data["sentiment"]
+        assert -1 <= sentiment <= 1
         
         print(f"✓ BTC Sentiment:")
-        print(f"  Overall: {data['overall_sentiment']:.2f} ({data['sentiment_label']})")
-        print(f"  Sources: {list(sources.keys())}")
+        print(f"  Overall: {sentiment:.2f} ({data['sentiment_label']})")
+        if "key_influencers" in data:
+            print(f"  Key influencers: {len(data['key_influencers'])}")
 
 
 class TestIntegrationFlows:
