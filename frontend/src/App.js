@@ -39,13 +39,17 @@ import ExportPanel from './components/ExportPanel';
 import TradingAvatar from './components/TradingAvatar';
 import ThemeToggle from './components/ThemeToggle';
 import NotificationManager from './components/NotificationManager';
+import TradingJournal from './components/TradingJournal';
+import PortfolioLeaderboard from './components/PortfolioLeaderboard';
+import SocialSignals from './components/SocialSignals';
 import axios from 'axios';
 
 // Icons
 import { 
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
-  Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings
+  Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings,
+  BookOpen, Trophy, MessageCircle
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -55,15 +59,15 @@ const NAV_TABS = [
   { id: 'dashboard', label: 'Trading', icon: LayoutDashboard, labelKey: 'nav.trading' },
   { id: 'avatar', label: 'Avatar', icon: User, labelKey: 'Avatar' },
   { id: 'crawler', label: 'Signals', icon: Radar, labelKey: 'crawler.title' },
+  { id: 'journal', label: 'Journal', icon: BookOpen, labelKey: 'Journal' },
+  { id: 'leaderboard', label: 'Leaders', icon: Trophy, labelKey: 'Leaderboard' },
+  { id: 'sentiment', label: 'Sentiment', icon: MessageCircle, labelKey: 'Sentiment' },
   { id: 'orders', label: 'Orders', icon: Layers, labelKey: 'nav.orders' },
   { id: 'alerts', label: 'Alerts', icon: Bell, labelKey: 'nav.alerts' },
-  { id: 'auto', label: 'Auto', icon: Bot, labelKey: 'nav.auto' },
   { id: 'news', label: 'News', icon: Newspaper, labelKey: 'nav.news' },
-  { id: 'social', label: 'Social', icon: Users, labelKey: 'nav.social' },
   { id: 'portfolio', label: 'Portfolio', icon: PieChart, labelKey: 'nav.portfolio' },
   { id: 'wallet', label: 'Wallet', icon: Wallet, labelKey: 'nav.wallet' },
   { id: 'paper', label: 'Paper', icon: Banknote, labelKey: 'nav.paper' },
-  { id: 'export', label: 'Export', icon: Download, labelKey: 'common.export' },
   { id: 'settings', label: 'Settings', icon: Settings, labelKey: 'common.settings' },
 ];
 
