@@ -320,7 +320,7 @@ const PortfolioLeaderboard = () => {
                   <span className="font-semibold text-teal-400">Copy Trading</span>
                 </div>
                 <p className="text-sm text-slate-400 mb-3">
-                  Automatically copy this trader's positions proportionally to your portfolio size.
+                  Automatically copy this trader&apos;s positions proportionally to your portfolio size.
                 </p>
                 <NeonButton variant="teal" className="w-full">
                   Enable Copy Trading

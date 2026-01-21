@@ -192,7 +192,7 @@ const SocialSignals = () => {
                   {/* Sample tweets */}
                   <div className="mt-2 space-y-1">
                     {topic.sample_tweets?.slice(0, 1).map((tweet, j) => (
-                      <p key={j} className="text-xs text-slate-400 truncate">"{tweet}"</p>
+                      <p key={j} className="text-xs text-slate-400 truncate">&quot;{tweet}&quot;</p>
                     ))}
                   </div>
                 </motion.div>
