@@ -226,6 +226,7 @@ const PortfolioLeaderboard = () => {
           </table>
         </div>
       </div>
+      )}
 
       {/* Portfolio Detail Modal */}
       <AnimatePresence>
