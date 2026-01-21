@@ -441,6 +441,27 @@ const Dashboard = () => {
                   </div>
                 </motion.div>
               )}
+
+              {/* Trading Journal */}
+              {activeTab === 'journal' && (
+                <motion.div key="journal" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-4xl mx-auto">
+                  <TradingJournal />
+                </motion.div>
+              )}
+
+              {/* Portfolio Leaderboard */}
+              {activeTab === 'leaderboard' && (
+                <motion.div key="leaderboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
+                  <PortfolioLeaderboard />
+                </motion.div>
+              )}
+
+              {/* Social Sentiment */}
+              {activeTab === 'sentiment' && (
+                <motion.div key="sentiment" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
+                  <SocialSignals />
+                </motion.div>
+              )}
             </AnimatePresence>
           </main>
 
