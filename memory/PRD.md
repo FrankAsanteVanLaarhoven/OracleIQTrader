@@ -202,10 +202,28 @@ Build a state-of-the-art Cognitive Oracle Trading Platform - an enterprise-level
 
 ## Mocked Features Note
 The following features use **SIMULATED/MOCKED** data for demo purposes:
-- Crawler data (whale, news, social, orderbook) - simulated signals
-- Avatar trading insights - predefined message templates
-- Facial mesh - generated landmarks (not real webcam tracking)
-In production, these would connect to real APIs (Whale Alert, CryptoPanic, Twitter, etc.)
+- Social signals (Twitter/Reddit) - simulated, no API keys
+- Avatar trading insights - predefined message templates (TTS audio is real)
+- CryptoPanic news has simulated fallback if API unavailable
+
+## Real API Integrations (P5 Enhanced)
+- **Whale Transactions**: blockchain.info API - Real BTC transactions >10 BTC
+- **Crypto News**: CryptoPanic API (free tier) with simulated fallback
+- **Voice Synthesis**: OpenAI TTS via Emergent LLM Key
+
+## P5 Enhanced API Endpoints
+- Voice: `POST /api/voice/command` - Process voice commands (buy/sell/check/alert)
+- Trade: `POST /api/avatar/announce-trade` - Generate trade announcements with TTS
+- Real Data: `GET /api/real/whale-transactions`, `GET /api/real/crypto-news`
+
+## Testing Results (P5 Enhanced - Jan 21, 2026)
+- **Backend**: 100% (27/27 API tests passed)
+- **Frontend**: 100% (all enhanced features working)
+- **Overall**: 100% success rate
+- Voice commands parsed correctly (buy/sell/check/alert)
+- Trade announcements generate correct emotions
+- Real whale data from blockchain.info
+- TTS audio generation working
 
 ## Future Enhancements (P6)
 1. Real blockchain API integration (Whale Alert) for whale tracking
