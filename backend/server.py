@@ -481,6 +481,19 @@ async def get_market_price(symbol: str):
         crypto_prices = await fetch_coingecko_prices()
         if symbol in crypto_prices:
             return crypto_prices[symbol]
+        # Fallback with simulated crypto price
+        base_prices = {"BTC": 90000, "ETH": 3000, "SOL": 130, "XRP": 2, "DOGE": 0.3, "ADA": 0.8}
+        return MarketData(
+            symbol=symbol,
+            name=COINGECKO_IDS[symbol].capitalize(),
+            price=base_prices.get(symbol, 100),
+            change_24h=0,
+            change_percent=round(random.uniform(-2, 2), 2),
+            volume=round(random.uniform(1e9, 10e9), 0),
+            high_24h=base_prices.get(symbol, 100) * 1.02,
+            low_24h=base_prices.get(symbol, 100) * 0.98,
+            source="fallback"
+        )
     
     # Check if it's a stock
     if symbol in STOCK_SYMBOLS:
