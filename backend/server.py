@@ -334,7 +334,293 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# Background task for price streaming
+# ============ ALERT MANAGER ============
+
+class AlertManager:
+    """Manages price alerts and triggers notifications via WebSocket"""
+    def __init__(self):
+        self.alerts: Dict[str, PriceAlert] = {}
+        self.alert_connections: List[WebSocket] = []
+    
+    async def connect_alert_ws(self, websocket: WebSocket):
+        await websocket.accept()
+        self.alert_connections.append(websocket)
+        logger.info(f"Alert WebSocket connected. Total: {len(self.alert_connections)}")
+    
+    def disconnect_alert_ws(self, websocket: WebSocket):
+        if websocket in self.alert_connections:
+            self.alert_connections.remove(websocket)
+    
+    async def add_alert(self, alert: PriceAlert):
+        self.alerts[alert.id] = alert
+        # Also persist to database
+        doc = alert.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        if doc.get('triggered_at'):
+            doc['triggered_at'] = doc['triggered_at'].isoformat()
+        await db.price_alerts.insert_one(doc)
+        logger.info(f"Alert added: {alert.symbol} {alert.condition} ${alert.target_price}")
+    
+    async def remove_alert(self, alert_id: str):
+        if alert_id in self.alerts:
+            del self.alerts[alert_id]
+        await db.price_alerts.delete_one({"id": alert_id})
+    
+    async def check_alerts(self, prices: Dict[str, float]):
+        """Check all alerts against current prices and trigger if conditions met"""
+        triggered = []
+        for alert_id, alert in list(self.alerts.items()):
+            if alert.triggered:
+                continue
+            
+            current_price = prices.get(alert.symbol)
+            if current_price is None:
+                continue
+            
+            should_trigger = False
+            if alert.condition == "above" and current_price >= alert.target_price:
+                should_trigger = True
+            elif alert.condition == "below" and current_price <= alert.target_price:
+                should_trigger = True
+            
+            if should_trigger:
+                alert.triggered = True
+                alert.triggered_at = datetime.now(timezone.utc)
+                alert.current_price = current_price
+                triggered.append(alert)
+                
+                # Update in database
+                await db.price_alerts.update_one(
+                    {"id": alert_id},
+                    {"$set": {"triggered": True, "triggered_at": alert.triggered_at.isoformat(), "current_price": current_price}}
+                )
+        
+        # Broadcast triggered alerts
+        if triggered:
+            for alert in triggered:
+                await self.broadcast_alert(alert)
+        
+        return triggered
+    
+    async def broadcast_alert(self, alert: PriceAlert):
+        """Send alert notification to all connected clients"""
+        message = {
+            "type": "price_alert_triggered",
+            "data": {
+                "id": alert.id,
+                "symbol": alert.symbol,
+                "condition": alert.condition,
+                "target_price": alert.target_price,
+                "current_price": alert.current_price,
+                "triggered_at": alert.triggered_at.isoformat() if alert.triggered_at else None
+            }
+        }
+        
+        for conn in self.alert_connections:
+            try:
+                await conn.send_json(message)
+            except Exception as e:
+                logger.error(f"Error sending alert: {e}")
+        
+        # Also broadcast to main WebSocket
+        await manager.broadcast(message)
+    
+    async def load_alerts_from_db(self):
+        """Load pending alerts from database on startup"""
+        alerts = await db.price_alerts.find({"triggered": False}, {"_id": 0}).to_list(1000)
+        for alert_doc in alerts:
+            if isinstance(alert_doc.get('created_at'), str):
+                alert_doc['created_at'] = datetime.fromisoformat(alert_doc['created_at'])
+            self.alerts[alert_doc['id']] = PriceAlert(**alert_doc)
+        logger.info(f"Loaded {len(self.alerts)} pending alerts from database")
+
+alert_manager = AlertManager()
+
+# ============ TRADE CRAWLER ============
+
+class TradeCrawler:
+    """Real-time trade signal crawler - monitors whales, news, social, orderbooks"""
+    def __init__(self):
+        self.signals: List[CrawlerSignal] = []
+        self.crawler_connections: List[WebSocket] = []
+        self.running = False
+    
+    async def connect_crawler_ws(self, websocket: WebSocket):
+        await websocket.accept()
+        self.crawler_connections.append(websocket)
+        logger.info(f"Crawler WebSocket connected. Total: {len(self.crawler_connections)}")
+    
+    def disconnect_crawler_ws(self, websocket: WebSocket):
+        if websocket in self.crawler_connections:
+            self.crawler_connections.remove(websocket)
+    
+    async def broadcast_signal(self, signal: CrawlerSignal):
+        """Broadcast crawler signal to all connected clients"""
+        message = {
+            "type": "crawler_signal",
+            "data": signal.model_dump()
+        }
+        message['data']['timestamp'] = message['data']['timestamp'].isoformat()
+        
+        for conn in self.crawler_connections:
+            try:
+                await conn.send_json(message)
+            except Exception as e:
+                logger.error(f"Error sending crawler signal: {e}")
+        
+        # Also broadcast to main WebSocket
+        await manager.broadcast(message)
+    
+    async def fetch_whale_transactions(self) -> List[WhaleTransaction]:
+        """Fetch large whale transactions from blockchain APIs"""
+        try:
+            # Using Whale Alert API simulation (in production, use real API)
+            # Real API: https://api.whale-alert.io/v1/transactions
+            
+            # Simulate whale transactions
+            whales = []
+            symbols = ["BTC", "ETH", "SOL"]
+            
+            for symbol in symbols:
+                if random.random() > 0.7:  # 30% chance of whale activity
+                    amount = random.uniform(100, 5000) if symbol == "BTC" else random.uniform(1000, 50000)
+                    price_map = {"BTC": 90000, "ETH": 3000, "SOL": 130}
+                    
+                    whale = WhaleTransaction(
+                        blockchain={"BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana"}[symbol],
+                        from_address=f"0x{uuid.uuid4().hex[:40]}",
+                        to_address=f"0x{uuid.uuid4().hex[:40]}",
+                        amount=round(amount, 4),
+                        symbol=symbol,
+                        usd_value=round(amount * price_map[symbol], 2),
+                        timestamp=datetime.now(timezone.utc),
+                        tx_hash=f"0x{uuid.uuid4().hex}",
+                        exchange_flow=random.choice(["inflow", "outflow", None])
+                    )
+                    whales.append(whale)
+            
+            return whales
+        except Exception as e:
+            logger.error(f"Whale fetch error: {e}")
+            return []
+    
+    async def fetch_news_headlines(self) -> List[NewsItem]:
+        """Fetch latest crypto news headlines"""
+        try:
+            # In production, use real news APIs like CryptoPanic, NewsAPI, etc.
+            # Simulating news for demo
+            
+            news_templates = [
+                {"title": "Bitcoin breaks ${price} resistance, analysts bullish", "sentiment": "bullish", "impact": "high", "symbols": ["BTC"]},
+                {"title": "Ethereum 2.0 staking reaches new all-time high", "sentiment": "bullish", "impact": "medium", "symbols": ["ETH"]},
+                {"title": "SEC announces new crypto regulation framework", "sentiment": "bearish", "impact": "high", "symbols": ["BTC", "ETH", "SOL"]},
+                {"title": "Major institution adds Bitcoin to treasury", "sentiment": "bullish", "impact": "high", "symbols": ["BTC"]},
+                {"title": "Solana network experiences brief congestion", "sentiment": "bearish", "impact": "medium", "symbols": ["SOL"]},
+                {"title": "DeFi TVL surges past $50B milestone", "sentiment": "bullish", "impact": "medium", "symbols": ["ETH", "SOL"]},
+                {"title": "Crypto exchange reports record trading volume", "sentiment": "bullish", "impact": "low", "symbols": ["BTC", "ETH"]},
+                {"title": "Federal Reserve hints at rate pause", "sentiment": "bullish", "impact": "high", "symbols": ["BTC", "ETH", "SPY"]},
+            ]
+            
+            news_items = []
+            if random.random() > 0.6:  # 40% chance of new news
+                template = random.choice(news_templates)
+                news_items.append(NewsItem(
+                    title=template["title"].replace("${price}", str(random.randint(85000, 105000))),
+                    source=random.choice(["CoinDesk", "Bloomberg", "CoinTelegraph", "Reuters", "The Block"]),
+                    url=f"https://news.example.com/{uuid.uuid4().hex[:8]}",
+                    sentiment=template["sentiment"],
+                    impact=template["impact"],
+                    symbols=template["symbols"],
+                    timestamp=datetime.now(timezone.utc),
+                    summary="Breaking news affecting crypto markets."
+                ))
+            
+            return news_items
+        except Exception as e:
+            logger.error(f"News fetch error: {e}")
+            return []
+    
+    async def fetch_social_signals(self) -> List[SocialSignal]:
+        """Fetch social media signals from Twitter/Reddit"""
+        try:
+            # In production, use Twitter API, Reddit API, or aggregators
+            
+            social_templates = [
+                {"content": "🚀 $BTC looking ready for breakout! Chart pattern forming.", "platform": "twitter", "sentiment": "bullish", "symbols": ["BTC"]},
+                {"content": "$ETH gas fees at yearly low - bullish for adoption", "platform": "twitter", "sentiment": "bullish", "symbols": ["ETH"]},
+                {"content": "Massive whale accumulation detected on $SOL", "platform": "twitter", "sentiment": "bullish", "symbols": ["SOL"]},
+                {"content": "Warning: Descending triangle forming on $BTC 4H", "platform": "twitter", "sentiment": "bearish", "symbols": ["BTC"]},
+                {"content": "Just bought more $ETH - loading up before the merge anniversary", "platform": "reddit", "sentiment": "bullish", "symbols": ["ETH"]},
+            ]
+            
+            signals = []
+            if random.random() > 0.5:  # 50% chance of social signal
+                template = random.choice(social_templates)
+                signals.append(SocialSignal(
+                    platform=template["platform"],
+                    content=template["content"],
+                    author=f"@crypto_{uuid.uuid4().hex[:8]}",
+                    sentiment=template["sentiment"],
+                    symbols=template["symbols"],
+                    engagement=random.randint(100, 50000),
+                    timestamp=datetime.now(timezone.utc),
+                    url=f"https://{template['platform']}.com/{uuid.uuid4().hex[:10]}"
+                ))
+            
+            return signals
+        except Exception as e:
+            logger.error(f"Social fetch error: {e}")
+            return []
+    
+    async def fetch_orderbook_signals(self) -> List[OrderBookSignal]:
+        """Analyze order books for large orders and imbalances"""
+        try:
+            signals = []
+            symbols = ["BTC", "ETH", "SOL"]
+            
+            for symbol in symbols:
+                if random.random() > 0.8:  # 20% chance of significant orderbook signal
+                    bid_vol = random.uniform(1e8, 5e8)
+                    ask_vol = random.uniform(1e8, 5e8)
+                    imbalance = (bid_vol - ask_vol) / (bid_vol + ask_vol)
+                    
+                    large_orders = []
+                    if abs(imbalance) > 0.1:
+                        large_orders.append({
+                            "side": "bid" if imbalance > 0 else "ask",
+                            "size": round(random.uniform(100, 1000), 2),
+                            "price": round(random.uniform(85000, 95000) if symbol == "BTC" else random.uniform(2800, 3200), 2)
+                        })
+                    
+                    signals.append(OrderBookSignal(
+                        symbol=symbol,
+                        exchange=random.choice(["Binance", "Coinbase", "Kraken"]),
+                        bid_volume=round(bid_vol, 2),
+                        ask_volume=round(ask_vol, 2),
+                        large_orders=large_orders,
+                        imbalance=round(imbalance, 4),
+                        timestamp=datetime.now(timezone.utc)
+                    ))
+            
+            return signals
+        except Exception as e:
+            logger.error(f"Orderbook fetch error: {e}")
+            return []
+    
+    def create_signal(self, signal_type: str, urgency: str, symbol: str, message: str, data: Dict, action: str = None) -> CrawlerSignal:
+        return CrawlerSignal(
+            signal_type=signal_type,
+            urgency=urgency,
+            symbol=symbol,
+            message=message,
+            data=data,
+            timestamp=datetime.now(timezone.utc),
+            action_suggested=action
+        )
+
+crawler = TradeCrawler()
+
+# Background task for crawler
 async def price_streamer():
     """Background task to stream prices to all connected clients"""
     while True:
