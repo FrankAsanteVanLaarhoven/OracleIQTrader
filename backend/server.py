@@ -2149,7 +2149,8 @@ async def add_journal_note(date: str, note: str, request: Request = None):
     
     await db.journal_notes.insert_one(entry)
     
-    return {"message": "Note added", "entry": entry}
+    # Return without MongoDB _id
+    return {"message": "Note added successfully", "id": entry["id"]}
 
 # ============ PORTFOLIO SHARING ============
 
