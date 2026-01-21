@@ -1,0 +1,128 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "refresh": "Refresh",
+    "export": "Export",
+    "download": "Download",
+    "settings": "Settings"
+  },
+  "nav": {
+    "trading": "Trading",
+    "orders": "Orders",
+    "alerts": "Alerts",
+    "auto": "Auto",
+    "news": "News",
+    "social": "Social",
+    "portfolio": "Portfolio",
+    "wallet": "Wallet",
+    "paper": "Paper"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "welcome": "Welcome",
+    "profile": "Profile"
+  },
+  "trading": {
+    "buy": "Buy",
+    "sell": "Sell",
+    "symbol": "Symbol",
+    "quantity": "Quantity",
+    "price": "Price",
+    "total": "Total",
+    "orderType": "Order Type",
+    "market": "Market",
+    "limit": "Limit",
+    "stopLoss": "Stop Loss",
+    "takeProfit": "Take Profit",
+    "trailingStop": "Trailing Stop",
+    "placeOrder": "Place Order",
+    "orderValue": "Order Value",
+    "currentPrice": "Current Price"
+  },
+  "alerts": {
+    "title": "Price Alerts",
+    "addAlert": "Add Alert",
+    "noAlerts": "No alerts set",
+    "createPrompt": "Click 'Add Alert' to create one",
+    "above": "Above",
+    "below": "Below",
+    "targetPrice": "Target Price",
+    "condition": "Condition",
+    "triggered": "Triggered",
+    "pending": "Pending",
+    "soundEnabled": "Sound Enabled"
+  },
+  "wallet": {
+    "title": "My Wallet",
+    "totalBalance": "Total Balance",
+    "holdings": "Holdings",
+    "send": "Send",
+    "receive": "Receive",
+    "transactions": "Recent Transactions",
+    "address": "Wallet Address",
+    "copied": "Copied!",
+    "amount": "Amount",
+    "recipient": "Recipient Address"
+  },
+  "crawler": {
+    "title": "Trade Signals",
+    "whales": "Whale Activity",
+    "news": "News Headlines",
+    "social": "Social Signals",
+    "orderbook": "Order Book",
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "noSignals": "No signals detected"
+  },
+  "autoTrading": {
+    "title": "Auto Trading",
+    "paperMode": "Paper Mode",
+    "liveMode": "Live Mode",
+    "strategies": "Trading Strategies",
+    "start": "Start",
+    "stop": "Stop",
+    "trades": "Trades",
+    "pnl": "P&L",
+    "wins": "Wins",
+    "losses": "Losses"
+  },
+  "news": {
+    "title": "Live News Feed",
+    "allNews": "All News",
+    "bullish": "Bullish",
+    "bearish": "Bearish",
+    "highImpact": "High Impact",
+    "sentiment": "Market Sentiment"
+  },
+  "export": {
+    "exportCSV": "Export CSV",
+    "exportPDF": "Export PDF",
+    "downloadHistory": "Download Trade History"
+  },
+  "status": {
+    "live": "Live",
+    "online": "Online",
+    "offline": "Offline",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "focused": "Focused",
+    "stressed": "Stressed",
+    "fatigued": "Fatigued",
+    "confident": "Confident"
+  }
+}
