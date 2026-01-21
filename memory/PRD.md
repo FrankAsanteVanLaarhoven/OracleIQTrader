@@ -63,6 +63,10 @@ Build a state-of-the-art Cognitive Oracle Trading Platform - an enterprise-level
   - NewsFeed (live market news)
   - AutoTrading (automated strategies)
   - UserWallet (holdings, send/receive)
+- **P4 Components:**
+  - TradeCrawler (real-time signal monitoring)
+  - LanguageSelector (5-language support)
+  - ExportPanel (CSV/PDF downloads)
 
 ## Backend Endpoints
 - Market: `/api/market/prices`, `/api/market/{symbol}`, `/api/market/{symbol}/history`
