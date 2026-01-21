@@ -60,6 +60,9 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 // Navigation Tabs
 const NAV_TABS = [
   { id: 'dashboard', label: 'Trading', icon: LayoutDashboard, labelKey: 'nav.trading' },
+  { id: 'playground', label: 'Playground', icon: Banknote, labelKey: 'Playground' },
+  { id: 'bot', label: 'AI Bot', icon: Bot, labelKey: 'AI Bot' },
+  { id: 'training', label: 'Training', icon: GraduationCap, labelKey: 'Training' },
   { id: 'avatar', label: 'Avatar', icon: User, labelKey: 'Avatar' },
   { id: 'crawler', label: 'Signals', icon: Radar, labelKey: 'crawler.title' },
   { id: 'journal', label: 'Journal', icon: BookOpen, labelKey: 'Journal' },
@@ -70,7 +73,6 @@ const NAV_TABS = [
   { id: 'news', label: 'News', icon: Newspaper, labelKey: 'nav.news' },
   { id: 'portfolio', label: 'Portfolio', icon: PieChart, labelKey: 'nav.portfolio' },
   { id: 'wallet', label: 'Wallet', icon: Wallet, labelKey: 'nav.wallet' },
-  { id: 'paper', label: 'Paper', icon: Banknote, labelKey: 'nav.paper' },
   { id: 'settings', label: 'Settings', icon: Settings, labelKey: 'common.settings' },
 ];
 
