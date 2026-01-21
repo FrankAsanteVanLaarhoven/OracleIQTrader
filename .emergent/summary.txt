@@ -1,584 +1,174 @@
 <analysis>**original_problem_statement:**
-The user wants to build a state-of-the-art Cognitive Oracle Trading Platform.
+The user wants to build a state-of-the-art Cognitive Oracle Trading Platform. The project has evolved through multiple phases, adding features like a 3D trading avatar, voice commands, real-time data, a trading journal, and social signals.
 
-**Initial MVP requirements included:**
-- Glassmorphism design with an ephemeral UI.
-- Voice-first interface, facial recognition, and gesture control.
-- A multi-agent AI consensus system and an Oracle memory for historical trade lookups.
+The most recent user requests are to make the platform production-ready and then add a new phase of features.
+**Production-Ready Requirements:**
+- A mock trading playground with virtual money.
+- An autonomous AI trading bot with configurable strategies.
+- An interactive training system for users.
+- A structure for real exchange and social media integrations.
 
-**Subsequent features added in phases:**
-- **P1:** Real webcam facial recognition (TensorFlow.js), WebSocket for live prices (from CoinGecko), and User Authentication (Google OAuth).
-- **P2:** Social/copy trading, advanced candlestick charts, portfolio analytics, and a paper trading mode.
-- **P3:** Mobile responsive optimization, price alert notifications, advanced order types (limit, stop-loss), a live newsfeed, auto-trading capabilities, and an individual user portal with a wallet.
-- **P4:** Trading history export (CSV/PDF), multi-language support, and a real-time trade crawler.
-- **P5:** A 3D interactive voice trading avatar, real API integrations for news/whale alerts, browser push notifications, and a theme toggle.
-- **P6 (Current):** A Trading Journal, multi-user portfolio sharing/leaderboard, enhanced webcam facial tracking, and enhanced social signal simulation.
+**Next Phase Feature Requirements:**
+- A React Native mobile application.
+- Integration with additional exchanges (Coinbase, Kraken).
+- Advanced ML-powered prediction models.
+- A trading competition feature with leaderboards and prizes.
+- Integration with Benzinga for news alerts.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A comprehensive full-stack trading application built with React, FastAPI, and MongoDB. The platform is highly feature-rich, developed over several iterations.
+A comprehensive full-stack trading application built with React, FastAPI, and a modularized backend using MongoDB.
 
-- **Backend:** A FastAPI server provides API endpoints for market data (simulated and from CoinGecko/blockchain.info), user authentication, WebSocket connections, AI agent consensus (mocked), OpenAI TTS, trading history, a trading journal, and portfolio leaderboards.
-- **Frontend:** A sophisticated React application featuring a glassmorphism and Matrix themed UI. It includes a 3D trading avatar (Three.js), multi-language support (i18next), theme toggling, and numerous components for the platform's features.
-- **Features Implemented:**
-    - **MVP, P1, P2:** Core dashboard, real-time data, auth, social trading, charts, analytics, paper trading.
-    - **P3:** Price alerts, advanced orders, newsfeed, auto-trading, user wallet.
-    - **P4:** Data export (CSV/PDF), multi-language support, real-time trade signals crawler.
-    - **P5:** 3D voice-interactive trading avatar, theme toggling (dark/light/matrix), push notification manager, and voice-activated trading commands.
-    - **P6 (In Progress):** Backend endpoints and frontend components for Trading Journal, Portfolio Leaderboard, and Enhanced Social Signals have been created. A PWA manifest has been added.
+- **Backend:** A FastAPI server with a modular architecture. It provides APIs for market data, user authentication, a trading journal, portfolio leaderboards, social signals, a trading playground (paper trading), an autonomous AI bot, an interactive training system, and placeholders for ML predictions and trading competitions.
+- **Frontend:** A sophisticated React application with a glassmorphism UI. It includes a 3D trading avatar with real-time facial tracking, multi-language support, theme toggling, and dedicated components for all major features, including the newly added Trading Playground, AI Bot, and Training Center.
+- **PWA:** The application is a Progressive Web App with a manifest and service worker for push notifications.
 
 **Last working item**:
-The agent was implementing the P6 feature set. It created the backend APIs and frontend components, integrated them into the app, and attempted to verify them.
+The agent was implementing the Next Phase Features requested by the user, starting with the backend modules and frontend components for ML Predictions and Trading Competitions.
 
-- **Last item agent was working:** Verifying the new P6 UI components (, , ) via screenshots after integrating them. The agent observed that the components were rendering but the data was not loading, likely due to an API or data-fetching issue. The last log showed a CoinGecko API returned 429 error, indicating rate limiting.
+- **Last item agent was working:** The agent had just created the backend modules for additional exchanges, ML predictions, and trading competitions. It integrated and tested the new API endpoints via . It then created the frontend component for ML Predictions () and was about to create the component for the Trading Competitions.
 - **Status:** IN PROGRESS
-- **Agent Testing Done:** N
+- **Agent Testing Done:** N (Only backend endpoints were curl-tested; frontend components are not fully integrated or tested).
 - **Which testing method agent to use?** both
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1 (P0):** P6 features are not loading data. The new components (, , ) render but remain empty.
-  - **Attempted fixes:** The agent took screenshots, noticed the problem, and was about to re-investigate before the session ended.
-  - **Next debug checklist:**
-    1.  Check the browser console log from the last screenshot attempt () for frontend errors.
-    2.  Check the backend logs (==> /var/log/supervisor/backend.err.log <==
-2026-01-21 08:03:37,070 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:03:39,812 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:03:44,895 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:03:47,076 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:03:48,642 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:03:50,036 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:04:20,130 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:04:50,245 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:04:55,328 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:04:57,090 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:00,405 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:05,488 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:07,101 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:10,566 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:15,649 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:17,096 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:18,584 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:20,737 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:25,825 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:27,079 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:30,904 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:35,983 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:37,073 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:41,066 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:46,150 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:47,081 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:48,593 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:05:51,277 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:06:21,388 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:26,470 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:27,057 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:31,549 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:36,631 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:37,056 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:41,713 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:46,793 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:47,064 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:48,558 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:51,904 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:56,986 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:06:57,060 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:07:02,073 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:07:07,056 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:07:07,154 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:07:12,235 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:07:17,060 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:07:17,319 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:07:18,560 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:07:22,434 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:07:27,098 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:07:57,555 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:02,638 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:07,054 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:07,723 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:12,811 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:17,613 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:17,893 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:18,611 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:22,975 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:27,057 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:28,076 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:33,158 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:37,060 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:38,243 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:43,326 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:47,614 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:48,409 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:48,607 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:53,492 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:57,054 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:08:58,640 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:09:28,762 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:09:58,870 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:03,954 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:07,058 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:09,035 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:14,114 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:17,085 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:18,567 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:19,197 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:24,277 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:27,058 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:29,386 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:34,496 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:37,059 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:39,578 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:44,678 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:47,074 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:48,569 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:49,763 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:54,847 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:57,060 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:10:59,987 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:11:30,108 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:12:00,204 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:05,285 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:07,072 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:10,367 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:15,571 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:17,056 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:18,561 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:20,653 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:25,735 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:27,065 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:30,846 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:35,925 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:37,064 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:12:41,032 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:13:11,152 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:13:41,294 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:13:46,376 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:13:47,061 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:13:48,563 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:13:51,460 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:13:56,537 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:13:57,061 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:01,629 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:06,714 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:07,058 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:11,820 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:16,901 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:17,059 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:18,563 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:21,982 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:27,073 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:27,078 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:32,155 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:37,060 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:37,232 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:14:42,371 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:15:12,469 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:15:42,578 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:15:47,065 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:15:47,663 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:15:48,566 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:15:52,745 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:15:57,060 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:15:57,822 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:02,908 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:07,064 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:07,989 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:13,083 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:17,068 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:18,161 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:18,563 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:23,245 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:27,056 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:28,325 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:33,412 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:37,071 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:38,507 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:16:43,660 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:17:13,764 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:17:43,880 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:17:47,066 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:17:48,562 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:17:48,966 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:17:54,064 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:17:57,069 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:17:59,145 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:04,229 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:07,066 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:09,309 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:14,408 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:17,065 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:18,563 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:19,487 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:24,569 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:27,066 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:29,650 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:34,731 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:37,063 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:39,810 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:18:44,924 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:19:15,022 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:19:45,160 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:20:15,276 - server - INFO - CoinGecko prices fetched successfully
-2026-01-21 08:20:45,393 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:20:47,069 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:20:48,569 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:20:50,483 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:20:55,565 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:20:57,064 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:21:00,646 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:21:05,725 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:21:07,073 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:21:10,808 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:21:15,888 - server - WARNING - CoinGecko API returned 429
-2026-01-21 08:21:17,062 - server - WARNING - CoinGecko API returned 429
-INFO:     Will watch for changes in these directories: ['/app/backend']
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-INFO:     Started reloader process [48] using WatchFiles
-INFO:     Started server process [91]
-INFO:     Waiting for application startup.
-2026-01-21 08:21:53,721 - server - INFO - Loaded 1 pending alerts from database
-2026-01-21 08:21:53,721 - server - INFO - Alert manager initialized
-2026-01-21 08:21:53,721 - server - INFO - Price streamer started
-2026-01-21 08:21:53,721 - server - INFO - Trade crawler started
-INFO:     Application startup complete.
-2026-01-21 08:21:53,838 - server - WARNING - CoinGecko API returned 429
-
-==> /var/log/supervisor/backend.out.log <==
-INFO:     10.64.138.62:36006 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:36006 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.138.62:56114 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:34046 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:53424 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:57646 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.138.62:35094 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:38386 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:42552 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:48466 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.10:59674 - "GET /api/journal/daily-summary HTTP/1.1" 200 OK
-INFO:     10.64.130.78:37868 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.7:51366 - "GET /api/portfolios/public?limit=3 HTTP/1.1" 200 OK
-INFO:     10.64.131.203:43470 - "GET /api/social/trending HTTP/1.1" 200 OK
-INFO:     10.64.138.62:44844 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:51336 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.13:55998 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.94:41620 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
-INFO:     10.64.129.94:41620 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:33536 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
-INFO:     10.64.138.62:53016 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.7:37806 - "GET /api/market/ETH HTTP/1.1" 200 OK
-INFO:     10.64.129.7:37820 - "GET /api/market/BTC HTTP/1.1" 200 OK
-INFO:     10.64.136.245:49226 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.13:55998 - "GET /api/market/ETH HTTP/1.1" 200 OK
-INFO:     10.64.129.10:50052 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:34812 - "GET /api/market/BTC HTTP/1.1" 200 OK
-INFO:     10.64.129.94:34316 - "GET /api/journal/daily-summary?date=2026-01-21 HTTP/1.1" 200 OK
-INFO:     10.64.129.13:55998 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.94:34318 - "GET /api/portfolios/public?sort_by=total_value HTTP/1.1" 200 OK
-INFO:     10.64.136.226:59226 - "GET /api/journal/daily-summary?date=2026-01-21 HTTP/1.1" 200 OK
-INFO:     10.64.129.13:55998 - "GET /api/social/sentiment/BTC HTTP/1.1" 200 OK
-INFO:     10.64.129.10:45042 - "GET /api/portfolios/public?sort_by=total_value HTTP/1.1" 200 OK
-INFO:     10.64.129.126:47912 - "GET /api/social/trending HTTP/1.1" 200 OK
-INFO:     10.64.138.62:56642 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:58824 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:50902 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.226:54406 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
-INFO:     10.64.130.78:33608 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.10:52436 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
-INFO:     10.64.129.7:51382 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:33198 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.10:52444 - "GET /api/market/BTC HTTP/1.1" 200 OK
-INFO:     10.64.129.10:52436 - "GET /api/market/ETH HTTP/1.1" 200 OK
-INFO:     10.64.136.226:54406 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.226:54418 - "GET /api/market/ETH HTTP/1.1" 200 OK
-INFO:     10.64.129.13:33052 - "GET /api/market/BTC HTTP/1.1" 200 OK
-INFO:     10.64.130.78:33608 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:46526 - "GET /api/journal/daily-summary?date=2026-01-21 HTTP/1.1" 200 OK
-INFO:     10.64.129.94:58904 - "GET /api/portfolios/public?sort_by=total_value HTTP/1.1" 200 OK
-INFO:     10.64.129.7:50054 - "GET /api/portfolios/public?sort_by=total_value HTTP/1.1" 200 OK
-INFO:     10.64.136.245:45346 - "GET /api/journal/daily-summary?date=2026-01-21 HTTP/1.1" 200 OK
-INFO:     10.64.129.126:38144 - "GET /api/social/trending HTTP/1.1" 200 OK
-INFO:     10.64.129.10:34158 - "GET /api/social/sentiment/BTC HTTP/1.1" 200 OK
-INFO:     10.64.130.78:44560 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:51826 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:34368 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.130.78:38376 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:40382 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:38426 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:38426 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.138.62:53584 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:36218 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:50712 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:44712 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.130.78:38720 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:52544 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:34450 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:34450 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.138.62:45630 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:35698 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:53862 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:57068 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.138.62:56254 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:41150 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:50576 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:52000 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.138.62:60062 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:55912 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:46936 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:57948 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.130.78:55792 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:40450 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:40560 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:37156 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.138.62:54506 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:44294 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:59996 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:53664 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.130.78:54174 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:41880 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:42916 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:42916 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.130.78:60866 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:50288 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:46140 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:46140 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.138.62:38956 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:49518 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:36272 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:54672 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.130.78:34712 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:37140 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:60524 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:60524 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.130.78:40390 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:42836 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.138.62:59830 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:38436 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.138.62:53652 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.130.78:43014 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.10:58726 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.94:56460 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.245:53462 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:54140 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.7:40870 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:48834 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.94:56256 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:37516 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.226:42522 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.245:43712 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.9:48402 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:54114 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.13:50884 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:54022 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.126:37158 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:41156 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.7:48342 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:52850 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.94:35374 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.226:42860 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:55732 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.7:44246 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.7:44250 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.245:42976 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:58658 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:40204 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.94:59140 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:60310 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.10:58626 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.245:49272 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.9:35024 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.226:38260 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.10:44802 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.94:56854 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.245:60422 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.226:60674 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:54408 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.10:43432 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.226:44434 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.245:57758 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.94:49378 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.7:38712 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.7:38720 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.13:60118 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:40338 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.226:39418 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.126:56668 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.226:55452 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.94:55544 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:57728 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.226:40252 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:58894 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.13:37624 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.245:50124 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.10:60950 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:44192 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.226:34398 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.245:44528 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.9:47178 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.13:44026 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.94:56664 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.13:54292 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.226:46114 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:33570 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.10:60032 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.7:43564 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.10:57048 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.226:36852 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.245:45066 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:54338 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.226:48398 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:38276 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.7:38404 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.245:58018 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.245:52004 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.10:51912 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.13:45918 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:33158 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.226:33428 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.136.245:51556 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:52694 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.9:48294 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.136.245:60376 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.94:51970 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.7:56900 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.13:38500 - "GET /api/portfolio/summary HTTP/1.1" 200 OK
-INFO:     10.64.129.9:59934 - "GET /api/market/prices HTTP/1.1" 200 OK
-INFO:     10.64.129.126:52404 - "GET /api/market/prices HTTP/1.1" 200 OK) for API errors. The  error is a strong suspect that may be blocking data flow to other components.
-    3.  Examine the data fetching logic within , , and  to see how they handle loading states and API errors.
-    4.  Implement a fix, which may involve adding a caching layer for CoinGecko data, handling the 429 error gracefully, or fixing a bug in the frontend state management.
-  - **Why fix this issue and what will be achieved with the fix?** This will complete the core implementation of the P6 features and unblock testing.
-  - **Status:** IN PROGRESS
-  - **Is recurring issue?** N
-  - **Should Test frontend/backend/both after fix?** both
-  - **Blocked on other issue:** None
+There are no outstanding blocking issues. The previous data loading issue with P6 features was resolved.
 
 **In progress Task List**:
-- **Task 1 (P0):** Complete and verify the P6 feature implementation.
-     - **Where to resume:** Resume from debugging **Issue 1**. After fixing the data loading problem, proceed with:
-        1.  Retaking screenshots of the Journal, Leaderboard, and Signals tabs to confirm the UI and data render correctly.
-        2.  Implementing the Enhanced Webcam Facial Tracking feature, which was part of the P6 plan but not yet started. This involves integrating the user's live webcam feed with the MediaPipe library to mirror their facial expressions onto the 3D avatar in real-time.
-        3.  Running  for a comprehensive E2E test of all P6 features.
-     - **What will be achieved with this?** This will finalize the P6 feature request from the user and ensure the application is stable.
-     - **Status:** IN PROGRESS
-     - **Should Test frontend/backend/both after fix?** both
-     - **Blocked on something:** Blocked on **Issue 1**.
+- **Task 1: Complete Next Phase Features Implementation (P0)**
+    - **Where to resume:** The agent has created the backend modules and the  frontend component. The immediate next steps are:
+        1. Create the frontend component for Trading Competitions: .
+        2. Create the frontend component for Benzinga news alerts.
+        3. Integrate , , and the Benzinga component into  with new navigation tabs and icons.
+        4. Begin scaffolding the React Native mobile app in a new  directory.
+    - **What will be achieved with this?** This will add advanced predictive analytics and gamification to the platform, integrate a key news source, and start the development of the mobile application.
+    - **Status:** IN PROGRESS
+    - **Should Test frontend/backend/both after fix?** both
+    - **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-  - **P6.2 (P0):** Enhanced Webcam Facial Tracking: Integrate a real webcam feed with MediaPipe (468-point mesh) to mirror the user's emotions and attention onto the 3D avatar. This is part of the current approved work.
+    - **P7.1 (P0):** Integrate Coinbase and Kraken exchange adapters into the backend  module, including testnet support.
+    - **P7.2 (P1):** Implement the UI for managing real exchange API keys (Binance, Coinbase, Kraken) and social media keys (Twitter, Reddit) in the user settings.
 - **Future Tasks:**
-  - **P7:** Full React Native mobile app development. The user has agreed to defer this.
-  - **Integration:** Real social media API integration (Twitter/Reddit) once the user can provide the necessary API keys.
+    - **P8:** Full implementation and build-out of the React Native mobile application.
+    - **Integration:** Connect to real Twitter/Reddit APIs once the user provides API keys.
+    - **ML:** Implement and train custom ML models (e.g., using /) to replace the current mocked prediction logic.
 
 **Completed work in this session**
-- **P3 Features Completion:** Verified and successfully tested Price Alerts, Advanced Orders, Newsfeed, Auto-Trading, and the User Wallet.
-- **P4 Features Implementation:** Implemented and tested Trading History Export (CSV/PDF), multi-language support with a language selector, and a Trade Crawler panel.
-- **P5 Features Implementation:**
-  - **3D Trading Avatar:** Created and fixed a 3D interactive avatar with a 68-point face mesh using Three.js and MediaPipe.
-  - **Voice Integration:** Integrated OpenAI TTS for avatar voice synthesis and implemented voice-activated trading commands (Buy 1 BTC).
-  - **Real-time Data:** Integrated a real blockchain API for whale transaction alerts.
-  - **UI Enhancements:** Added a theme toggle (Dark/Light/Matrix) and a push notification manager.
-- **P6 Scaffolding:** Created backend endpoints and frontend components for the Trading Journal, Portfolio Leaderboard, and Social Signals. Added a PWA .
+- **P6 Data Loading Issue (RESOLVED):** Fixed the critical bug where , , and  components were not displaying data. The fix involved optimizing the backend API to make audio data load on-demand and resolving a CORS misconfiguration.
+- **Enhanced Webcam Facial Tracking (DONE):** Implemented real-time facial expression mirroring from the user's webcam onto the 3D avatar using MediaPipe's 468-point face mesh.
+- **P6 Feature Testing (DONE):** Successfully ran a comprehensive E2E test suite (28/28 tests passed) using the testing agent to validate all P6 features after the fixes.
+- **Production-Ready Features (DONE):**
+    - **Backend:** Created and integrated modular backend services for a Trading Playground, Autonomous AI Bot, Interactive Training System, and placeholders for exchange/social integrations.
+    - **Frontend:** Created and integrated UI components (, , ).
+    - **E2E Testing:** Successfully ran a second E2E test suite (32/32 tests passed) to validate all new production-ready features.
+- **Next Phase Scaffolding (IN PROGRESS):**
+    - **Backend:** Created backend modules and API endpoints for Additional Exchanges (), ML Predictions (), and Trading Competitions ().
+    - **Frontend:** Created the  component.
 
 **Earlier issues found/mentioned but not fixed**
 - None.
 
 **Known issue recurrence from previous fork**
-- **Issue:** The agent previously encountered a memory limit that caused the pod to terminate and restart.
+- **Issue:** The application's complexity and use of memory-intensive libraries (Three.js, TensorFlow.js) pose a risk of hitting memory limits, which previously caused a pod restart.
 - **Recurrence count:** 1
-- **Status:** RESOLVED (by pod restart), but remains a risk given the application's increasing complexity and use of memory-intensive libraries like Three.js and TensorFlow.js.
+- **Status:** RESOLVED (by pod restart), but remains a background risk.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend:** React, TailwindCSS, Three.js (for 3D avatar), MediaPipe (for facial recognition), i18next (for localization), Framer Motion, Recharts.
-- **Backend:** FastAPI, WebSockets, aiohttp, ReportLab (for PDF generation), OpenAI (for TTS).
+- **Frontend:** React, TailwindCSS, Three.js, MediaPipe, i18next, Framer Motion, Recharts.
+- **Backend:** FastAPI (modular architecture), WebSockets, aiohttp, ReportLab, OpenAI TTS.
 - **Database:** MongoDB.
-- **Architecture:** Full-stack monolith with real-time WebSocket communication.
-- **UI/UX:** Glassmorphism, Ephemeral UI, Matrix theme, 3D Voice-Interactive Avatar.
+- **Planned Tech:** React Native, Benzinga API.
 
 **key DB schema**
-- **Users:** For authentication (Google OAuth).
-- **MarketData:** Storing cached prices.
-- **Trades:** For paper trading and portfolio tracking.
-- **Alerts:** User-defined price alerts.
-- **JournalEntries:** Storing daily performance summaries, P&L, win rates, and AI insights.
-- **Portfolios:** User profiles, holdings, and performance for the leaderboard.
+- **PlaygroundAccounts:** Virtual money accounts for paper trading.
+- **AutonomousBots:** User-configured AI trading bots, their strategies, and performance.
+- **TrainingProgress:** User progress in the training center (tutorials, lessons, XP).
+- **Competitions:** Definitions for trading competitions.
+- **CompetitionEntries:** User participation and performance in competitions.
+
+**changes in tech stack**
+- The backend has been significantly refactored from a single  file into a modular architecture with distinct files for each major feature located in .
 
 **All files of reference**
-- : Heavily modified to include endpoints for P4, P5, and P6 features.
-- : Heavily modified to integrate new tabs, components, context providers (Theme), and localization.
-- : Completely rewritten to fix rendering issues and improve visuals.
-- **New P6 Files:**
+- **New Backend Modules:**
     - 
     - 
     - 
     - 
-- **New P5 Files:**
     - 
     - 
     - 
     - 
-- **New P4 Files:**
+- **New Frontend Components:**
     - 
     - 
     - 
-    -  (directory with config and locales)
+    - 
+    - 
+- **Modified Core Files:**
+    - : Updated to import and route to new modules.
+    - : Updated to include new navigation tabs and render new components.
+    - : Updated to integrate webcam face tracking.
+
+**Areas that need refactoring**:
+- Continue the backend modularization pattern for any new features to keep  lean and focused on routing and startup logic.
 
 **key api endpoints**
-- : GET, POST for trading journal entries.
-- : GET for user portfolio rankings.
-- : GET for enhanced social media signals.
-- : POST to process spoken trade commands.
-- : POST to generate avatar speech for trade executions.
-- : POST for text-to-speech generation via OpenAI.
-- : GET for real-time whale transaction data.
-- : GET for CSV/PDF trade history.
-- : CRUD endpoints for price alerts.
+- : CRUD for paper trading accounts and orders.
+- : CRUD for autonomous trading bots.
+- : Endpoints for fetching training content and user progress.
+- : GET for ML price predictions.
+- : Endpoints for listing and joining trading competitions.
+- : GET list of supported exchanges.
 
 **Critical Info for New Agent**
-- **Priority 1 is fixing the P6 data loading issue.** The app is in a broken state. Investigate the  error as the most likely root cause. This rate-limiting issue may be preventing data from loading across multiple new components.
-- The user has approved a large P6 feature set. After fixing the current issue, the next step is to implement the Enhanced Webcam Facial Tracking to complete the P6 work before a final round of testing.
-- React Native mobile app development is deferred to a future phase (P7).
+- You are in the middle of a large feature implementation phase. The backend modules for the Next Phase Features (ML, Competitions, Exchanges) have been created and tested with .
+- Your immediate task is to build out the corresponding frontend components (, Benzinga alerts), integrate them into the UI, and then start the React Native project.
+- The user has approved all proposed features and expects them to be production-ready. This implies robust implementation and testing.
+- API keys for real exchanges (Coinbase, Kraken) and social media (Twitter, Reddit) are still pending from the user. Build the integration structure so keys can be added later.
 
 **documents and test reports created in this job**
--  (updated multiple times)
-- 
-- 
-- 
-- 
+-  (Updated with P6 and production-ready features).
+-  (P6 Features E2E Test Report).
+-  (Production-Ready Features E2E Test Report).
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **Agent (Msg 262):** Finished P5 enhancements and proposed P6 features (Trading Journal).
-2.  **User (Msg 263):** Agreed to proceed.
-3.  **Agent (Msg 266):** Presented a detailed P6 plan, including Trading Journal, Enhanced Facial Tracking, Portfolio Sharing, and Social Signals, while recommending deferring React Native.
-4.  **User (Msg 266):** leave reactnative for later procced.
-5.  **Agent (Msg 267 - 296):** Began implementing P6 features, created backend/frontend, and took screenshots.
-6.  **Agent (Msg 298):** Noticed the new features were rendering without data and decided to investigate further. This is the last agent action.
+1.  **User (Msg 258):** Acknowledged the completion of production-ready features and approved the agent's suggestion for a Trading Competition. Requested to proceed with building the next phase. (DONE)
+2.  **Agent (Msg 261):** Asked for clarification on the Next Phase Features, including React Native, additional exchanges, ML models, and trading competitions. (DONE)
+3.  **User (Msg 262):** Confirmed all features and instructed the agent to proceed and ensure they are all production ready. (IN PROGRESS)
 
 **Project Health Check:**
-- **Broken:** The newly implemented P6 features (Trading Journal, Leaderboard, Social Signals) are not functional as they fail to load and display data.
-- **Mocked:** Social media signals are still simulated.
-- **At Risk:** The CoinGecko integration is facing API rate-limiting issues (), which is likely causing the data loading failure in the new P6 components.
+- **Broken:** None.
+- **Mocked:**
+    - Real exchange trading (Binance, Coinbase, Kraken adapters are placeholders).
+    - Social media integration (Twitter/Reddit structure is a placeholder).
+    - ML predictions are currently mocked and do not use a real model.
 
 **3rd Party Integrations**
-- **OpenAI TTS:** Uses Emergent LLM Key for avatar voice synthesis.
-- **CoinGecko:** For real-time cryptocurrency market data (Currently experiencing rate-limiting issues).
-- **Emergent-managed Google Auth:** For user sign-in.
-- **TensorFlow.js / MediaPipe:** For client-side AI vision features (facial recognition, gesture).
-- **Three.js:** For rendering the 3D Trading Avatar.
-- **blockchain.info:** Used via a public, keyless API to fetch real whale transaction data.
+- **OpenAI TTS:** (Active) Uses Emergent LLM Key for avatar voice.
+- **CoinGecko:** (Active) For real-time market data. Rate-limiting was an issue but is now mitigated by less frequent calls.
+- **Emergent-managed Google Auth:** (Active) For user sign-in.
+- **TensorFlow.js / MediaPipe:** (Active) For client-side facial tracking.
+- **Three.js:** (Active) For the 3D Trading Avatar.
+- **blockchain.info:** (Active) For whale transaction alerts.
+- **Benzinga:** (Planned) For news alerts.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES (for P3, P4, P5). It is pending for P6.
-- **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** Yes, via testing agent in .
-- **Known regressions:** The P6 features are currently not working.
+- **Testing agent used after significant changes:** YES. Two successful, comprehensive E2E test runs were completed in the last session for P6 and production-ready features.
+- **Test files created:**
+    - 
+    - 
+- **Known regressions:** None.
 
 **Credentials to test flow:**
-- Google OAuth is used for login. The testing agent handles this flow.
+- Google OAuth is used for login. The testing agent handles this flow automatically.
 
 **What agent forgot to execute**
-- The agent did not resolve the data loading issue for the P6 components before the session ended.
-- The Enhanced Webcam Facial Tracking feature, which is part of the approved P6 plan, has not been started.</analysis>
+- The agent was in the middle of a large implementation. It has not yet started work on the Benzinga integration or the React Native mobile app, both of which were requested by the user.</analysis>

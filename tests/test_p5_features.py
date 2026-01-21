@@ -12,7 +12,7 @@ import requests
 import os
 import json
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://oracle-trading-2.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://smart-oracle-trade.preview.emergentagent.com')
 
 class TestAvatarAPIs:
     """Test Avatar TTS API endpoints"""

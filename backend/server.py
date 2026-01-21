@@ -3044,7 +3044,7 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["http://localhost:3000", "https://oracle-trading-2.preview.emergentagent.com"],
+    allow_origins=["http://localhost:3000", "https://smart-oracle-trade.preview.emergentagent.com"],
     allow_origin_regex=r"https://.*\.preview\.emergentagent\.com",
     allow_methods=["*"],
     allow_headers=["*"],
