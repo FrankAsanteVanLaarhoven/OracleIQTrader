@@ -55,7 +55,7 @@ import {
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
   Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings,
-  BookOpen, Trophy, MessageCircle, GraduationCap
+  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -66,14 +66,16 @@ const NAV_TABS = [
   { id: 'playground', label: 'Playground', icon: Banknote, labelKey: 'Playground' },
   { id: 'bot', label: 'AI Bot', icon: Bot, labelKey: 'AI Bot' },
   { id: 'training', label: 'Training', icon: GraduationCap, labelKey: 'Training' },
+  { id: 'predictions', label: 'ML Predict', icon: Sparkles, labelKey: 'ML Predict' },
+  { id: 'competitions', label: 'Compete', icon: Medal, labelKey: 'Compete' },
   { id: 'avatar', label: 'Avatar', icon: User, labelKey: 'Avatar' },
   { id: 'crawler', label: 'Signals', icon: Radar, labelKey: 'crawler.title' },
   { id: 'journal', label: 'Journal', icon: BookOpen, labelKey: 'Journal' },
   { id: 'leaderboard', label: 'Leaders', icon: Trophy, labelKey: 'Leaderboard' },
   { id: 'sentiment', label: 'Sentiment', icon: MessageCircle, labelKey: 'Sentiment' },
+  { id: 'benzinga', label: 'Benzinga', icon: Newspaper, labelKey: 'Benzinga' },
   { id: 'orders', label: 'Orders', icon: Layers, labelKey: 'nav.orders' },
   { id: 'alerts', label: 'Alerts', icon: Bell, labelKey: 'nav.alerts' },
-  { id: 'news', label: 'News', icon: Newspaper, labelKey: 'nav.news' },
   { id: 'portfolio', label: 'Portfolio', icon: PieChart, labelKey: 'nav.portfolio' },
   { id: 'wallet', label: 'Wallet', icon: Wallet, labelKey: 'nav.wallet' },
   { id: 'settings', label: 'Settings', icon: Settings, labelKey: 'common.settings' },
