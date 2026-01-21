@@ -278,6 +278,14 @@ const TradingJournal = () => {
               </GlassCard>
             </div>
           )}
+
+          {!loading && !dailySummary && (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+              <BookOpen size={48} className="mb-4 opacity-50" />
+              <p className="text-lg">No trading data for this date</p>
+              <p className="text-sm mt-2">Select a date with trading activity</p>
+            </div>
+          )}
         </>
       ) : (
         /* Weekly View */
