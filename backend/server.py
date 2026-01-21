@@ -1258,7 +1258,266 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     return status_checks
 
-# ============ WEBSOCKET ENDPOINT ============
+# ============ PRICE ALERTS ROUTES ============
+
+@api_router.post("/alerts", response_model=PriceAlert)
+async def create_price_alert(alert_data: PriceAlertCreate, request: Request):
+    """Create a new price alert"""
+    user = await get_current_user(request)
+    
+    # Get current price
+    symbol = alert_data.symbol.upper()
+    current_price = 0
+    if symbol in COINGECKO_IDS:
+        crypto_prices = await fetch_coingecko_prices()
+        if symbol in crypto_prices:
+            current_price = crypto_prices[symbol].price
+    elif symbol in STOCK_SYMBOLS:
+        current_price = generate_stock_price(symbol).price
+    
+    alert = PriceAlert(
+        user_id=user.user_id if user else None,
+        symbol=symbol,
+        condition=alert_data.condition.lower(),
+        target_price=alert_data.target_price,
+        current_price=current_price
+    )
+    
+    await alert_manager.add_alert(alert)
+    return alert
+
+@api_router.get("/alerts", response_model=List[PriceAlert])
+async def get_price_alerts(request: Request, include_triggered: bool = False):
+    """Get all price alerts"""
+    user = await get_current_user(request)
+    
+    query = {"triggered": False} if not include_triggered else {}
+    if user:
+        query["user_id"] = user.user_id
+    
+    alerts = await db.price_alerts.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    for alert in alerts:
+        if isinstance(alert.get('created_at'), str):
+            alert['created_at'] = datetime.fromisoformat(alert['created_at'])
+        if alert.get('triggered_at') and isinstance(alert['triggered_at'], str):
+            alert['triggered_at'] = datetime.fromisoformat(alert['triggered_at'])
+    
+    return alerts
+
+@api_router.delete("/alerts/{alert_id}")
+async def delete_price_alert(alert_id: str):
+    """Delete a price alert"""
+    await alert_manager.remove_alert(alert_id)
+    return {"message": "Alert deleted", "id": alert_id}
+
+# ============ TRADE CRAWLER ROUTES ============
+
+@api_router.get("/crawler/signals")
+async def get_crawler_signals(limit: int = 50, signal_type: Optional[str] = None):
+    """Get recent crawler signals"""
+    query = {}
+    if signal_type:
+        query["signal_type"] = signal_type
+    
+    signals = await db.crawler_signals.find(query, {"_id": 0}).sort("timestamp", -1).to_list(limit)
+    return signals
+
+@api_router.get("/crawler/whales")
+async def get_whale_transactions(limit: int = 20):
+    """Get recent whale transactions"""
+    signals = await db.crawler_signals.find(
+        {"signal_type": "whale"}, 
+        {"_id": 0}
+    ).sort("timestamp", -1).to_list(limit)
+    return signals
+
+@api_router.get("/crawler/news")
+async def get_news_signals(limit: int = 20):
+    """Get recent news signals"""
+    signals = await db.crawler_signals.find(
+        {"signal_type": "news"}, 
+        {"_id": 0}
+    ).sort("timestamp", -1).to_list(limit)
+    return signals
+
+@api_router.get("/crawler/social")
+async def get_social_signals(limit: int = 20):
+    """Get recent social media signals"""
+    signals = await db.crawler_signals.find(
+        {"signal_type": "social"}, 
+        {"_id": 0}
+    ).sort("timestamp", -1).to_list(limit)
+    return signals
+
+@api_router.get("/crawler/orderbook")
+async def get_orderbook_signals(limit: int = 20):
+    """Get recent order book signals"""
+    signals = await db.crawler_signals.find(
+        {"signal_type": "orderbook"}, 
+        {"_id": 0}
+    ).sort("timestamp", -1).to_list(limit)
+    return signals
+
+# ============ EXPORT ROUTES ============
+
+@api_router.get("/export/trades/csv")
+async def export_trades_csv(request: Request):
+    """Export trade history as CSV"""
+    user = await get_current_user(request)
+    
+    query = {"user_id": user.user_id} if user else {}
+    trades = await db.trades.find(query, {"_id": 0}).sort("timestamp", -1).to_list(1000)
+    
+    # Create CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow(["ID", "Date", "Time", "Action", "Symbol", "Quantity", "Price", "Total Value", "Status", "Confidence"])
+    
+    for trade in trades:
+        timestamp = trade.get('timestamp')
+        if isinstance(timestamp, str):
+            timestamp = datetime.fromisoformat(timestamp)
+        
+        date_str = timestamp.strftime("%Y-%m-%d") if timestamp else ""
+        time_str = timestamp.strftime("%H:%M:%S") if timestamp else ""
+        total_value = trade.get('quantity', 0) * trade.get('price', 0)
+        
+        writer.writerow([
+            trade.get('id', ''),
+            date_str,
+            time_str,
+            trade.get('action', ''),
+            trade.get('symbol', ''),
+            trade.get('quantity', 0),
+            f"${trade.get('price', 0):,.2f}",
+            f"${total_value:,.2f}",
+            trade.get('status', ''),
+            f"{trade.get('consensus_confidence', 0)*100:.1f}%"
+        ])
+    
+    output.seek(0)
+    
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=trades_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+@api_router.get("/export/trades/pdf")
+async def export_trades_pdf(request: Request):
+    """Export trade history as PDF"""
+    user = await get_current_user(request)
+    
+    query = {"user_id": user.user_id} if user else {}
+    trades = await db.trades.find(query, {"_id": 0}).sort("timestamp", -1).to_list(1000)
+    
+    # Create PDF in memory
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    elements = []
+    
+    # Title
+    elements.append(Paragraph("Cognitive Oracle Trading Platform", styles['Title']))
+    elements.append(Paragraph("Trade History Report", styles['Heading2']))
+    elements.append(Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
+    elements.append(Spacer(1, 20))
+    
+    # Create table data
+    table_data = [["Date", "Action", "Symbol", "Qty", "Price", "Total", "Status"]]
+    
+    for trade in trades[:50]:  # Limit to 50 for PDF
+        timestamp = trade.get('timestamp')
+        if isinstance(timestamp, str):
+            timestamp = datetime.fromisoformat(timestamp)
+        
+        date_str = timestamp.strftime("%Y-%m-%d %H:%M") if timestamp else ""
+        total_value = trade.get('quantity', 0) * trade.get('price', 0)
+        
+        table_data.append([
+            date_str,
+            trade.get('action', ''),
+            trade.get('symbol', ''),
+            str(trade.get('quantity', 0)),
+            f"${trade.get('price', 0):,.2f}",
+            f"${total_value:,.2f}",
+            trade.get('status', '')
+        ])
+    
+    # Create and style table
+    table = Table(table_data, colWidths=[80, 50, 50, 40, 70, 80, 60])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.Color(0, 0.5, 0.5)),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.Color(0.95, 0.95, 0.95)),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 1, colors.Color(0.7, 0.7, 0.7)),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.Color(0.95, 0.95, 0.95)])
+    ]))
+    
+    elements.append(table)
+    elements.append(Spacer(1, 20))
+    elements.append(Paragraph(f"Total trades: {len(trades)}", styles['Normal']))
+    
+    doc.build(elements)
+    buffer.seek(0)
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=trades_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"}
+    )
+
+@api_router.get("/export/alerts/csv")
+async def export_alerts_csv(request: Request):
+    """Export price alerts as CSV"""
+    user = await get_current_user(request)
+    
+    query = {}
+    if user:
+        query["user_id"] = user.user_id
+    
+    alerts = await db.price_alerts.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["ID", "Symbol", "Condition", "Target Price", "Triggered", "Created At", "Triggered At"])
+    
+    for alert in alerts:
+        created_at = alert.get('created_at', '')
+        if isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at)
+        triggered_at = alert.get('triggered_at', '')
+        if triggered_at and isinstance(triggered_at, str):
+            triggered_at = datetime.fromisoformat(triggered_at)
+        
+        writer.writerow([
+            alert.get('id', ''),
+            alert.get('symbol', ''),
+            alert.get('condition', ''),
+            f"${alert.get('target_price', 0):,.2f}",
+            "Yes" if alert.get('triggered') else "No",
+            created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else "",
+            triggered_at.strftime("%Y-%m-%d %H:%M:%S") if triggered_at else ""
+        ])
+    
+    output.seek(0)
+    
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=alerts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+# ============ WEBSOCKET ENDPOINTS ============
 
 @app.websocket("/ws/prices")
 async def websocket_prices(websocket: WebSocket):
