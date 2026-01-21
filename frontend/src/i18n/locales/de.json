@@ -1,0 +1,128 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "refresh": "Aktualisieren",
+    "export": "Exportieren",
+    "download": "Herunterladen",
+    "settings": "Einstellungen"
+  },
+  "nav": {
+    "trading": "Handel",
+    "orders": "Aufträge",
+    "alerts": "Alarme",
+    "auto": "Auto",
+    "news": "Nachrichten",
+    "social": "Sozial",
+    "portfolio": "Portfolio",
+    "wallet": "Wallet",
+    "paper": "Demo"
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "welcome": "Willkommen",
+    "profile": "Profil"
+  },
+  "trading": {
+    "buy": "Kaufen",
+    "sell": "Verkaufen",
+    "symbol": "Symbol",
+    "quantity": "Menge",
+    "price": "Preis",
+    "total": "Gesamt",
+    "orderType": "Auftragsart",
+    "market": "Markt",
+    "limit": "Limit",
+    "stopLoss": "Stop Loss",
+    "takeProfit": "Take Profit",
+    "trailingStop": "Trailing Stop",
+    "placeOrder": "Auftrag Erteilen",
+    "orderValue": "Auftragswert",
+    "currentPrice": "Aktueller Preis"
+  },
+  "alerts": {
+    "title": "Preisalarme",
+    "addAlert": "Alarm Hinzufügen",
+    "noAlerts": "Keine Alarme",
+    "createPrompt": "Klicken Sie auf 'Alarm Hinzufügen' um einen zu erstellen",
+    "above": "Über",
+    "below": "Unter",
+    "targetPrice": "Zielpreis",
+    "condition": "Bedingung",
+    "triggered": "Ausgelöst",
+    "pending": "Ausstehend",
+    "soundEnabled": "Ton Aktiviert"
+  },
+  "wallet": {
+    "title": "Mein Wallet",
+    "totalBalance": "Gesamtguthaben",
+    "holdings": "Bestände",
+    "send": "Senden",
+    "receive": "Empfangen",
+    "transactions": "Letzte Transaktionen",
+    "address": "Wallet-Adresse",
+    "copied": "Kopiert!",
+    "amount": "Betrag",
+    "recipient": "Empfängeradresse"
+  },
+  "crawler": {
+    "title": "Handelssignale",
+    "whales": "Wal-Aktivität",
+    "news": "Schlagzeilen",
+    "social": "Soziale Signale",
+    "orderbook": "Orderbuch",
+    "critical": "Kritisch",
+    "high": "Hoch",
+    "medium": "Mittel",
+    "low": "Niedrig",
+    "noSignals": "Keine Signale erkannt"
+  },
+  "autoTrading": {
+    "title": "Automatischer Handel",
+    "paperMode": "Demo-Modus",
+    "liveMode": "Live-Modus",
+    "strategies": "Handelsstrategien",
+    "start": "Starten",
+    "stop": "Stoppen",
+    "trades": "Trades",
+    "pnl": "G&V",
+    "wins": "Gewinne",
+    "losses": "Verluste"
+  },
+  "news": {
+    "title": "Live-Nachrichten",
+    "allNews": "Alle",
+    "bullish": "Bullisch",
+    "bearish": "Bärisch",
+    "highImpact": "Hohe Auswirkung",
+    "sentiment": "Marktstimmung"
+  },
+  "export": {
+    "exportCSV": "CSV Exportieren",
+    "exportPDF": "PDF Exportieren",
+    "downloadHistory": "Verlauf Herunterladen"
+  },
+  "status": {
+    "live": "Live",
+    "online": "Online",
+    "offline": "Offline",
+    "connected": "Verbunden",
+    "disconnected": "Getrennt",
+    "focused": "Fokussiert",
+    "stressed": "Gestresst",
+    "fatigued": "Ermüdet",
+    "confident": "Selbstsicher"
+  }
+}

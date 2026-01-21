@@ -1,0 +1,128 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "refresh": "Actualiser",
+    "export": "Exporter",
+    "download": "Télécharger",
+    "settings": "Paramètres"
+  },
+  "nav": {
+    "trading": "Trading",
+    "orders": "Ordres",
+    "alerts": "Alertes",
+    "auto": "Auto",
+    "news": "Actualités",
+    "social": "Social",
+    "portfolio": "Portefeuille",
+    "wallet": "Portefeuille",
+    "paper": "Démo"
+  },
+  "auth": {
+    "signIn": "Connexion",
+    "signOut": "Déconnexion",
+    "welcome": "Bienvenue",
+    "profile": "Profil"
+  },
+  "trading": {
+    "buy": "Acheter",
+    "sell": "Vendre",
+    "symbol": "Symbole",
+    "quantity": "Quantité",
+    "price": "Prix",
+    "total": "Total",
+    "orderType": "Type d'Ordre",
+    "market": "Marché",
+    "limit": "Limite",
+    "stopLoss": "Stop Loss",
+    "takeProfit": "Take Profit",
+    "trailingStop": "Trailing Stop",
+    "placeOrder": "Passer l'Ordre",
+    "orderValue": "Valeur de l'Ordre",
+    "currentPrice": "Prix Actuel"
+  },
+  "alerts": {
+    "title": "Alertes de Prix",
+    "addAlert": "Ajouter une Alerte",
+    "noAlerts": "Aucune alerte",
+    "createPrompt": "Cliquez sur 'Ajouter une Alerte' pour en créer une",
+    "above": "Au-dessus",
+    "below": "En-dessous",
+    "targetPrice": "Prix Cible",
+    "condition": "Condition",
+    "triggered": "Déclenchée",
+    "pending": "En attente",
+    "soundEnabled": "Son Activé"
+  },
+  "wallet": {
+    "title": "Mon Portefeuille",
+    "totalBalance": "Solde Total",
+    "holdings": "Positions",
+    "send": "Envoyer",
+    "receive": "Recevoir",
+    "transactions": "Transactions Récentes",
+    "address": "Adresse du Portefeuille",
+    "copied": "Copié!",
+    "amount": "Montant",
+    "recipient": "Adresse du Destinataire"
+  },
+  "crawler": {
+    "title": "Signaux de Trading",
+    "whales": "Activité des Baleines",
+    "news": "Titres des Actualités",
+    "social": "Signaux Sociaux",
+    "orderbook": "Carnet d'Ordres",
+    "critical": "Critique",
+    "high": "Élevé",
+    "medium": "Moyen",
+    "low": "Faible",
+    "noSignals": "Aucun signal détecté"
+  },
+  "autoTrading": {
+    "title": "Trading Automatique",
+    "paperMode": "Mode Démo",
+    "liveMode": "Mode Réel",
+    "strategies": "Stratégies de Trading",
+    "start": "Démarrer",
+    "stop": "Arrêter",
+    "trades": "Transactions",
+    "pnl": "P&L",
+    "wins": "Gains",
+    "losses": "Pertes"
+  },
+  "news": {
+    "title": "Actualités en Direct",
+    "allNews": "Toutes",
+    "bullish": "Haussières",
+    "bearish": "Baissières",
+    "highImpact": "Fort Impact",
+    "sentiment": "Sentiment du Marché"
+  },
+  "export": {
+    "exportCSV": "Exporter CSV",
+    "exportPDF": "Exporter PDF",
+    "downloadHistory": "Télécharger l'Historique"
+  },
+  "status": {
+    "live": "En Direct",
+    "online": "En Ligne",
+    "offline": "Hors Ligne",
+    "connected": "Connecté",
+    "disconnected": "Déconnecté",
+    "focused": "Concentré",
+    "stressed": "Stressé",
+    "fatigued": "Fatigué",
+    "confident": "Confiant"
+  }
+}
