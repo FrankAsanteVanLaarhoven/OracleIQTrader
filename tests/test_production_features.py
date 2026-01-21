@@ -577,15 +577,20 @@ class TestTrainingSystem:
         assert "results" in data
         
         results = data["results"]
-        assert "total_return" in results
+        # Verify backtest results structure (actual keys)
+        assert "final_balance" in results
         assert "total_trades" in results
         assert "win_rate" in results
         assert "max_drawdown" in results
         assert "sharpe_ratio" in results
         
+        # Calculate return from final balance
+        total_return = ((results["final_balance"] - 10000) / 10000) * 100
+        
         print(f"✓ Backtest completed:")
         print(f"  Strategy: {data['config']['strategy_type']}")
-        print(f"  Total return: {results['total_return']:.2f}%")
+        print(f"  Final balance: ${results['final_balance']:,.2f}")
+        print(f"  Total return: {total_return:.2f}%")
         print(f"  Win rate: {results['win_rate']:.1f}%")
         print(f"  Max drawdown: {results['max_drawdown']:.2f}%")
         print(f"  Sharpe ratio: {results['sharpe_ratio']:.2f}")
