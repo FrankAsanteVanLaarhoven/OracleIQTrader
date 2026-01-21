@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import './i18n';
 import '@/App.css';
@@ -35,13 +36,16 @@ import UserWallet from './components/UserWallet';
 import TradeCrawler from './components/TradeCrawler';
 import LanguageSelector from './components/LanguageSelector';
 import ExportPanel from './components/ExportPanel';
+import TradingAvatar from './components/TradingAvatar';
+import ThemeToggle from './components/ThemeToggle';
+import NotificationManager from './components/NotificationManager';
 import axios from 'axios';
 
 // Icons
 import { 
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
-  Newspaper, Bot, Wallet, Menu, X, Radar, Download
+  Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -49,6 +53,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 // Navigation Tabs
 const NAV_TABS = [
   { id: 'dashboard', label: 'Trading', icon: LayoutDashboard, labelKey: 'nav.trading' },
+  { id: 'avatar', label: 'Avatar', icon: User, labelKey: 'Avatar' },
   { id: 'crawler', label: 'Signals', icon: Radar, labelKey: 'crawler.title' },
   { id: 'orders', label: 'Orders', icon: Layers, labelKey: 'nav.orders' },
   { id: 'alerts', label: 'Alerts', icon: Bell, labelKey: 'nav.alerts' },
