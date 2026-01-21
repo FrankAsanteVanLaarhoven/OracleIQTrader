@@ -369,6 +369,40 @@ const TradingAvatar = ({ marketData = {}, onInsight, onTradeCommand }) => {
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef(null);
   
+  // Announce trade function (can be called externally)
+  const announceTrade = useCallback(async (tradeData) => {
+    try {
+      const response = await fetch(`${API}/avatar/announce-trade`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tradeData)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(data.message);
+        setEmotion(data.emotion);
+        
+        if (data.audio && !isMuted && audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${data.audio}`;
+          setIsSpeaking(true);
+          audioRef.current.play().catch(console.error);
+          audioRef.current.onended = () => setIsSpeaking(false);
+        }
+      }
+    } catch (error) {
+      console.error('Trade announcement error:', error);
+    }
+  }, [isMuted]);
+  
+  // Expose announceTrade via ref or callback
+  useEffect(() => {
+    if (onInsight) {
+      // Pass the announce function to parent
+      onInsight({ announceTrade });
+    }
+  }, [announceTrade, onInsight]);
+  
   // Determine emotion based on market data
   useEffect(() => {
     const btcChange = marketData.btc_change || 0;
