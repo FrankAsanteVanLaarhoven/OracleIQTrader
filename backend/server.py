@@ -620,24 +620,31 @@ class TradeCrawler:
 
 crawler = TradeCrawler()
 
-# Background task for crawler
+# Background task for price streaming with alert checking
 async def price_streamer():
-    """Background task to stream prices to all connected clients"""
+    """Background task to stream prices to all connected clients and check alerts"""
     while True:
         try:
+            # Fetch real crypto prices
+            crypto_prices = await fetch_coingecko_prices()
+            
+            # Generate stock prices
+            all_prices = []
+            price_dict = {}
+            
+            for symbol, data in crypto_prices.items():
+                all_prices.append(data.model_dump())
+                price_dict[symbol] = data.price
+            
+            for symbol in STOCK_SYMBOLS.keys():
+                stock_data = generate_stock_price(symbol)
+                all_prices.append(stock_data.model_dump())
+                price_dict[symbol] = stock_data.price
+            
+            # Check price alerts
+            await alert_manager.check_alerts(price_dict)
+            
             if manager.active_connections:
-                # Fetch real crypto prices
-                crypto_prices = await fetch_coingecko_prices()
-                
-                # Generate stock prices
-                all_prices = []
-                for symbol, data in crypto_prices.items():
-                    all_prices.append(data.model_dump())
-                
-                for symbol in STOCK_SYMBOLS.keys():
-                    stock_data = generate_stock_price(symbol)
-                    all_prices.append(stock_data.model_dump())
-                
                 # Convert datetime to ISO string for JSON
                 for price in all_prices:
                     if isinstance(price.get('timestamp'), datetime):
@@ -653,6 +660,97 @@ async def price_streamer():
         except Exception as e:
             logger.error(f"Price streamer error: {e}")
             await asyncio.sleep(5)
+
+# Background task for trade crawler
+async def trade_crawler_task():
+    """Background task to crawl for trade signals"""
+    while True:
+        try:
+            # Fetch whale transactions
+            whales = await crawler.fetch_whale_transactions()
+            for whale in whales:
+                urgency = "critical" if whale.usd_value > 10000000 else "high" if whale.usd_value > 1000000 else "medium"
+                action = None
+                if whale.exchange_flow == "inflow":
+                    action = "POTENTIAL_SELL_PRESSURE"
+                elif whale.exchange_flow == "outflow":
+                    action = "POTENTIAL_ACCUMULATION"
+                
+                signal = crawler.create_signal(
+                    signal_type="whale",
+                    urgency=urgency,
+                    symbol=whale.symbol,
+                    message=f"🐋 Whale Alert: {whale.amount:,.2f} {whale.symbol} (${whale.usd_value:,.0f}) moved",
+                    data=whale.model_dump(),
+                    action=action
+                )
+                signal.data['timestamp'] = signal.data['timestamp'].isoformat()
+                await crawler.broadcast_signal(signal)
+                
+                # Store in database
+                doc = signal.model_dump()
+                doc['timestamp'] = doc['timestamp'].isoformat()
+                await db.crawler_signals.insert_one(doc)
+            
+            # Fetch news headlines
+            news = await crawler.fetch_news_headlines()
+            for item in news:
+                urgency = "critical" if item.impact == "high" else "medium" if item.impact == "medium" else "low"
+                action = "CONSIDER_LONG" if item.sentiment == "bullish" else "CONSIDER_SHORT" if item.sentiment == "bearish" else None
+                
+                signal = crawler.create_signal(
+                    signal_type="news",
+                    urgency=urgency,
+                    symbol=item.symbols[0] if item.symbols else "MARKET",
+                    message=f"📰 {item.title}",
+                    data=item.model_dump(),
+                    action=action
+                )
+                signal.data['timestamp'] = signal.data['timestamp'].isoformat()
+                await crawler.broadcast_signal(signal)
+                
+                doc = signal.model_dump()
+                doc['timestamp'] = doc['timestamp'].isoformat()
+                await db.crawler_signals.insert_one(doc)
+            
+            # Fetch social signals
+            social = await crawler.fetch_social_signals()
+            for item in social:
+                urgency = "high" if item.engagement > 10000 else "medium" if item.engagement > 1000 else "low"
+                
+                signal = crawler.create_signal(
+                    signal_type="social",
+                    urgency=urgency,
+                    symbol=item.symbols[0] if item.symbols else "CRYPTO",
+                    message=f"📱 [{item.platform.upper()}] {item.content[:100]}",
+                    data=item.model_dump(),
+                    action=None
+                )
+                signal.data['timestamp'] = signal.data['timestamp'].isoformat()
+                await crawler.broadcast_signal(signal)
+            
+            # Fetch orderbook signals
+            orderbook = await crawler.fetch_orderbook_signals()
+            for item in orderbook:
+                if abs(item.imbalance) > 0.15:  # Only significant imbalances
+                    urgency = "high" if abs(item.imbalance) > 0.3 else "medium"
+                    action = "BULLISH_PRESSURE" if item.imbalance > 0 else "BEARISH_PRESSURE"
+                    
+                    signal = crawler.create_signal(
+                        signal_type="orderbook",
+                        urgency=urgency,
+                        symbol=item.symbol,
+                        message=f"📊 Order book imbalance on {item.exchange}: {item.imbalance:+.1%}",
+                        data=item.model_dump(),
+                        action=action
+                    )
+                    signal.data['timestamp'] = signal.data['timestamp'].isoformat()
+                    await crawler.broadcast_signal(signal)
+            
+            await asyncio.sleep(10)  # Check every 10 seconds
+        except Exception as e:
+            logger.error(f"Trade crawler error: {e}")
+            await asyncio.sleep(10)
 
 # ============ AUTHENTICATION ============
 
