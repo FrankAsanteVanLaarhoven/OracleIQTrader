@@ -13,7 +13,7 @@ import WebcamFaceTracker from './WebcamFaceTracker';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Animated SVG Face Mesh Component
-const AnimatedFaceMesh = ({ emotion, speaking, confidence }) => {
+const AnimatedFaceMesh = ({ emotion, speaking, confidence, webcamFace = null }) => {
   const [frame, setFrame] = useState(0);
   
   useEffect(() => {
@@ -31,25 +31,36 @@ const AnimatedFaceMesh = ({ emotion, speaking, confidence }) => {
     focused: '#3b82f6'
   };
   
-  const color = emotionColors[emotion] || emotionColors.neutral;
+  const color = emotionColors[webcamFace?.emotion || emotion] || emotionColors.neutral;
   
-  // Animation calculations
+  // Animation calculations - use webcam data if available
   const time = frame * 0.05;
   const blinkCycle = Math.sin(time * 2.5);
-  const isBlinking = blinkCycle > 0.97;
+  const isBlinking = webcamFace ? (webcamFace.leftEyeOpen < 0.3 || webcamFace.rightEyeOpen < 0.3) : blinkCycle > 0.97;
   const breathe = Math.sin(time * 0.8) * 0.02;
-  const headTilt = Math.sin(time * 0.3) * 2;
+  const headTilt = webcamFace ? webcamFace.headTiltX : Math.sin(time * 0.3) * 2;
   
-  // Eye animation
-  const eyeOpenness = isBlinking ? 1 : (emotion === 'excited' ? 6 : emotion === 'concerned' ? 3 : 5);
+  // Eye animation - use webcam data if available
+  const eyeOpenness = webcamFace 
+    ? Math.max(1, webcamFace.leftEyeOpen * 6) 
+    : (isBlinking ? 1 : (emotion === 'excited' ? 6 : emotion === 'concerned' ? 3 : 5));
   
-  // Mouth animation
-  const mouthOpen = speaking ? 4 + Math.sin(time * 12) * 3 : 0;
-  const smileAmount = emotion === 'happy' || emotion === 'excited' ? -8 : 
-                      emotion === 'concerned' ? 4 : 0;
+  // Mouth animation - use webcam data if available
+  const mouthOpen = webcamFace 
+    ? (webcamFace.mouthOpen * 8) 
+    : (speaking ? 4 + Math.sin(time * 12) * 3 : 0);
+  const smileAmount = webcamFace 
+    ? (webcamFace.smileAmount * -12) 
+    : (emotion === 'happy' || emotion === 'excited' ? -8 : emotion === 'concerned' ? 4 : 0);
   
-  // Eyebrow position
-  const eyebrowY = emotion === 'excited' ? -2 : emotion === 'concerned' ? 3 : 0;
+  // Eyebrow position - use webcam data if available
+  const eyebrowY = webcamFace 
+    ? (webcamFace.eyebrowRaise * -5) 
+    : (emotion === 'excited' ? -2 : emotion === 'concerned' ? 3 : 0);
+  
+  // Eye gaze - use webcam data if available
+  const lookX = webcamFace ? webcamFace.lookX * 0.5 : Math.sin(time * 0.5) * 2;
+  const lookY = webcamFace ? webcamFace.lookY * 0.5 : 0;
   
   // Generate mesh grid points
   const generateGridPoints = () => {
