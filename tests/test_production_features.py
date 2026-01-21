@@ -676,15 +676,17 @@ class TestSocialIntegration:
         data = response.json()
         
         assert "symbol" in data
-        assert "sentiment" in data  # Actual key name
+        assert "sentiment_score" in data
         assert "sentiment_label" in data
         
         # Verify sentiment value
-        sentiment = data["sentiment"]
+        sentiment = data["sentiment_score"]
         assert -1 <= sentiment <= 1
         
         print(f"✓ BTC Sentiment:")
         print(f"  Overall: {sentiment:.2f} ({data['sentiment_label']})")
+        if "sources" in data:
+            print(f"  Sources: {list(data['sources'].keys())}")
         if "key_influencers" in data:
             print(f"  Key influencers: {len(data['key_influencers'])}")
 
