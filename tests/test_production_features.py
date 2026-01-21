@@ -26,8 +26,10 @@ class TestHealthAndBasics:
         response = requests.get(f"{BASE_URL}/api/market/prices")
         assert response.status_code == 200
         data = response.json()
-        assert "prices" in data
-        print(f"✓ Market prices: {len(data['prices'])} coins")
+        # API returns list directly
+        assert isinstance(data, list)
+        assert len(data) > 0
+        print(f"✓ Market prices: {len(data)} coins")
 
 
 class TestTradingPlayground:
