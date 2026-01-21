@@ -71,13 +71,28 @@ const TradingJournal = () => {
     }
   }, [view, fetchDailySummary, fetchWeeklySummary]);
 
-  // Play audio summary
-  const playAudioSummary = () => {
-    if (dailySummary?.audio && audioRef.current) {
-      audioRef.current.src = `data:audio/mp3;base64,${dailySummary.audio}`;
-      audioRef.current.play();
-      setIsPlaying(true);
-      audioRef.current.onended = () => setIsPlaying(false);
+  // Play audio summary - fetch audio on demand
+  const playAudioSummary = async () => {
+    if (isPlaying) {
+      audioRef.current?.pause();
+      setIsPlaying(false);
+      return;
+    }
+    
+    try {
+      // Fetch audio only when play is requested
+      const response = await fetch(`${API}/journal/daily-summary?date=${selectedDate}&include_audio=true`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.audio && audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${data.audio}`;
+          audioRef.current.play();
+          setIsPlaying(true);
+          audioRef.current.onended = () => setIsPlaying(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error playing audio summary:', error);
     }
   };
 
