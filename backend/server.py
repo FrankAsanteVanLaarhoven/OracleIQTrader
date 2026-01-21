@@ -1665,6 +1665,326 @@ async def get_available_voices():
         "default": "nova"
     }
 
+# ============ VOICE COMMAND PROCESSING ============
+
+class VoiceCommandRequest(BaseModel):
+    transcript: str
+    context: Optional[Dict[str, Any]] = None
+
+class TradeAnnouncementRequest(BaseModel):
+    action: str  # "buy" or "sell"
+    symbol: str
+    quantity: float
+    price: float
+    profit_loss: Optional[float] = None
+
+@api_router.post("/voice/command")
+async def process_voice_command(request: VoiceCommandRequest):
+    """Process voice command and return action"""
+    transcript = request.transcript.lower().strip()
+    
+    # Parse trading commands
+    command = None
+    response_message = ""
+    action_data = {}
+    
+    # Buy commands
+    if any(word in transcript for word in ["buy", "purchase", "get", "long"]):
+        command = "buy"
+        # Extract quantity and symbol
+        import re
+        
+        # Match patterns like "buy 100 btc" or "buy btc 100" or "buy 0.5 bitcoin"
+        qty_match = re.search(r'(\d+\.?\d*)\s*(btc|bitcoin|eth|ethereum|sol|solana|spy|aapl|nvda)?', transcript)
+        symbol_match = re.search(r'(btc|bitcoin|eth|ethereum|sol|solana|spy|aapl|nvda)\s*(\d+\.?\d*)?', transcript)
+        
+        quantity = 1.0
+        symbol = "BTC"
+        
+        if qty_match:
+            quantity = float(qty_match.group(1))
+        if symbol_match:
+            symbol_map = {"btc": "BTC", "bitcoin": "BTC", "eth": "ETH", "ethereum": "ETH", 
+                         "sol": "SOL", "solana": "SOL", "spy": "SPY", "aapl": "AAPL", "nvda": "NVDA"}
+            symbol = symbol_map.get(symbol_match.group(1).lower(), "BTC")
+            if symbol_match.group(2):
+                quantity = float(symbol_match.group(2))
+        
+        action_data = {"action": "buy", "symbol": symbol, "quantity": quantity}
+        response_message = f"Understood! Preparing to buy {quantity} {symbol}."
+    
+    # Sell commands
+    elif any(word in transcript for word in ["sell", "short", "dump", "exit"]):
+        command = "sell"
+        import re
+        
+        qty_match = re.search(r'(\d+\.?\d*)\s*(btc|bitcoin|eth|ethereum|sol|solana|spy|aapl|nvda)?', transcript)
+        symbol_match = re.search(r'(btc|bitcoin|eth|ethereum|sol|solana|spy|aapl|nvda)', transcript)
+        
+        quantity = 1.0
+        symbol = "BTC"
+        
+        if qty_match:
+            quantity = float(qty_match.group(1))
+        if symbol_match:
+            symbol_map = {"btc": "BTC", "bitcoin": "BTC", "eth": "ETH", "ethereum": "ETH",
+                         "sol": "SOL", "solana": "SOL", "spy": "SPY", "aapl": "AAPL", "nvda": "NVDA"}
+            symbol = symbol_map.get(symbol_match.group(1).lower(), "BTC")
+        
+        action_data = {"action": "sell", "symbol": symbol, "quantity": quantity}
+        response_message = f"Understood! Preparing to sell {quantity} {symbol}."
+    
+    # Price check
+    elif any(word in transcript for word in ["price", "how much", "what's", "what is", "check"]):
+        command = "price_check"
+        import re
+        symbol_match = re.search(r'(btc|bitcoin|eth|ethereum|sol|solana|spy|aapl|nvda)', transcript)
+        symbol = "BTC"
+        if symbol_match:
+            symbol_map = {"btc": "BTC", "bitcoin": "BTC", "eth": "ETH", "ethereum": "ETH",
+                         "sol": "SOL", "solana": "SOL", "spy": "SPY", "aapl": "AAPL", "nvda": "NVDA"}
+            symbol = symbol_map.get(symbol_match.group(1).lower(), "BTC")
+        
+        action_data = {"action": "price_check", "symbol": symbol}
+        response_message = f"Checking the current price of {symbol}."
+    
+    # Set alert
+    elif any(word in transcript for word in ["alert", "notify", "tell me when", "watch"]):
+        command = "set_alert"
+        import re
+        
+        price_match = re.search(r'(\d+(?:,\d{3})*(?:\.\d+)?)', transcript)
+        symbol_match = re.search(r'(btc|bitcoin|eth|ethereum|sol|solana)', transcript)
+        condition = "above" if any(w in transcript for w in ["above", "over", "reaches", "hits"]) else "below"
+        
+        target_price = 100000
+        symbol = "BTC"
+        
+        if price_match:
+            target_price = float(price_match.group(1).replace(",", ""))
+        if symbol_match:
+            symbol_map = {"btc": "BTC", "bitcoin": "BTC", "eth": "ETH", "ethereum": "ETH", "sol": "SOL", "solana": "SOL"}
+            symbol = symbol_map.get(symbol_match.group(1).lower(), "BTC")
+        
+        action_data = {"action": "set_alert", "symbol": symbol, "condition": condition, "target_price": target_price}
+        response_message = f"Setting alert for {symbol} {condition} ${target_price:,.2f}."
+    
+    # Market status
+    elif any(word in transcript for word in ["market", "status", "how are", "overview"]):
+        command = "market_status"
+        action_data = {"action": "market_status"}
+        response_message = "Let me check the current market conditions for you."
+    
+    # Help
+    elif any(word in transcript for word in ["help", "what can", "commands"]):
+        command = "help"
+        action_data = {"action": "help"}
+        response_message = "I can help you buy or sell crypto, check prices, set alerts, and provide market insights. Just say 'buy 1 BTC' or 'what's the price of ETH'."
+    
+    else:
+        command = "unknown"
+        response_message = "I didn't quite catch that. Try saying 'buy 1 BTC', 'sell ETH', 'check BTC price', or 'set alert BTC above 100000'."
+    
+    # Generate audio response
+    audio_data = None
+    if tts_client and response_message:
+        try:
+            audio_data = await tts_client.generate_speech_base64(
+                text=response_message,
+                model="tts-1",
+                voice="nova",
+                speed=1.0,
+                response_format="mp3"
+            )
+        except Exception as e:
+            logger.error(f"Voice command TTS error: {e}")
+    
+    return {
+        "command": command,
+        "transcript": transcript,
+        "response": response_message,
+        "action_data": action_data,
+        "audio": audio_data,
+        "format": "mp3" if audio_data else None
+    }
+
+@api_router.post("/avatar/announce-trade")
+async def announce_trade(request: TradeAnnouncementRequest):
+    """Generate voice announcement for a completed trade"""
+    action = request.action.upper()
+    symbol = request.symbol.upper()
+    quantity = request.quantity
+    price = request.price
+    profit_loss = request.profit_loss
+    
+    # Generate announcement message
+    if profit_loss is not None and profit_loss != 0:
+        if profit_loss > 0:
+            message = f"Trade executed! {action} {quantity} {symbol} at ${price:,.2f}. Congratulations, you made ${profit_loss:,.2f} profit!"
+            emotion = "excited"
+        else:
+            message = f"Trade executed. {action} {quantity} {symbol} at ${price:,.2f}. Loss of ${abs(profit_loss):,.2f}. Let's analyze what happened."
+            emotion = "concerned"
+    else:
+        message = f"Trade executed! {action} {quantity} {symbol} at ${price:,.2f}. Order filled successfully."
+        emotion = "happy"
+    
+    # Generate audio
+    audio_data = None
+    if tts_client:
+        try:
+            voice_map = {"excited": "nova", "concerned": "onyx", "happy": "shimmer"}
+            audio_data = await tts_client.generate_speech_base64(
+                text=message,
+                model="tts-1",
+                voice=voice_map.get(emotion, "alloy"),
+                speed=1.1 if emotion == "excited" else 0.95 if emotion == "concerned" else 1.0,
+                response_format="mp3"
+            )
+        except Exception as e:
+            logger.error(f"Trade announcement TTS error: {e}")
+    
+    # Store trade in database
+    trade_doc = {
+        "id": str(uuid.uuid4()),
+        "action": request.action,
+        "symbol": symbol,
+        "quantity": quantity,
+        "price": price,
+        "profit_loss": profit_loss,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "announced": True
+    }
+    await db.trades.insert_one(trade_doc)
+    
+    # Broadcast trade to WebSocket clients
+    await manager.broadcast({
+        "type": "trade_executed",
+        "data": {
+            "action": request.action,
+            "symbol": symbol,
+            "quantity": quantity,
+            "price": price,
+            "profit_loss": profit_loss,
+            "message": message
+        }
+    })
+    
+    return {
+        "message": message,
+        "emotion": emotion,
+        "audio": audio_data,
+        "format": "mp3" if audio_data else None,
+        "trade_id": trade_doc["id"]
+    }
+
+# ============ REAL API INTEGRATIONS ============
+
+@api_router.get("/real/whale-transactions")
+async def get_real_whale_transactions():
+    """Fetch real whale transactions from blockchain APIs"""
+    try:
+        # Using Blockchain.com API for large transactions (free, no key needed)
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            # Get latest BTC blocks
+            response = await client.get("https://blockchain.info/latestblock")
+            if response.status_code == 200:
+                latest = response.json()
+                block_hash = latest.get("hash")
+                
+                # Get block details
+                block_resp = await client.get(f"https://blockchain.info/rawblock/{block_hash}")
+                if block_resp.status_code == 200:
+                    block = block_resp.json()
+                    
+                    # Filter large transactions (> 10 BTC)
+                    large_txs = []
+                    for tx in block.get("tx", [])[:50]:  # Check first 50 txs
+                        total_output = sum(out.get("value", 0) for out in tx.get("out", [])) / 100000000  # Satoshi to BTC
+                        if total_output > 10:
+                            large_txs.append({
+                                "hash": tx.get("hash"),
+                                "amount": round(total_output, 4),
+                                "symbol": "BTC",
+                                "usd_value": round(total_output * 90000, 2),  # Approximate
+                                "timestamp": datetime.fromtimestamp(tx.get("time", 0), timezone.utc).isoformat(),
+                                "inputs": len(tx.get("inputs", [])),
+                                "outputs": len(tx.get("out", []))
+                            })
+                    
+                    return {
+                        "source": "blockchain.info",
+                        "transactions": large_txs[:10],
+                        "block_height": latest.get("height"),
+                        "fetched_at": datetime.now(timezone.utc).isoformat()
+                    }
+        
+        return {"source": "blockchain.info", "transactions": [], "error": "Could not fetch data"}
+    except Exception as e:
+        logger.error(f"Whale API error: {e}")
+        return {"source": "blockchain.info", "transactions": [], "error": str(e)}
+
+@api_router.get("/real/crypto-news")
+async def get_real_crypto_news():
+    """Fetch real crypto news from CryptoPanic API (free tier)"""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            # CryptoPanic public feed (no auth required for basic access)
+            response = await client.get(
+                "https://cryptopanic.com/api/v1/posts/",
+                params={
+                    "auth_token": "free",  # Public access
+                    "public": "true",
+                    "kind": "news",
+                    "filter": "hot"
+                }
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                news = []
+                for item in data.get("results", [])[:15]:
+                    # Determine sentiment from votes
+                    votes = item.get("votes", {})
+                    positive = votes.get("positive", 0)
+                    negative = votes.get("negative", 0)
+                    sentiment = "bullish" if positive > negative else "bearish" if negative > positive else "neutral"
+                    
+                    news.append({
+                        "id": item.get("id"),
+                        "title": item.get("title"),
+                        "source": item.get("source", {}).get("title", "Unknown"),
+                        "url": item.get("url"),
+                        "sentiment": sentiment,
+                        "votes": votes,
+                        "currencies": [c.get("code") for c in item.get("currencies", [])],
+                        "published_at": item.get("published_at")
+                    })
+                
+                return {
+                    "source": "cryptopanic",
+                    "news": news,
+                    "fetched_at": datetime.now(timezone.utc).isoformat()
+                }
+            else:
+                # Fallback to simulated news if API fails
+                return await get_fallback_news()
+    except Exception as e:
+        logger.error(f"CryptoPanic API error: {e}")
+        return await get_fallback_news()
+
+async def get_fallback_news():
+    """Return simulated news as fallback"""
+    return {
+        "source": "simulated",
+        "news": [
+            {"title": "Bitcoin maintains support above $89,000", "sentiment": "bullish", "source": "CoinDesk"},
+            {"title": "Ethereum gas fees reach 6-month low", "sentiment": "bullish", "source": "The Block"},
+            {"title": "Federal Reserve signals potential rate cuts", "sentiment": "bullish", "source": "Bloomberg"},
+        ],
+        "fetched_at": datetime.now(timezone.utc).isoformat()
+    }
+
 # ============ WEBSOCKET ENDPOINTS ============
 
 @app.websocket("/ws/prices")
