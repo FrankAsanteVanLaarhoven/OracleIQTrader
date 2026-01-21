@@ -623,17 +623,19 @@ class TestExchangeIntegration:
         exchange = exchanges[0]
         assert "id" in exchange
         assert "name" in exchange
-        assert "features" in exchange  # Actual key name
-        assert "testnet" in exchange  # Actual key name
+        assert "features" in exchange
+        assert "testnet_available" in exchange
         
         # Binance should be supported
         binance = next((e for e in exchanges if e["id"] == "binance"), None)
         assert binance is not None
-        assert binance["testnet"] == True
+        assert binance["testnet_available"] == True
+        assert binance["supported"] == True
         
         print(f"✓ Supported exchanges: {len(exchanges)}")
         for ex in exchanges:
-            print(f"  - {ex['name']} (testnet: {ex['testnet']})")
+            status = "✓" if ex.get("supported") else "Coming Soon"
+            print(f"  - {ex['name']} ({status}, testnet: {ex['testnet_available']})")
 
 
 class TestSocialIntegration:
