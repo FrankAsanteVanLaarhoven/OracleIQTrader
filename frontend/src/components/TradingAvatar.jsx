@@ -1,9 +1,6 @@
-import React, { useRef, useState, useEffect, useCallback, Suspense, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import * as THREE from 'three';
 import { 
   Mic, MicOff, Volume2, VolumeX, 
   Maximize2, Minimize2, Brain, Activity,
@@ -14,364 +11,347 @@ import StatusBadge from './StatusBadge';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// Create face mesh geometry with 68 landmarks
-const createFaceMeshGeometry = (emotion = 'neutral', speaking = false, time = 0) => {
-  const vertices = [];
-  const indices = [];
+// Animated SVG Face Mesh Component
+const AnimatedFaceMesh = ({ emotion, speaking, confidence }) => {
+  const [frame, setFrame] = useState(0);
   
-  // Face oval contour (17 points)
-  for (let i = 0; i < 17; i++) {
-    const angle = (i / 16) * Math.PI;
-    const x = Math.sin(angle) * 1.3;
-    const y = -Math.cos(angle) * 1.6 + 0.2;
-    const z = Math.cos(angle * 0.5) * 0.15;
-    vertices.push(x, y, z);
-  }
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFrame(prev => prev + 1);
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
   
-  // Eyebrow height varies with emotion
-  const eyebrowY = emotion === 'excited' ? 1.0 : emotion === 'concerned' ? 0.7 : 0.85;
-  const eyebrowCurve = emotion === 'concerned' ? -0.08 : 0.05;
+  const emotionColors = {
+    excited: '#22c55e',
+    happy: '#10b981',
+    concerned: '#f59e0b',
+    neutral: '#14b8a6',
+    focused: '#3b82f6'
+  };
   
-  // Right eyebrow (5 points) - indices 17-21
-  for (let i = 0; i < 5; i++) {
-    const t = i / 4;
-    const x = 0.25 + t * 0.55;
-    const y = eyebrowY + Math.sin(t * Math.PI) * eyebrowCurve;
-    vertices.push(x, y, 0.15);
-  }
+  const color = emotionColors[emotion] || emotionColors.neutral;
   
-  // Left eyebrow (5 points) - indices 22-26
-  for (let i = 0; i < 5; i++) {
-    const t = i / 4;
-    const x = -0.25 - t * 0.55;
-    const y = eyebrowY + Math.sin(t * Math.PI) * eyebrowCurve;
-    vertices.push(x, y, 0.15);
-  }
-  
-  // Nose bridge (4 points) - indices 27-30
-  for (let i = 0; i < 4; i++) {
-    vertices.push(0, 0.5 - i * 0.25, 0.25 + i * 0.05);
-  }
-  
-  // Nose bottom (5 points) - indices 31-35
-  for (let i = 0; i < 5; i++) {
-    const x = (i - 2) * 0.13;
-    vertices.push(x, -0.2, 0.2);
-  }
+  // Animation calculations
+  const time = frame * 0.05;
+  const blinkCycle = Math.sin(time * 2.5);
+  const isBlinking = blinkCycle > 0.97;
+  const breathe = Math.sin(time * 0.8) * 0.02;
+  const headTilt = Math.sin(time * 0.3) * 2;
   
   // Eye animation
-  const blinkAmount = Math.sin(time * 2.5) > 0.97 ? 0.01 : 0.1;
-  const eyeOpenness = emotion === 'excited' ? 0.12 : emotion === 'concerned' ? 0.06 : blinkAmount;
-  
-  // Right eye (6 points) - indices 36-41
-  for (let i = 0; i < 6; i++) {
-    const angle = (i / 6) * Math.PI * 2;
-    const x = 0.42 + Math.cos(angle) * 0.15;
-    const y = 0.5 + Math.sin(angle) * eyeOpenness;
-    vertices.push(x, y, 0.18);
-  }
-  
-  // Left eye (6 points) - indices 42-47
-  for (let i = 0; i < 6; i++) {
-    const angle = (i / 6) * Math.PI * 2;
-    const x = -0.42 + Math.cos(angle) * 0.15;
-    const y = 0.5 + Math.sin(angle) * eyeOpenness;
-    vertices.push(x, y, 0.18);
-  }
+  const eyeOpenness = isBlinking ? 1 : (emotion === 'excited' ? 6 : emotion === 'concerned' ? 3 : 5);
   
   // Mouth animation
-  const mouthOpen = speaking ? 0.12 + Math.sin(time * 12) * 0.08 : 0.02;
-  const smileAmount = emotion === 'happy' || emotion === 'excited' ? 0.12 : 
-                      emotion === 'concerned' ? -0.08 : 0;
+  const mouthOpen = speaking ? 4 + Math.sin(time * 12) * 3 : 0;
+  const smileAmount = emotion === 'happy' || emotion === 'excited' ? -8 : 
+                      emotion === 'concerned' ? 4 : 0;
   
-  // Outer lip (12 points) - indices 48-59
-  for (let i = 0; i < 12; i++) {
-    const angle = (i / 12) * Math.PI * 2;
-    const x = Math.cos(angle) * 0.3;
-    const yBase = -0.55 + Math.sin(angle) * 0.08;
-    const smile = Math.abs(x) > 0.15 ? smileAmount * (1 - Math.abs(Math.sin(angle))) : 0;
-    const openOffset = Math.sin(angle) > 0 ? mouthOpen : -mouthOpen * 0.3;
-    vertices.push(x, yBase + smile + openOffset, 0.12);
-  }
+  // Eyebrow position
+  const eyebrowY = emotion === 'excited' ? -2 : emotion === 'concerned' ? 3 : 0;
   
-  // Inner lip (8 points) - indices 60-67
-  for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2;
-    const x = Math.cos(angle) * 0.2;
-    const yBase = -0.55 + Math.sin(angle) * 0.04;
-    const openOffset = Math.sin(angle) > 0 ? mouthOpen * 0.6 : -mouthOpen * 0.2;
-    vertices.push(x, yBase + openOffset, 0.15);
-  }
-  
-  return new Float32Array(vertices);
-};
-
-// Face Mesh Lines Component
-const FaceMeshLines = ({ emotion, speaking, color }) => {
-  const meshRef = useRef();
-  const [time, setTime] = useState(0);
-  
-  // Connection indices for lines
-  const connections = useMemo(() => [
-    // Face contour
-    ...Array.from({length: 16}, (_, i) => [i, i+1]).flat(),
-    // Right eyebrow
-    17,18, 18,19, 19,20, 20,21,
-    // Left eyebrow
-    22,23, 23,24, 24,25, 25,26,
-    // Nose
-    27,28, 28,29, 29,30, 31,32, 32,33, 33,34, 34,35, 30,33,
-    // Right eye
-    36,37, 37,38, 38,39, 39,40, 40,41, 41,36,
-    // Left eye
-    42,43, 43,44, 44,45, 45,46, 46,47, 47,42,
-    // Outer lip
-    48,49, 49,50, 50,51, 51,52, 52,53, 53,54, 54,55, 55,56, 56,57, 57,58, 58,59, 59,48,
-    // Inner lip
-    60,61, 61,62, 62,63, 63,64, 64,65, 65,66, 66,67, 67,60,
-    // Cross connections for mesh effect
-    0,27, 16,27, 8,30, 4,31, 12,35,
-    17,36, 21,39, 22,42, 26,45,
-    33,51, 33,57, 48,4, 54,12,
-  ], []);
-  
-  useFrame((state) => {
-    setTime(state.clock.elapsedTime);
-    if (meshRef.current) {
-      // Subtle head movement
-      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
-      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.05;
-    }
-  });
-  
-  const vertices = useMemo(() => createFaceMeshGeometry(emotion, speaking, time), [emotion, speaking, time]);
-  
-  // Create line positions from vertex pairs
-  const linePositions = useMemo(() => {
-    const positions = [];
-    for (let i = 0; i < connections.length; i += 2) {
-      const idx1 = connections[i] * 3;
-      const idx2 = connections[i + 1] * 3;
-      if (idx1 < vertices.length && idx2 < vertices.length) {
-        positions.push(
-          vertices[idx1], vertices[idx1 + 1], vertices[idx1 + 2],
-          vertices[idx2], vertices[idx2 + 1], vertices[idx2 + 2]
-        );
+  // Generate mesh grid points
+  const generateGridPoints = () => {
+    const points = [];
+    const rows = 8;
+    const cols = 6;
+    
+    for (let r = 0; r <= rows; r++) {
+      for (let c = 0; c <= cols; c++) {
+        const x = 20 + (c / cols) * 60;
+        const y = 15 + (r / rows) * 90;
+        
+        // Apply face oval distortion
+        const distFromCenter = Math.sqrt(Math.pow(x - 50, 2) + Math.pow(y - 55, 2));
+        const ovalFactor = Math.max(0, 1 - distFromCenter / 50);
+        
+        if (ovalFactor > 0.1) {
+          points.push({ x, y, opacity: ovalFactor });
+        }
       }
     }
-    return new Float32Array(positions);
-  }, [vertices, connections]);
-  
-  return (
-    <group ref={meshRef}>
-      {/* Main mesh lines */}
-      <lineSegments>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            array={linePositions}
-            count={linePositions.length / 3}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <lineBasicMaterial color={color} linewidth={2} transparent opacity={0.9} />
-      </lineSegments>
-      
-      {/* Vertex points */}
-      <points>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            array={vertices}
-            count={vertices.length / 3}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <pointsMaterial color={color} size={0.06} sizeAttenuation transparent opacity={1} />
-      </points>
-      
-      {/* Glow sphere behind face */}
-      <mesh position={[0, 0, -0.5]}>
-        <sphereGeometry args={[1.8, 32, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.08} />
-      </mesh>
-      
-      {/* Inner glow */}
-      <mesh position={[0, 0, -0.2]}>
-        <sphereGeometry args={[1.4, 32, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.05} />
-      </mesh>
-    </group>
-  );
-};
-
-// Confidence Number Display
-const ConfidenceDisplay = ({ value, color }) => {
-  return (
-    <group position={[-2, 1.5, 0]}>
-      <mesh>
-        <planeGeometry args={[0.8, 0.5]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.5} />
-      </mesh>
-    </group>
-  );
-};
-
-// Main Scene
-const AvatarScene = ({ emotion, speaking, confidence }) => {
-  const emotionColors = {
-    excited: '#22c55e',
-    happy: '#10b981',
-    concerned: '#f59e0b',
-    neutral: '#14b8a6',
-    focused: '#3b82f6'
+    return points;
   };
   
-  const color = emotionColors[emotion] || emotionColors.neutral;
+  const gridPoints = useMemo(() => generateGridPoints(), []);
   
   return (
-    <>
-      <ambientLight intensity={0.2} />
-      <pointLight position={[5, 5, 5]} intensity={0.3} />
-      <pointLight position={[-5, 5, 5]} intensity={0.3} color={color} />
-      
-      <FaceMeshLines emotion={emotion} speaking={speaking} color={color} />
-      <ConfidenceDisplay value={confidence} color={color} />
-      
-      <OrbitControls 
-        enableZoom={false} 
-        enablePan={false} 
-        maxPolarAngle={Math.PI / 2} 
-        minPolarAngle={Math.PI / 3}
-        autoRotate={false}
-      />
-    </>
-  );
-};
-
-// Fallback 2D Avatar when WebGL not available
-const Avatar2D = ({ emotion, speaking, confidence }) => {
-  const emotionColors = {
-    excited: '#22c55e',
-    happy: '#10b981',
-    concerned: '#f59e0b',
-    neutral: '#14b8a6',
-    focused: '#3b82f6'
-  };
-  
-  const color = emotionColors[emotion] || emotionColors.neutral;
-  
-  // SVG face mesh
-  const eyeY = emotion === 'excited' ? 35 : emotion === 'concerned' ? 40 : 38;
-  const mouthCurve = emotion === 'happy' || emotion === 'excited' ? -10 : 
-                     emotion === 'concerned' ? 5 : 0;
-  
-  return (
-    <div className="relative w-full h-full flex items-center justify-center">
-      {/* Glow background */}
+    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+      {/* Ambient glow */}
       <div 
-        className="absolute inset-0 rounded-full opacity-20 blur-3xl"
-        style={{ background: `radial-gradient(circle, ${color} 0%, transparent 70%)` }}
+        className="absolute inset-0 opacity-30"
+        style={{ 
+          background: `radial-gradient(ellipse at center, ${color}40 0%, transparent 60%)`,
+        }}
       />
       
-      {/* Confidence badge */}
-      <div className="absolute top-4 left-4 text-4xl font-bold" style={{ color }}>
+      {/* Confidence number */}
+      <div 
+        className="absolute top-6 left-6 font-mono font-bold text-5xl"
+        style={{ color, textShadow: `0 0 20px ${color}80` }}
+      >
         {confidence}
       </div>
       
-      <svg viewBox="0 0 100 120" className="w-4/5 h-4/5 max-w-[300px]">
-        {/* Face outline */}
+      {/* Main SVG */}
+      <svg 
+        viewBox="0 0 100 120" 
+        className="w-full h-full max-w-[400px] max-h-[450px]"
+        style={{ transform: `rotate(${headTilt}deg) scale(${1 + breathe})` }}
+      >
+        <defs>
+          {/* Glow filter */}
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          
+          {/* Stronger glow for points */}
+          <filter id="pointGlow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        
+        {/* Background mesh grid */}
+        <g filter="url(#glow)" opacity="0.3">
+          {/* Horizontal lines */}
+          {[20, 35, 50, 65, 80, 95].map((y, i) => (
+            <path
+              key={`h${i}`}
+              d={`M 15 ${y} Q 50 ${y + Math.sin(time + i) * 2} 85 ${y}`}
+              fill="none"
+              stroke={color}
+              strokeWidth="0.5"
+            />
+          ))}
+          {/* Vertical lines */}
+          {[25, 37.5, 50, 62.5, 75].map((x, i) => (
+            <path
+              key={`v${i}`}
+              d={`M ${x} 15 Q ${x + Math.sin(time + i) * 2} 55 ${x} 100`}
+              fill="none"
+              stroke={color}
+              strokeWidth="0.5"
+            />
+          ))}
+        </g>
+        
+        {/* Face outline - main contour */}
         <ellipse 
-          cx="50" cy="55" rx="35" ry="45" 
+          cx="50" cy="55" rx="32" ry="42" 
           fill="none" 
           stroke={color} 
           strokeWidth="1.5"
-          opacity="0.8"
+          filter="url(#glow)"
+          opacity="0.9"
         />
         
-        {/* Mesh grid lines - horizontal */}
-        {[25, 40, 55, 70, 85].map((y, i) => (
-          <path
-            key={`h${i}`}
-            d={`M ${15 + Math.abs(y - 55) * 0.3} ${y} Q 50 ${y + (y > 55 ? 5 : -5)} ${85 - Math.abs(y - 55) * 0.3} ${y}`}
-            fill="none"
-            stroke={color}
-            strokeWidth="0.8"
-            opacity="0.5"
-          />
-        ))}
+        {/* Secondary contour */}
+        <ellipse 
+          cx="50" cy="55" rx="28" ry="38" 
+          fill="none" 
+          stroke={color} 
+          strokeWidth="0.8"
+          filter="url(#glow)"
+          opacity="0.5"
+        />
         
-        {/* Mesh grid lines - vertical */}
-        {[30, 40, 50, 60, 70].map((x, i) => (
-          <path
-            key={`v${i}`}
-            d={`M ${x} 15 Q ${x + (x - 50) * 0.1} 55 ${x} 95`}
-            fill="none"
-            stroke={color}
-            strokeWidth="0.8"
-            opacity="0.5"
-          />
-        ))}
+        {/* Forehead lines */}
+        <path
+          d={`M 25 30 Q 50 ${25 + Math.sin(time) * 2} 75 30`}
+          fill="none"
+          stroke={color}
+          strokeWidth="0.8"
+          filter="url(#glow)"
+          opacity="0.6"
+        />
         
         {/* Left eyebrow */}
-        <path
-          d={`M 25 ${eyeY - 8} Q 35 ${eyeY - 12} 42 ${eyeY - 8}`}
-          fill="none"
-          stroke={color}
-          strokeWidth="1.5"
-        />
+        <g filter="url(#glow)">
+          <path
+            d={`M 28 ${38 + eyebrowY} Q 35 ${33 + eyebrowY} 44 ${36 + eyebrowY}`}
+            fill="none"
+            stroke={color}
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </g>
         
         {/* Right eyebrow */}
-        <path
-          d={`M 58 ${eyeY - 8} Q 65 ${eyeY - 12} 75 ${eyeY - 8}`}
-          fill="none"
-          stroke={color}
-          strokeWidth="1.5"
-        />
+        <g filter="url(#glow)">
+          <path
+            d={`M 56 ${36 + eyebrowY} Q 65 ${33 + eyebrowY} 72 ${38 + eyebrowY}`}
+            fill="none"
+            stroke={color}
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </g>
         
         {/* Left eye */}
-        <ellipse 
-          cx="33" cy={eyeY} rx="8" ry={speaking ? 4 : 5}
-          fill="none" 
-          stroke={color} 
-          strokeWidth="1.5"
-        />
-        <circle cx="33" cy={eyeY} r="2" fill={color} />
+        <g filter="url(#glow)">
+          <ellipse 
+            cx="36" cy="48" rx="8" ry={eyeOpenness}
+            fill="none" 
+            stroke={color} 
+            strokeWidth="1.5"
+          />
+          {/* Pupil */}
+          <circle 
+            cx={36 + Math.sin(time * 0.5) * 2} 
+            cy="48" 
+            r="2.5" 
+            fill={color}
+          />
+          {/* Eye highlight */}
+          <circle cx="34" cy="46" r="1" fill="white" opacity="0.8" />
+        </g>
         
         {/* Right eye */}
-        <ellipse 
-          cx="67" cy={eyeY} rx="8" ry={speaking ? 4 : 5}
-          fill="none" 
-          stroke={color} 
-          strokeWidth="1.5"
-        />
-        <circle cx="67" cy={eyeY} r="2" fill={color} />
+        <g filter="url(#glow)">
+          <ellipse 
+            cx="64" cy="48" rx="8" ry={eyeOpenness}
+            fill="none" 
+            stroke={color} 
+            strokeWidth="1.5"
+          />
+          {/* Pupil */}
+          <circle 
+            cx={64 + Math.sin(time * 0.5) * 2} 
+            cy="48" 
+            r="2.5" 
+            fill={color}
+          />
+          {/* Eye highlight */}
+          <circle cx="62" cy="46" r="1" fill="white" opacity="0.8" />
+        </g>
         
         {/* Nose */}
-        <path
-          d="M 50 45 L 50 60 M 45 62 Q 50 65 55 62"
-          fill="none"
-          stroke={color}
-          strokeWidth="1"
-        />
+        <g filter="url(#glow)" opacity="0.8">
+          <path
+            d="M 50 42 L 50 60"
+            fill="none"
+            stroke={color}
+            strokeWidth="1"
+          />
+          <path
+            d="M 44 63 Q 47 67 50 65 Q 53 67 56 63"
+            fill="none"
+            stroke={color}
+            strokeWidth="1"
+          />
+        </g>
         
         {/* Mouth */}
-        <path
-          d={`M 35 75 Q 50 ${75 + mouthCurve + (speaking ? Math.sin(Date.now() / 100) * 5 : 0)} 65 75`}
-          fill="none"
-          stroke={color}
-          strokeWidth="1.5"
-        />
+        <g filter="url(#glow)">
+          {/* Upper lip */}
+          <path
+            d={`M 38 ${78 + smileAmount} Q 44 ${75 + smileAmount - mouthOpen} 50 ${76 + smileAmount - mouthOpen} Q 56 ${75 + smileAmount - mouthOpen} 62 ${78 + smileAmount}`}
+            fill="none"
+            stroke={color}
+            strokeWidth="1.5"
+          />
+          {/* Lower lip */}
+          <path
+            d={`M 38 ${78 + smileAmount} Q 50 ${82 + smileAmount + mouthOpen} 62 ${78 + smileAmount}`}
+            fill="none"
+            stroke={color}
+            strokeWidth="1.5"
+          />
+          {/* Mouth opening */}
+          {speaking && (
+            <ellipse
+              cx="50"
+              cy={78 + smileAmount}
+              rx="8"
+              ry={mouthOpen * 0.8}
+              fill={`${color}20`}
+              stroke={color}
+              strokeWidth="0.5"
+            />
+          )}
+        </g>
         
-        {/* Vertex points */}
-        {[
-          [50, 15], [30, 20], [70, 20], [20, 35], [80, 35],
-          [15, 55], [85, 55], [20, 75], [80, 75], [30, 90], [70, 90], [50, 98],
-          [33, eyeY], [67, eyeY], [50, 60], [42, 75], [58, 75]
-        ].map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="2" fill={color} opacity="0.8" />
-        ))}
+        {/* Cheekbones */}
+        <g filter="url(#glow)" opacity="0.5">
+          <path d="M 22 55 Q 28 60 30 70" fill="none" stroke={color} strokeWidth="0.8" />
+          <path d="M 78 55 Q 72 60 70 70" fill="none" stroke={color} strokeWidth="0.8" />
+        </g>
+        
+        {/* Jaw lines */}
+        <g filter="url(#glow)" opacity="0.6">
+          <path d="M 25 70 Q 35 90 50 95" fill="none" stroke={color} strokeWidth="0.8" />
+          <path d="M 75 70 Q 65 90 50 95" fill="none" stroke={color} strokeWidth="0.8" />
+        </g>
+        
+        {/* Key landmark points */}
+        <g filter="url(#pointGlow)">
+          {/* Face contour points */}
+          {[[50, 13], [30, 18], [70, 18], [20, 35], [80, 35], [18, 55], [82, 55], 
+            [20, 75], [80, 75], [30, 90], [70, 90], [50, 97]].map(([x, y], i) => (
+            <circle key={`fc${i}`} cx={x} cy={y} r="2" fill={color} />
+          ))}
+          
+          {/* Eye points */}
+          {[[28, 48], [36, 43], [44, 48], [36, 53],
+            [56, 48], [64, 43], [72, 48], [64, 53]].map(([x, y], i) => (
+            <circle key={`ep${i}`} cx={x} cy={y} r="1.5" fill={color} />
+          ))}
+          
+          {/* Nose points */}
+          {[[50, 42], [50, 52], [50, 60], [44, 63], [56, 63]].map(([x, y], i) => (
+            <circle key={`np${i}`} cx={x} cy={y} r="1.5" fill={color} />
+          ))}
+          
+          {/* Mouth points */}
+          {[[38, 78 + smileAmount], [44, 76 + smileAmount], [50, 76 + smileAmount], 
+            [56, 76 + smileAmount], [62, 78 + smileAmount], [50, 82 + smileAmount]].map(([x, y], i) => (
+            <circle key={`mp${i}`} cx={x} cy={y} r="1.5" fill={color} />
+          ))}
+          
+          {/* Eyebrow points */}
+          {[[28, 38 + eyebrowY], [36, 34 + eyebrowY], [44, 36 + eyebrowY],
+            [56, 36 + eyebrowY], [64, 34 + eyebrowY], [72, 38 + eyebrowY]].map(([x, y], i) => (
+            <circle key={`eb${i}`} cx={x} cy={y} r="1.5" fill={color} />
+          ))}
+        </g>
+        
+        {/* Connection lines between landmarks */}
+        <g filter="url(#glow)" opacity="0.4">
+          {/* Cross mesh lines */}
+          <line x1="50" y1="13" x2="50" y2="42" stroke={color} strokeWidth="0.5" />
+          <line x1="30" y1="18" x2="36" y2="43" stroke={color} strokeWidth="0.5" />
+          <line x1="70" y1="18" x2="64" y2="43" stroke={color} strokeWidth="0.5" />
+          <line x1="36" y1="53" x2="44" y2="63" stroke={color} strokeWidth="0.5" />
+          <line x1="64" y1="53" x2="56" y2="63" stroke={color} strokeWidth="0.5" />
+          <line x1="50" y1="65" x2="50" y2={76 + smileAmount} stroke={color} strokeWidth="0.5" />
+        </g>
       </svg>
+      
+      {/* Particle effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 rounded-full"
+            style={{
+              backgroundColor: color,
+              boxShadow: `0 0 6px ${color}`,
+              left: `${30 + Math.sin(time + i * 0.8) * 20 + i * 5}%`,
+              top: `${40 + Math.cos(time + i * 0.5) * 15 + i * 3}%`,
+              opacity: 0.3 + Math.sin(time * 2 + i) * 0.2,
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 };
@@ -387,29 +367,17 @@ const TradingAvatar = ({ marketData = {}, onInsight }) => {
   const [message, setMessage] = useState('');
   const [confidence, setConfidence] = useState(68);
   const [isLoading, setIsLoading] = useState(false);
-  const [webGLSupported, setWebGLSupported] = useState(true);
   const audioRef = useRef(null);
-  
-  // Check WebGL support
-  useEffect(() => {
-    try {
-      const canvas = document.createElement('canvas');
-      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      setWebGLSupported(!!gl);
-    } catch (e) {
-      setWebGLSupported(false);
-    }
-  }, []);
   
   // Determine emotion based on market data
   useEffect(() => {
     const btcChange = marketData.btc_change || 0;
     if (btcChange > 3) {
       setEmotion('excited');
-      setConfidence(Math.min(95, 68 + Math.abs(btcChange) * 3));
+      setConfidence(Math.min(95, Math.round(68 + Math.abs(btcChange) * 3)));
     } else if (btcChange < -3) {
       setEmotion('concerned');
-      setConfidence(Math.max(40, 68 - Math.abs(btcChange) * 3));
+      setConfidence(Math.max(40, Math.round(68 - Math.abs(btcChange) * 3)));
     } else if (btcChange > 0) {
       setEmotion('happy');
       setConfidence(Math.round(68 + btcChange * 2));
@@ -498,20 +466,20 @@ const TradingAvatar = ({ marketData = {}, onInsight }) => {
   };
   
   const emotionColors = {
-    excited: 'border-emerald-500/50',
-    happy: 'border-emerald-500/50',
-    concerned: 'border-amber-500/50',
-    neutral: 'border-teal-500/50',
-    focused: 'border-blue-500/50'
+    excited: 'border-emerald-500/50 shadow-emerald-500/20',
+    happy: 'border-emerald-500/50 shadow-emerald-500/20',
+    concerned: 'border-amber-500/50 shadow-amber-500/20',
+    neutral: 'border-teal-500/50 shadow-teal-500/20',
+    focused: 'border-blue-500/50 shadow-blue-500/20'
   };
   
   return (
     <div className={`${isExpanded ? 'fixed inset-4 z-50' : 'relative'}`} data-testid="trading-avatar">
       <audio ref={audioRef} className="hidden" />
       
-      <div className={`h-full min-h-[400px] rounded-2xl overflow-hidden bg-black/90 backdrop-blur-xl border-2 ${emotionColors[emotion]} transition-colors duration-500 ${isExpanded ? '' : ''}`}>
+      <div className={`h-full min-h-[450px] rounded-2xl overflow-hidden bg-black/95 backdrop-blur-xl border-2 shadow-lg ${emotionColors[emotion]} transition-all duration-500`}>
         {/* Header */}
-        <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/90 to-transparent">
+        <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent">
           <div className="flex items-center gap-2">
             <StatusBadge variant={isSpeaking ? 'active' : 'default'} pulse={isSpeaking}>
               {emotionIcons[emotion]}
@@ -522,7 +490,7 @@ const TradingAvatar = ({ marketData = {}, onInsight }) => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsMuted(!isMuted)}
-              className={`p-2 rounded-lg transition-colors ${isMuted ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-white'}`}
+              className={`p-2 rounded-lg transition-colors ${isMuted ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-white hover:bg-white/20'}`}
               data-testid="avatar-mute-btn"
             >
               {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
@@ -537,21 +505,9 @@ const TradingAvatar = ({ marketData = {}, onInsight }) => {
           </div>
         </div>
         
-        {/* 3D Canvas or 2D Fallback */}
-        <div className="w-full h-full">
-          {webGLSupported ? (
-            <Canvas
-              camera={{ position: [0, 0, 4], fov: 45 }}
-              gl={{ antialias: true, alpha: true }}
-              style={{ background: 'transparent' }}
-            >
-              <Suspense fallback={null}>
-                <AvatarScene emotion={emotion} speaking={isSpeaking} confidence={confidence} />
-              </Suspense>
-            </Canvas>
-          ) : (
-            <Avatar2D emotion={emotion} speaking={isSpeaking} confidence={confidence} />
-          )}
+        {/* Animated Face Mesh */}
+        <div className="w-full h-full pt-16 pb-32">
+          <AnimatedFaceMesh emotion={emotion} speaking={isSpeaking} confidence={confidence} />
         </div>
         
         {/* Bottom Controls */}
