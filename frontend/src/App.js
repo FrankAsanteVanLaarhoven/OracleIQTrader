@@ -52,7 +52,7 @@ import {
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
   Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings,
-  BookOpen, Trophy, MessageCircle
+  BookOpen, Trophy, MessageCircle, GraduationCap
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
