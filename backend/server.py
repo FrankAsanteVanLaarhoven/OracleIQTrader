@@ -2056,9 +2056,9 @@ async def get_daily_summary(date: Optional[str] = None, include_audio: bool = Fa
         insight = "Flat day with no significant gains or losses. Markets may be consolidating. Use this time to research potential opportunities."
         emotion = "neutral"
     
-    # Generate audio summary
+    # Generate audio summary only if requested
     audio_data = None
-    if tts_client:
+    if include_audio and tts_client:
         summary_text = f"Here's your trading summary for {date}. You made {len(trades)} trades with {wins} wins and {losses} losses. "
         summary_text += f"Your total profit and loss is ${total_pnl:,.2f}. " + insight
         
