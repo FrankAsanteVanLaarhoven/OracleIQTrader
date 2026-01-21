@@ -1,0 +1,145 @@
+{
+  "design_system": {
+    "identity": {
+      "name": "Cognitive Oracle",
+      "aesthetic": "Dark Glassmorphism / Future-Tech HUD",
+      "principles": [
+        "Fusion: Fintech Data x Sci-Fi HUD x Apple Glass",
+        "Emotion: Omniscience, Precision, Calm Control",
+        "Depth: Heavy use of Z-axis, layering, and blur",
+        "Ephemeral: UI elements appear only when needed (Voice/Gesture)"
+      ]
+    },
+    "typography": {
+      "font_imports": [
+        "@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@300;400;500;600&display=swap');"
+      ],
+      "families": {
+        "heading": "Barlow Condensed, sans-serif",
+        "body": "Manrope, sans-serif",
+        "mono": "JetBrains Mono, monospace"
+      },
+      "usage": {
+        "h1": "text-5xl font-bold tracking-tight font-heading uppercase text-white/90",
+        "h2": "text-3xl font-semibold tracking-tight font-heading text-white/80",
+        "h3": "text-xl font-medium tracking-wide font-heading text-teal-400",
+        "body": "text-base font-body text-slate-300 leading-relaxed",
+        "label": "text-xs font-mono uppercase tracking-widest text-slate-500",
+        "number": "font-mono tabular-nums tracking-tight"
+      }
+    },
+    "colors": {
+      "palette": {
+        "background": "#050505",
+        "surface": "rgba(20, 20, 25, 0.6)",
+        "primary": "#14b8a6",
+        "secondary": "#6366f1",
+        "accent": "#f43f5e",
+        "success": "#10b981",
+        "warning": "#f59e0b",
+        "border": "rgba(255, 255, 255, 0.1)"
+      },
+      "gradients": {
+        "main_bg": "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#050505] to-black",
+        "glass_surface": "bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl",
+        "active_glow": "shadow-[0_0_20px_rgba(20,184,166,0.3)]"
+      },
+      "css_variables": {
+        "--background": "0 0% 2%",
+        "--foreground": "210 40% 98%",
+        "--card": "222 47% 4%",
+        "--card-foreground": "210 40% 98%",
+        "--popover": "222 47% 4%",
+        "--popover-foreground": "210 40% 98%",
+        "--primary": "173 80% 40%",
+        "--primary-foreground": "210 40% 98%",
+        "--secondary": "217 91% 60%",
+        "--secondary-foreground": "222 47% 11%",
+        "--muted": "217 33% 17%",
+        "--muted-foreground": "215 20% 65%",
+        "--accent": "173 80% 40%",
+        "--accent-foreground": "210 40% 98%",
+        "--destructive": "0 63% 31%",
+        "--destructive-foreground": "210 40% 98%",
+        "--border": "217 33% 17%",
+        "--input": "217 33% 17%",
+        "--ring": "173 80% 40%"
+      }
+    },
+    "layout": {
+      "grid_system": "Bento Grid (High Density)",
+      "spacing": {
+        "container_padding": "p-6 md:p-8",
+        "gap": "gap-4 md:gap-6",
+        "section_margin": "my-12"
+      },
+      "containers": {
+        "main_dashboard": "grid grid-cols-1 md:grid-cols-12 gap-4 h-screen overflow-hidden p-4 bg-[#050505]",
+        "glass_panel": "rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 overflow-hidden relative"
+      }
+    },
+    "components": {
+      "GlassCard": {
+        "base": "relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20",
+        "header": "flex items-center justify-between border-b border-white/5 pb-4 mb-4"
+      },
+      "NeonButton": {
+        "base": "relative inline-flex items-center justify-center rounded-lg bg-teal-500/10 px-6 py-3 font-mono text-sm font-medium text-teal-400 transition-all hover:bg-teal-500/20 hover:shadow-[0_0_20px_rgba(20,184,166,0.3)] active:scale-95 border border-teal-500/50",
+        "danger": "bg-rose-500/10 text-rose-400 border-rose-500/50 hover:bg-rose-500/20 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)]"
+      },
+      "StatusBadge": {
+        "base": "inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-300 backdrop-blur-sm",
+        "active": "border-teal-500/50 bg-teal-500/10 text-teal-400 animate-pulse"
+      }
+    },
+    "motion": {
+      "library": "framer-motion",
+      "animations": {
+        "fade_in": {
+          "initial": { "opacity": 0, "y": 10 },
+          "animate": { "opacity": 1, "y": 0 },
+          "transition": { "duration": 0.4, "ease": "easeOut" }
+        },
+        "ephemeral_toast": {
+          "initial": { "opacity": 0, "scale": 0.9, "y": 20 },
+          "animate": { "opacity": 1, "scale": 1, "y": 0 },
+          "exit": { "opacity": 0, "scale": 0.95, "y": 10 },
+          "transition": { "type": "spring", "stiffness": 300, "damping": 25 }
+        },
+        "hover_scale": {
+          "whileHover": { "scale": 1.02 },
+          "whileTap": { "scale": 0.98 }
+        }
+      }
+    },
+    "assets": {
+      "images": {
+        "trader_avatar": "https://images.pexels.com/photos/5831527/pexels-photo-5831527.jpeg",
+        "abstract_bg": "https://images.pexels.com/photos/25626445/pexels-photo-25626445.jpeg",
+        "btc_icon": "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
+        "eth_icon": "https://cryptologos.cc/logos/ethereum-eth-logo.png",
+        "spy_icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/2560px-Adidas_Logo.svg.png" 
+      },
+      "icons": "lucide-react"
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. UPDATE TAILWIND CONFIG: Add 'font-heading', 'font-body', 'font-mono' to theme.extend.fontFamily.",
+    "2. UPDATE INDEX.CSS: Import the Google Fonts (Barlow Condensed, Manrope, JetBrains Mono) at the very top.",
+    "3. UPDATE INDEX.CSS: Replace the :root and .dark variables with the 'css_variables' provided above to enforce the Dark Glass theme.",
+    "4. FORCE DARK MODE: Ensure the app defaults to dark mode (add 'dark' class to html/body or set default theme).",
+    "5. CREATE LAYOUT: Build the 'Bento Grid' layout. Use 'grid-cols-12'.",
+    "6. GLASSMORPHISM: Do not use solid backgrounds for cards. Use 'bg-black/40 backdrop-blur-xl border-white/10'.",
+    "7. EPHEMERAL UI: Use Framer Motion's AnimatePresence for the Voice Command and Gesture panels. They should appear only when active.",
+    "8. CHARTS: Use Recharts. Style them to look like TradingView (dark bg, teal/rose candles, no grid lines).",
+    "9. DATA-TESTID: Add data-testid attributes to all interactive elements (buttons, inputs, cards)."
+  ],
+  "universal_guidelines": [
+    "Avoid 'AI Slop': No generic centered layouts. Use asymmetry.",
+    "Dark Mode Only: The app is a pro tool. No light mode.",
+    "Teal is the Hero: Use Teal (#14b8a6) for primary actions and 'Active' states.",
+    "Rose is the Warning: Use Rose (#f43f5e) for 'Sell' or 'Danger' states.",
+    "Font Hierarchy: HEADINGS = Barlow Condensed (Uppercase, Bold). BODY = Manrope. DATA = JetBrains Mono.",
+    "Micro-Interactions: Every button must have a hover state (glow or scale)."
+  ]
+}
