@@ -162,7 +162,14 @@ const TradingJournal = () => {
             </button>
           </div>
 
-          {dailySummary && (
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin h-8 w-8 border-2 border-teal-500 border-t-transparent rounded-full" />
+              <span className="ml-3 text-slate-400">Loading journal data...</span>
+            </div>
+          )}
+
+          {!loading && dailySummary && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Stats Cards */}
               <div className="grid grid-cols-2 gap-4">
