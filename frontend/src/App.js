@@ -362,6 +362,20 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* ML Predictions */}
+              {activeTab === 'predictions' && (
+                <motion.div key="predictions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
+                  <MLPredictions />
+                </motion.div>
+              )}
+
+              {/* Trading Competitions */}
+              {activeTab === 'competitions' && (
+                <motion.div key="competitions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
+                  <TradingCompetitions />
+                </motion.div>
+              )}
+
               {/* Trade Crawler / Signals */}
               {activeTab === 'crawler' && (
                 <motion.div key="crawler" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-3xl mx-auto">
