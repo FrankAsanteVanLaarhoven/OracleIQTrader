@@ -469,9 +469,11 @@ const AppRouter = () => {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <div className="App"><AppRouter /></div>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <div className="App"><AppRouter /></div>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
