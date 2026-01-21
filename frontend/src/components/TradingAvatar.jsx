@@ -357,7 +357,7 @@ const AnimatedFaceMesh = ({ emotion, speaking, confidence }) => {
 };
 
 // Main Trading Avatar Component
-const TradingAvatar = ({ marketData = {}, onInsight }) => {
+const TradingAvatar = ({ marketData = {}, onInsight, onTradeCommand }) => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
