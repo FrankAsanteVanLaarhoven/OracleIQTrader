@@ -2875,6 +2875,168 @@ async def get_trending_crypto():
     trending = await social_manager.get_trending_crypto()
     return {"trending": trending}
 
+# ============ ML PREDICTION ENDPOINTS ============
+
+from modules.ml_prediction import MLPredictionEngine, TimeHorizon, PredictionType
+from modules.trading_competition import CompetitionEngine, CompetitionType
+
+# Initialize new engines
+ml_engine = MLPredictionEngine(db)
+competition_engine = CompetitionEngine(db, playground_engine)
+
+@api_router.get("/ml/predict/direction/{symbol}")
+async def predict_price_direction(symbol: str, horizon: str = "24h"):
+    """Get AI price direction prediction"""
+    try:
+        horizon_enum = TimeHorizon(horizon)
+    except ValueError:
+        horizon_enum = TimeHorizon.HOUR_24
+    
+    prediction = await ml_engine.predict_price_direction(symbol.upper(), horizon_enum)
+    return prediction.model_dump()
+
+@api_router.get("/ml/predict/volatility/{symbol}")
+async def predict_volatility(symbol: str, horizon: str = "24h"):
+    """Get AI volatility prediction"""
+    try:
+        horizon_enum = TimeHorizon(horizon)
+    except ValueError:
+        horizon_enum = TimeHorizon.HOUR_24
+    
+    prediction = await ml_engine.predict_volatility(symbol.upper(), horizon_enum)
+    return prediction.model_dump()
+
+@api_router.get("/ml/predict/trend/{symbol}")
+async def predict_trend(symbol: str, horizon: str = "24h"):
+    """Get AI trend prediction"""
+    try:
+        horizon_enum = TimeHorizon(horizon)
+    except ValueError:
+        horizon_enum = TimeHorizon.HOUR_24
+    
+    prediction = await ml_engine.predict_trend(symbol.upper(), horizon_enum)
+    return prediction.model_dump()
+
+@api_router.get("/ml/predict/comprehensive/{symbol}")
+async def get_comprehensive_prediction(symbol: str, horizon: str = "24h"):
+    """Get comprehensive AI prediction combining all models"""
+    try:
+        horizon_enum = TimeHorizon(horizon)
+    except ValueError:
+        horizon_enum = TimeHorizon.HOUR_24
+    
+    prediction = await ml_engine.get_comprehensive_prediction(symbol.upper(), horizon_enum)
+    return prediction.model_dump()
+
+@api_router.get("/ml/accuracy")
+async def get_prediction_accuracy():
+    """Get ML prediction accuracy statistics"""
+    accuracy = await ml_engine.get_prediction_accuracy()
+    return accuracy
+
+# ============ TRADING COMPETITION ENDPOINTS ============
+
+@api_router.get("/competition/active")
+async def get_active_competitions():
+    """Get all active competitions"""
+    competitions = await competition_engine.get_active_competitions()
+    return {"competitions": [c.model_dump() for c in competitions]}
+
+@api_router.get("/competition/{competition_id}")
+async def get_competition(competition_id: str):
+    """Get competition details"""
+    competition = await competition_engine.get_competition(competition_id)
+    if not competition:
+        raise HTTPException(status_code=404, detail="Competition not found")
+    return competition.model_dump()
+
+@api_router.post("/competition/create/daily")
+async def create_daily_challenge():
+    """Create a daily trading challenge"""
+    competition = await competition_engine.create_daily_challenge()
+    return competition.model_dump()
+
+@api_router.post("/competition/create/weekly")
+async def create_weekly_tournament():
+    """Create a weekly tournament"""
+    competition = await competition_engine.create_weekly_tournament()
+    return competition.model_dump()
+
+@api_router.post("/competition/create/themed")
+async def create_themed_event(theme: str = "moon_mission"):
+    """Create a themed competition event"""
+    competition = await competition_engine.create_themed_event(theme)
+    return competition.model_dump()
+
+@api_router.post("/competition/{competition_id}/join")
+async def join_competition(competition_id: str, request: Request):
+    """Join a competition"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else f"demo_{uuid.uuid4().hex[:8]}"
+    username = user.get("name") if user else f"Trader_{random.randint(1000, 9999)}"
+    
+    result = await competition_engine.join_competition(competition_id, user_id, username)
+    return result
+
+@api_router.get("/competition/{competition_id}/leaderboard")
+async def get_competition_leaderboard(competition_id: str, limit: int = 50):
+    """Get competition leaderboard"""
+    leaderboard = await competition_engine.get_competition_leaderboard(competition_id, limit)
+    return {"leaderboard": leaderboard}
+
+@api_router.get("/competition/{competition_id}/entry")
+async def get_user_entry(competition_id: str, request: Request):
+    """Get user's entry in a competition"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    entry = await competition_engine.get_user_entry(competition_id, user_id)
+    if not entry:
+        raise HTTPException(status_code=404, detail="Not entered in this competition")
+    return entry.model_dump()
+
+@api_router.post("/competition/entry/{entry_id}/trade")
+async def execute_competition_trade(
+    entry_id: str,
+    symbol: str,
+    side: str,
+    quantity: float,
+    price: Optional[float] = None
+):
+    """Execute a trade in a competition"""
+    # Get current price if not provided
+    if price is None:
+        price = await playground_engine.get_current_price(symbol.upper())
+    
+    result = await competition_engine.execute_competition_trade(
+        entry_id, symbol.upper(), side.lower(), quantity, price
+    )
+    return result
+
+@api_router.get("/competition/user/stats")
+async def get_user_competition_stats(request: Request):
+    """Get user's overall competition statistics"""
+    user = await get_current_user(request) if request else None
+    user_id = user.get("id") if user else "demo"
+    
+    stats = await competition_engine.get_user_stats(user_id)
+    return stats.model_dump()
+
+@api_router.get("/competition/global/leaderboard")
+async def get_global_competition_leaderboard(limit: int = 100):
+    """Get global competition leaderboard by tier"""
+    leaderboard = await competition_engine.get_global_leaderboard(limit)
+    return {"leaderboard": leaderboard}
+
+@api_router.post("/competition/{competition_id}/finalize")
+async def finalize_competition(competition_id: str):
+    """Finalize a competition and distribute prizes"""
+    try:
+        result = await competition_engine.finalize_competition(competition_id)
+        return result.model_dump()
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
 # Include the router
 app.include_router(api_router)
 
