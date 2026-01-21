@@ -16,20 +16,50 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.oracle.trading"
+      "bundleIdentifier": "com.oracle.trading",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan QR codes for API key import.",
+        "NSFaceIDUsageDescription": "This app uses Face ID for secure authentication."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#050505"
       },
-      "package": "com.oracle.trading"
+      "package": "com.oracle.trading",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store"
-    ]
+      "expo-secure-store",
+      "expo-local-authentication",
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow Oracle Trading to access camera for scanning QR codes."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Oracle Trading to access camera for scanning API key QR codes."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "YOUR_EAS_PROJECT_ID"
+      }
+    },
+    "owner": "YOUR_EXPO_ACCOUNT"
   }
 }
