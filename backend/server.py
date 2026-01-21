@@ -1564,9 +1564,17 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
+    # Load pending alerts from database
+    await alert_manager.load_alerts_from_db()
+    logger.info("Alert manager initialized")
+    
     # Start price streaming background task
     asyncio.create_task(price_streamer())
     logger.info("Price streamer started")
+    
+    # Start trade crawler background task
+    asyncio.create_task(trade_crawler_task())
+    logger.info("Trade crawler started")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
