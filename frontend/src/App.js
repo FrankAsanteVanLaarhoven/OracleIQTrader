@@ -494,6 +494,13 @@ const Dashboard = () => {
                   <SocialSignals />
                 </motion.div>
               )}
+
+              {/* Benzinga News */}
+              {activeTab === 'benzinga' && (
+                <motion.div key="benzinga" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-4xl mx-auto">
+                  <BenzingaNews />
+                </motion.div>
+              )}
             </AnimatePresence>
           </main>
 
