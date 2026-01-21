@@ -1532,6 +1532,139 @@ async def export_alerts_csv(request: Request):
         headers={"Content-Disposition": f"attachment; filename=alerts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"}
     )
 
+# ============ TTS / AVATAR ROUTES ============
+
+class TTSRequest(BaseModel):
+    text: str
+    voice: str = "nova"  # Default to energetic voice for trading
+    speed: float = 1.0
+
+class AvatarMessage(BaseModel):
+    message: str
+    emotion: str = "neutral"  # neutral, happy, concerned, excited, focused
+    market_context: Optional[Dict[str, Any]] = None
+
+@api_router.post("/avatar/speak")
+async def avatar_speak(request: TTSRequest):
+    """Generate speech audio for the avatar"""
+    if not tts_client:
+        raise HTTPException(status_code=503, detail="TTS service not available")
+    
+    if len(request.text) > 4096:
+        raise HTTPException(status_code=400, detail="Text too long (max 4096 characters)")
+    
+    try:
+        # Generate speech as base64
+        audio_base64 = await tts_client.generate_speech_base64(
+            text=request.text,
+            model="tts-1",  # Fast model for real-time
+            voice=request.voice,
+            speed=request.speed,
+            response_format="mp3"
+        )
+        
+        return {
+            "audio": audio_base64,
+            "format": "mp3",
+            "voice": request.voice
+        }
+    except Exception as e:
+        logger.error(f"TTS generation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/avatar/insight")
+async def avatar_generate_insight(request: AvatarMessage):
+    """Generate trading insight and speech for avatar"""
+    # Determine emotion based on market context
+    emotion = request.emotion
+    
+    market_data = request.market_context or {}
+    btc_change = market_data.get('btc_change', 0)
+    
+    if btc_change > 3:
+        emotion = "excited"
+    elif btc_change < -3:
+        emotion = "concerned"
+    elif btc_change > 0:
+        emotion = "happy"
+    
+    # Generate contextual trading insight
+    insights = {
+        "excited": [
+            "Wow! Bitcoin is surging! This could be the breakout we've been waiting for.",
+            "Markets are heating up! Time to consider taking profits on your winners.",
+            "Bullish momentum is strong! Watch for a potential continuation pattern.",
+        ],
+        "concerned": [
+            "Market conditions are turning bearish. Consider reviewing your stop losses.",
+            "We're seeing some significant selling pressure. Stay cautious.",
+            "Volatility is increasing. This might be a good time to reduce exposure.",
+        ],
+        "happy": [
+            "Markets are looking healthy today. Your portfolio is in good shape.",
+            "Steady gains across the board. Keep an eye on key support levels.",
+            "Positive momentum continues. Your trading strategy is working well.",
+        ],
+        "neutral": [
+            "Markets are consolidating. Waiting for a clear direction.",
+            "Volume is low. Major moves could come with the next catalyst.",
+            "Range-bound trading continues. Watch for breakout signals.",
+        ],
+        "focused": [
+            "I'm monitoring key price levels for you.",
+            "Alert systems are active. I'll notify you of any significant moves.",
+            "Analyzing market patterns for potential opportunities.",
+        ]
+    }
+    
+    message = request.message or random.choice(insights.get(emotion, insights["neutral"]))
+    
+    # Generate speech if TTS is available
+    audio_data = None
+    if tts_client:
+        try:
+            voice_map = {
+                "excited": "nova",
+                "concerned": "onyx",
+                "happy": "shimmer",
+                "neutral": "alloy",
+                "focused": "sage"
+            }
+            audio_base64 = await tts_client.generate_speech_base64(
+                text=message,
+                model="tts-1",
+                voice=voice_map.get(emotion, "alloy"),
+                speed=1.1 if emotion == "excited" else 0.95 if emotion == "concerned" else 1.0,
+                response_format="mp3"
+            )
+            audio_data = audio_base64
+        except Exception as e:
+            logger.error(f"TTS error: {e}")
+    
+    return {
+        "message": message,
+        "emotion": emotion,
+        "audio": audio_data,
+        "format": "mp3" if audio_data else None,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/avatar/voices")
+async def get_available_voices():
+    """Get list of available avatar voices"""
+    return {
+        "voices": [
+            {"id": "alloy", "name": "Alloy", "description": "Neutral, balanced"},
+            {"id": "nova", "name": "Nova", "description": "Energetic, upbeat"},
+            {"id": "shimmer", "name": "Shimmer", "description": "Bright, cheerful"},
+            {"id": "onyx", "name": "Onyx", "description": "Deep, authoritative"},
+            {"id": "sage", "name": "Sage", "description": "Wise, measured"},
+            {"id": "echo", "name": "Echo", "description": "Smooth, calm"},
+            {"id": "fable", "name": "Fable", "description": "Expressive, storytelling"},
+        ],
+        "default": "nova"
+    }
+
 # ============ WEBSOCKET ENDPOINTS ============
 
 @app.websocket("/ws/prices")
