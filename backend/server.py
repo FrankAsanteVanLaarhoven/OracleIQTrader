@@ -1985,6 +1985,451 @@ async def get_fallback_news():
         "fetched_at": datetime.now(timezone.utc).isoformat()
     }
 
+# ============ TRADING JOURNAL ============
+
+class JournalEntry(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: Optional[str] = None
+    date: str  # YYYY-MM-DD
+    trades_count: int = 0
+    wins: int = 0
+    losses: int = 0
+    total_pnl: float = 0
+    best_trade: Optional[Dict[str, Any]] = None
+    worst_trade: Optional[Dict[str, Any]] = None
+    notes: Optional[str] = None
+    ai_insights: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.get("/journal/daily-summary")
+async def get_daily_summary(date: Optional[str] = None, request: Request = None):
+    """Get trading journal summary for a specific day"""
+    user = await get_current_user(request) if request else None
+    
+    if not date:
+        date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Get trades for the day
+    start_of_day = f"{date}T00:00:00"
+    end_of_day = f"{date}T23:59:59"
+    
+    query = {
+        "timestamp": {"$gte": start_of_day, "$lte": end_of_day}
+    }
+    if user:
+        query["user_id"] = user.user_id
+    
+    trades = await db.trades.find(query, {"_id": 0}).to_list(1000)
+    
+    if not trades:
+        # Generate sample trades for demo
+        trades = [
+            {"action": "buy", "symbol": "BTC", "quantity": 0.5, "price": 89500, "profit_loss": 250, "timestamp": f"{date}T10:30:00"},
+            {"action": "sell", "symbol": "ETH", "quantity": 5, "price": 2950, "profit_loss": -75, "timestamp": f"{date}T14:15:00"},
+            {"action": "buy", "symbol": "SOL", "quantity": 20, "price": 125, "profit_loss": 180, "timestamp": f"{date}T16:45:00"},
+        ]
+    
+    # Calculate statistics
+    wins = sum(1 for t in trades if (t.get("profit_loss") or 0) > 0)
+    losses = sum(1 for t in trades if (t.get("profit_loss") or 0) < 0)
+    total_pnl = sum(t.get("profit_loss") or 0 for t in trades)
+    
+    best_trade = max(trades, key=lambda t: t.get("profit_loss") or 0) if trades else None
+    worst_trade = min(trades, key=lambda t: t.get("profit_loss") or 0) if trades else None
+    
+    win_rate = (wins / len(trades) * 100) if trades else 0
+    
+    # Generate AI insights
+    if total_pnl > 0:
+        insight = f"Great day! You made ${total_pnl:,.2f} with a {win_rate:.1f}% win rate. "
+        if best_trade:
+            insight += f"Your best trade was {best_trade.get('action', '')} {best_trade.get('symbol', '')} for ${best_trade.get('profit_loss', 0):,.2f} profit. "
+        insight += "Consider taking partial profits on winning positions to lock in gains."
+        emotion = "excited"
+    elif total_pnl < 0:
+        insight = f"Challenging day with ${abs(total_pnl):,.2f} in losses. "
+        if worst_trade:
+            insight += f"Your biggest loss was on {worst_trade.get('symbol', '')}. "
+        insight += "Review your entry points and consider tighter stop losses. Tomorrow is a new opportunity!"
+        emotion = "concerned"
+    else:
+        insight = "Flat day with no significant gains or losses. Markets may be consolidating. Use this time to research potential opportunities."
+        emotion = "neutral"
+    
+    # Generate audio summary
+    audio_data = None
+    if tts_client:
+        summary_text = f"Here's your trading summary for {date}. You made {len(trades)} trades with {wins} wins and {losses} losses. "
+        summary_text += f"Your total profit and loss is ${total_pnl:,.2f}. " + insight
+        
+        try:
+            voice_map = {"excited": "nova", "concerned": "onyx", "neutral": "alloy"}
+            audio_data = await tts_client.generate_speech_base64(
+                text=summary_text,
+                model="tts-1",
+                voice=voice_map.get(emotion, "alloy"),
+                speed=1.0,
+                response_format="mp3"
+            )
+        except Exception as e:
+            logger.error(f"Journal TTS error: {e}")
+    
+    return {
+        "date": date,
+        "trades_count": len(trades),
+        "wins": wins,
+        "losses": losses,
+        "win_rate": round(win_rate, 1),
+        "total_pnl": round(total_pnl, 2),
+        "best_trade": best_trade,
+        "worst_trade": worst_trade,
+        "trades": trades,
+        "ai_insights": insight,
+        "emotion": emotion,
+        "audio": audio_data,
+        "format": "mp3" if audio_data else None
+    }
+
+@api_router.get("/journal/weekly-summary")
+async def get_weekly_summary(request: Request = None):
+    """Get trading journal summary for the past 7 days"""
+    user = await get_current_user(request) if request else None
+    
+    daily_summaries = []
+    total_pnl = 0
+    total_trades = 0
+    total_wins = 0
+    
+    for i in range(7):
+        date = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
+        summary = await get_daily_summary(date, request)
+        daily_summaries.append({
+            "date": date,
+            "pnl": summary["total_pnl"],
+            "trades": summary["trades_count"],
+            "win_rate": summary["win_rate"]
+        })
+        total_pnl += summary["total_pnl"]
+        total_trades += summary["trades_count"]
+        total_wins += summary["wins"]
+    
+    overall_win_rate = (total_wins / total_trades * 100) if total_trades > 0 else 0
+    
+    # AI weekly insight
+    if total_pnl > 500:
+        weekly_insight = f"Excellent week! You're up ${total_pnl:,.2f}. Your consistent strategy is paying off."
+    elif total_pnl > 0:
+        weekly_insight = f"Positive week with ${total_pnl:,.2f} profit. Keep refining your approach."
+    elif total_pnl > -500:
+        weekly_insight = f"Slight drawdown of ${abs(total_pnl):,.2f}. Review your risk management."
+    else:
+        weekly_insight = f"Tough week with ${abs(total_pnl):,.2f} in losses. Consider reducing position sizes."
+    
+    return {
+        "period": "7 days",
+        "daily_summaries": daily_summaries,
+        "total_pnl": round(total_pnl, 2),
+        "total_trades": total_trades,
+        "overall_win_rate": round(overall_win_rate, 1),
+        "ai_insights": weekly_insight
+    }
+
+@api_router.post("/journal/add-note")
+async def add_journal_note(date: str, note: str, request: Request = None):
+    """Add a personal note to a trading journal entry"""
+    user = await get_current_user(request) if request else None
+    
+    entry = {
+        "id": str(uuid.uuid4()),
+        "user_id": user.user_id if user else None,
+        "date": date,
+        "note": note,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.journal_notes.insert_one(entry)
+    
+    return {"message": "Note added", "entry": entry}
+
+# ============ PORTFOLIO SHARING ============
+
+class UserPortfolio(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    username: str
+    avatar_url: Optional[str] = None
+    is_public: bool = False
+    total_value: float = 0
+    daily_pnl: float = 0
+    weekly_pnl: float = 0
+    win_rate: float = 0
+    holdings: List[Dict[str, Any]] = []
+    followers: int = 0
+    following: int = 0
+    verified: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.get("/portfolios/public")
+async def get_public_portfolios(sort_by: str = "total_value", limit: int = 20):
+    """Get public portfolios for leaderboard"""
+    # Generate sample leaderboard data
+    portfolios = [
+        {
+            "id": str(uuid.uuid4()),
+            "username": "CryptoWhale_42",
+            "avatar_url": None,
+            "total_value": 2547832.50,
+            "daily_pnl": 12450.00,
+            "daily_pnl_percent": 0.49,
+            "weekly_pnl": 87250.00,
+            "win_rate": 72.5,
+            "followers": 15420,
+            "verified": True,
+            "top_holdings": ["BTC", "ETH", "SOL"],
+            "rank": 1
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "username": "TradingMaster",
+            "avatar_url": None,
+            "total_value": 1823450.00,
+            "daily_pnl": 8920.00,
+            "daily_pnl_percent": 0.49,
+            "weekly_pnl": 45600.00,
+            "win_rate": 68.3,
+            "followers": 8750,
+            "verified": True,
+            "top_holdings": ["ETH", "BTC", "AAPL"],
+            "rank": 2
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "username": "DeFiKing",
+            "avatar_url": None,
+            "total_value": 956780.00,
+            "daily_pnl": -2340.00,
+            "daily_pnl_percent": -0.24,
+            "weekly_pnl": 23400.00,
+            "win_rate": 65.8,
+            "followers": 5230,
+            "verified": False,
+            "top_holdings": ["SOL", "ETH", "BTC"],
+            "rank": 3
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "username": "QuantTrader_Pro",
+            "avatar_url": None,
+            "total_value": 745230.00,
+            "daily_pnl": 5670.00,
+            "daily_pnl_percent": 0.76,
+            "weekly_pnl": 18900.00,
+            "win_rate": 71.2,
+            "followers": 3890,
+            "verified": True,
+            "top_holdings": ["BTC", "NVDA", "SPY"],
+            "rank": 4
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "username": "AlphaSeeker",
+            "avatar_url": None,
+            "total_value": 523890.00,
+            "daily_pnl": 1230.00,
+            "daily_pnl_percent": 0.23,
+            "weekly_pnl": 8750.00,
+            "win_rate": 58.9,
+            "followers": 2150,
+            "verified": False,
+            "top_holdings": ["ETH", "SOL", "BTC"],
+            "rank": 5
+        },
+    ]
+    
+    # Sort by specified field
+    if sort_by == "daily_pnl":
+        portfolios.sort(key=lambda x: x["daily_pnl"], reverse=True)
+    elif sort_by == "win_rate":
+        portfolios.sort(key=lambda x: x["win_rate"], reverse=True)
+    elif sort_by == "followers":
+        portfolios.sort(key=lambda x: x["followers"], reverse=True)
+    
+    return {
+        "portfolios": portfolios[:limit],
+        "total_count": len(portfolios),
+        "sort_by": sort_by
+    }
+
+@api_router.get("/portfolios/{portfolio_id}")
+async def get_portfolio_details(portfolio_id: str):
+    """Get detailed portfolio information"""
+    # Return sample portfolio details
+    return {
+        "id": portfolio_id,
+        "username": "CryptoWhale_42",
+        "bio": "Full-time crypto trader since 2017. Focus on BTC and ETH swing trading.",
+        "total_value": 2547832.50,
+        "initial_value": 500000.00,
+        "all_time_pnl": 2047832.50,
+        "all_time_return": 409.57,
+        "daily_pnl": 12450.00,
+        "weekly_pnl": 87250.00,
+        "monthly_pnl": 234500.00,
+        "win_rate": 72.5,
+        "avg_win": 2450.00,
+        "avg_loss": 980.00,
+        "risk_reward_ratio": 2.5,
+        "followers": 15420,
+        "following": 45,
+        "verified": True,
+        "holdings": [
+            {"symbol": "BTC", "quantity": 15.5, "value": 1390975.00, "allocation": 54.6, "pnl": 125000.00},
+            {"symbol": "ETH", "quantity": 250, "value": 742500.00, "allocation": 29.1, "pnl": 45000.00},
+            {"symbol": "SOL", "quantity": 1500, "value": 195000.00, "allocation": 7.7, "pnl": 12500.00},
+            {"symbol": "USDT", "quantity": 219357.50, "value": 219357.50, "allocation": 8.6, "pnl": 0}
+        ],
+        "recent_trades": [
+            {"action": "buy", "symbol": "BTC", "quantity": 0.5, "price": 89500, "timestamp": datetime.now(timezone.utc).isoformat()},
+            {"action": "sell", "symbol": "ETH", "quantity": 10, "price": 2980, "timestamp": (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()},
+        ],
+        "trading_style": "Swing Trading",
+        "risk_level": "Medium",
+        "joined_date": "2017-03-15"
+    }
+
+@api_router.post("/portfolios/follow/{portfolio_id}")
+async def follow_portfolio(portfolio_id: str, request: Request = None):
+    """Follow a portfolio for copy trading"""
+    user = await get_current_user(request) if request else None
+    
+    follow_doc = {
+        "id": str(uuid.uuid4()),
+        "follower_id": user.user_id if user else "anonymous",
+        "portfolio_id": portfolio_id,
+        "copy_trades": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.portfolio_follows.insert_one(follow_doc)
+    
+    return {"message": "Now following portfolio", "follow_id": follow_doc["id"]}
+
+# ============ ENHANCED SOCIAL SIGNALS ============
+
+@api_router.get("/social/trending")
+async def get_trending_topics():
+    """Get trending crypto topics from social media (simulated)"""
+    trending = [
+        {
+            "topic": "#Bitcoin",
+            "mentions": 45230,
+            "sentiment": "bullish",
+            "sentiment_score": 0.72,
+            "change_24h": 15.3,
+            "top_influencers": ["@whale_alert", "@bitcoin", "@CryptoCapital"],
+            "sample_tweets": [
+                "BTC breaking out! $100k incoming 🚀",
+                "Institutional buying continues to accelerate",
+                "Bitcoin dominance reaching new highs"
+            ]
+        },
+        {
+            "topic": "#Ethereum",
+            "mentions": 28450,
+            "sentiment": "bullish",
+            "sentiment_score": 0.65,
+            "change_24h": 8.7,
+            "top_influencers": ["@VitalikButerin", "@ethereum", "@DeFiPulse"],
+            "sample_tweets": [
+                "ETH staking rewards looking attractive",
+                "Layer 2 adoption accelerating",
+                "Gas fees at yearly lows"
+            ]
+        },
+        {
+            "topic": "#Solana",
+            "mentions": 18920,
+            "sentiment": "neutral",
+            "sentiment_score": 0.51,
+            "change_24h": -5.2,
+            "top_influencers": ["@solaboratory", "@SolanaConf", "@phantom"],
+            "sample_tweets": [
+                "SOL ecosystem growing despite volatility",
+                "New DEX launches on Solana",
+                "Network congestion concerns addressed"
+            ]
+        },
+        {
+            "topic": "#DeFi",
+            "mentions": 12340,
+            "sentiment": "bullish",
+            "sentiment_score": 0.68,
+            "change_24h": 22.1,
+            "top_influencers": ["@DefiLlama", "@DeFiPulse", "@AaveAave"],
+            "sample_tweets": [
+                "TVL surging across protocols",
+                "Yield farming opportunities emerging",
+                "DeFi summer 2.0?"
+            ]
+        },
+        {
+            "topic": "#NFTs",
+            "mentions": 8760,
+            "sentiment": "bearish",
+            "sentiment_score": 0.38,
+            "change_24h": -12.5,
+            "top_influencers": ["@opensea", "@BoredApeYC", "@pudaborated"],
+            "sample_tweets": [
+                "NFT volume declining",
+                "Blue chips holding steady",
+                "Focus shifting to utility"
+            ]
+        }
+    ]
+    
+    return {
+        "trending": trending,
+        "overall_sentiment": "bullish",
+        "fear_greed_index": 72,
+        "fear_greed_label": "Greed",
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/social/sentiment/{symbol}")
+async def get_symbol_sentiment(symbol: str):
+    """Get social sentiment for a specific symbol"""
+    symbol = symbol.upper()
+    
+    # Simulated sentiment data
+    sentiments = {
+        "BTC": {"score": 0.72, "label": "Very Bullish", "mentions": 45230, "volume_change": 15.3},
+        "ETH": {"score": 0.65, "label": "Bullish", "mentions": 28450, "volume_change": 8.7},
+        "SOL": {"score": 0.51, "label": "Neutral", "mentions": 18920, "volume_change": -5.2},
+        "AAPL": {"score": 0.58, "label": "Slightly Bullish", "mentions": 12400, "volume_change": 3.2},
+        "NVDA": {"score": 0.78, "label": "Very Bullish", "mentions": 34500, "volume_change": 28.5},
+    }
+    
+    data = sentiments.get(symbol, {"score": 0.50, "label": "Neutral", "mentions": 1000, "volume_change": 0})
+    
+    return {
+        "symbol": symbol,
+        "sentiment_score": data["score"],
+        "sentiment_label": data["label"],
+        "mentions_24h": data["mentions"],
+        "mentions_change": data["volume_change"],
+        "sources": {
+            "twitter": int(data["mentions"] * 0.6),
+            "reddit": int(data["mentions"] * 0.25),
+            "telegram": int(data["mentions"] * 0.15)
+        },
+        "key_influencers": [
+            {"name": "@CryptoTrader1", "followers": 125000, "sentiment": "bullish"},
+            {"name": "@MarketAnalyst", "followers": 89000, "sentiment": "bullish"},
+            {"name": "@WhaleWatch", "followers": 67000, "sentiment": "neutral"}
+        ],
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+
 # ============ WEBSOCKET ENDPOINTS ============
 
 @app.websocket("/ws/prices")
