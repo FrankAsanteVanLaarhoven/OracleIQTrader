@@ -379,6 +379,8 @@ const TradingAvatar = ({ marketData = {}, onInsight, onTradeCommand }) => {
   const [message, setMessage] = useState('');
   const [confidence, setConfidence] = useState(68);
   const [isLoading, setIsLoading] = useState(false);
+  const [webcamFace, setWebcamFace] = useState(null);
+  const [showWebcamPanel, setShowWebcamPanel] = useState(false);
   const audioRef = useRef(null);
   
   // Announce trade function (can be called externally)
