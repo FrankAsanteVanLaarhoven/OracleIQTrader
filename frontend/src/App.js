@@ -48,15 +48,17 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Navigation Tabs
 const NAV_TABS = [
-  { id: 'dashboard', label: 'Trading', icon: LayoutDashboard },
-  { id: 'orders', label: 'Orders', icon: Layers },
-  { id: 'alerts', label: 'Alerts', icon: Bell },
-  { id: 'auto', label: 'Auto', icon: Bot },
-  { id: 'news', label: 'News', icon: Newspaper },
-  { id: 'social', label: 'Social', icon: Users },
-  { id: 'portfolio', label: 'Portfolio', icon: PieChart },
-  { id: 'wallet', label: 'Wallet', icon: Wallet },
-  { id: 'paper', label: 'Paper', icon: Banknote },
+  { id: 'dashboard', label: 'Trading', icon: LayoutDashboard, labelKey: 'nav.trading' },
+  { id: 'crawler', label: 'Signals', icon: Radar, labelKey: 'crawler.title' },
+  { id: 'orders', label: 'Orders', icon: Layers, labelKey: 'nav.orders' },
+  { id: 'alerts', label: 'Alerts', icon: Bell, labelKey: 'nav.alerts' },
+  { id: 'auto', label: 'Auto', icon: Bot, labelKey: 'nav.auto' },
+  { id: 'news', label: 'News', icon: Newspaper, labelKey: 'nav.news' },
+  { id: 'social', label: 'Social', icon: Users, labelKey: 'nav.social' },
+  { id: 'portfolio', label: 'Portfolio', icon: PieChart, labelKey: 'nav.portfolio' },
+  { id: 'wallet', label: 'Wallet', icon: Wallet, labelKey: 'nav.wallet' },
+  { id: 'paper', label: 'Paper', icon: Banknote, labelKey: 'nav.paper' },
+  { id: 'export', label: 'Export', icon: Download, labelKey: 'common.export' },
 ];
 
 // Main Dashboard Component
