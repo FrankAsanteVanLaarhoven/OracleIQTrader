@@ -18,7 +18,14 @@ React Native mobile application for the Cognitive Oracle Trading Platform.
 2. **Markets** - Live crypto & stock prices with search/filter
 3. **Trade** - Buy/Sell interface with order execution
 4. **Portfolio** - Holdings, positions, trade history
-5. **Settings** - Exchange API key management (Binance, Coinbase, Kraken)
+5. **Settings** - Exchange API key management with QR scanner
+
+### Security Features
+
+- **QR Code Scanner** - Import API keys by scanning Binance/Coinbase/Kraken QR codes
+- **Biometric Auth** - Face ID / Fingerprint protection for sensitive operations
+- **Secure Storage** - API keys encrypted using device-level security
+- **Testnet Mode** - Safe paper trading by default
 
 ### Design System
 
@@ -34,6 +41,7 @@ React Native mobile application for the Cognitive Oracle Trading Platform.
 - Node.js 18+
 - Expo CLI: `npm install -g expo-cli`
 - Expo Go app on iOS/Android device
+- EAS CLI for builds: `npm install -g eas-cli`
 
 ### Installation
 
@@ -53,7 +61,43 @@ yarn android
 yarn ios
 ```
 
-### API Configuration
+## Building for App Store / Play Store
+
+### Prerequisites
+
+1. **Apple Developer Account** ($99/year) - Required for iOS
+2. **Google Play Console** ($25 one-time) - Required for Android
+3. **EAS Account** - `eas login`
+
+### Configure EAS
+
+1. Update `eas.json` with your credentials
+2. Update `app.json` with your Apple Team ID and project ID
+
+### Build Commands
+
+```bash
+# Install EAS CLI
+npm install -g eas-cli
+
+# Login to Expo
+eas login
+
+# Configure project
+eas build:configure
+
+# Build for iOS
+eas build --platform ios --profile production
+
+# Build for Android
+eas build --platform android --profile production
+
+# Submit to stores
+eas submit --platform ios
+eas submit --platform android
+```
+
+## API Configuration
 
 The app connects to the same backend API as the web app:
 - API URL: `https://smart-oracle-trade.preview.emergentagent.com/api`
@@ -62,27 +106,34 @@ The app connects to the same backend API as the web app:
 
 The Settings screen allows users to configure:
 
-1. **Binance** - Uses HMAC (API Key + Secret Key)
+1. **Binance** - HMAC (API Key + Secret Key) or Ed25519
 2. **Coinbase** - API credentials
-3. **Kraken** - API credentials
+3. **Kraken** - API key/private key
 
-Keys are stored securely using Expo SecureStore (device encryption).
+**Import Methods:**
+- Manual entry
+- QR Code scanning (recommended)
 
-**Testnet Mode:** Enabled by default for safe testing.
+**Security:**
+- Keys stored using Expo SecureStore (device encryption)
+- Biometric authentication for sensitive operations
+- Testnet mode by default
 
 ## Project Structure
 
 ```
 /app/mobile/
 ├── App.js                    # Main entry point
-├── app.json                  # Expo config
+├── app.json                  # Expo config (App Store metadata)
+├── eas.json                  # EAS Build config
 ├── package.json              # Dependencies
 ├── src/
 │   ├── components/
-│   │   └── ui/
-│   │       ├── GlassCard.js   # Glassmorphism card
-│   │       ├── NeonButton.js  # Glowing button
-│   │       └── PriceCard.js   # Market price display
+│   │   ├── ui/
+│   │   │   ├── GlassCard.js   # Glassmorphism card
+│   │   │   ├── NeonButton.js  # Glowing button
+│   │   │   └── PriceCard.js   # Market price display
+│   │   └── QRScanner.js       # API key QR scanner
 │   ├── navigation/
 │   │   └── AppNavigator.js   # Tab + Stack navigation
 │   ├── screens/
@@ -92,29 +143,55 @@ Keys are stored securely using Expo SecureStore (device encryption).
 │   │   ├── PortfolioScreen.js
 │   │   └── SettingsScreen.js
 │   ├── services/
-│   │   └── api.js            # API service layer
+│   │   ├── api.js            # API service layer
+│   │   └── BiometricService.js # Biometric auth
 │   └── theme.js              # Design tokens
-└── assets/                   # App icons/images
+├── assets/                   # App icons/images
+└── README.md
 ```
 
-## Future Enhancements
+## Environment Variables
 
-- [ ] Push notifications for price alerts
-- [ ] Biometric authentication
-- [ ] ML Predictions screen
-- [ ] Trading competitions
-- [ ] Real-time WebSocket for prices
-- [ ] Offline support
+Create a `.env` file (optional for custom API URL):
 
-## Building for Production
-
-```bash
-# Build for Android
-eas build --platform android
-
-# Build for iOS
-eas build --platform ios
+```env
+API_BASE_URL=https://your-api-url.com/api
 ```
+
+## App Store Submission Checklist
+
+### iOS (App Store)
+- [ ] App icon (1024x1024)
+- [ ] Screenshots (6.5", 5.5", 12.9" iPad)
+- [ ] App description
+- [ ] Privacy policy URL
+- [ ] Support URL
+- [ ] Age rating
+- [ ] Apple Developer account configured
+
+### Android (Play Store)
+- [ ] App icon (512x512)
+- [ ] Feature graphic (1024x500)
+- [ ] Screenshots (phone, tablet)
+- [ ] App description (short + full)
+- [ ] Privacy policy URL
+- [ ] Content rating questionnaire
+- [ ] Google Play Console configured
+
+## Troubleshooting
+
+### QR Scanner not working
+- Ensure camera permission is granted
+- Check that the QR code contains valid JSON with `apiKey` and `secretKey` fields
+
+### Biometrics not available
+- Ensure device has Face ID/Touch ID or fingerprint enrolled
+- Check device security settings
+
+### API connection issues
+- Verify network connectivity
+- Check if backend URL is correct
+- Ensure CORS is configured for mobile requests
 
 ---
 
