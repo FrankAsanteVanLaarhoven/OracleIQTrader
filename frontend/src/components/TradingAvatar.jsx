@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { 
   Mic, MicOff, Volume2, VolumeX, 
   Maximize2, Minimize2, Brain, Activity,
-  TrendingUp, TrendingDown, Loader2
+  TrendingUp, TrendingDown, Loader2, Camera
 } from 'lucide-react';
 import NeonButton from './NeonButton';
 import StatusBadge from './StatusBadge';
+import WebcamFaceTracker from './WebcamFaceTracker';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
