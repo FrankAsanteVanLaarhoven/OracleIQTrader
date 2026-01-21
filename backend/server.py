@@ -1530,6 +1530,27 @@ async def websocket_prices(websocket: WebSocket):
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
+@app.websocket("/ws/alerts")
+async def websocket_alerts(websocket: WebSocket):
+    """WebSocket for real-time price alert notifications"""
+    await alert_manager.connect_alert_ws(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # Handle subscribe/unsubscribe commands
+    except WebSocketDisconnect:
+        alert_manager.disconnect_alert_ws(websocket)
+
+@app.websocket("/ws/crawler")
+async def websocket_crawler(websocket: WebSocket):
+    """WebSocket for real-time crawler signals"""
+    await crawler.connect_crawler_ws(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+    except WebSocketDisconnect:
+        crawler.disconnect_crawler_ws(websocket)
+
 # Include the router
 app.include_router(api_router)
 
