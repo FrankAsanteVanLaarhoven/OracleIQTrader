@@ -10,6 +10,7 @@ import '@/App.css';
 // Components
 import MatrixBackground from './components/MatrixBackground';
 import SplashScreen from './components/SplashScreen';
+import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import AuthCallback from './components/AuthCallback';
 import GlassCard from './components/GlassCard';
