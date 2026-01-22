@@ -1,10 +1,27 @@
 # Cognitive Oracle Trading Platform - PRD
 
-## Status: P10 Complete ✅
+## Status: P10 Complete ✅ | Landing Page Fixed ✅
 
 All features implemented and production-ready.
 
-## Latest Updates (P10)
+## Latest Updates (January 22, 2026)
+
+### Landing Page Fix
+- Fixed LandingPage component integration in `/app/frontend/src/App.js`
+- Unauthenticated users now see SOTA landing page with:
+  - Hero section: "Trade Smarter With AI Oracle"
+  - Stats: $2.4B+ volume, 50K+ traders, 99.9% uptime
+  - Features section: AI Analysis, Trading Bot, Real-time Analytics, Competitions
+  - CTA buttons: "Start Trading Free", "Launch App"
+- Authenticated users see Dashboard with splash screen
+
+### Trade History Bug Fix
+- Fixed `TradeExecution` model in `/app/backend/server.py`
+- Changed `quantity: int` to `quantity: float` (supports fractional crypto)
+- Added default values for `status` and `consensus_confidence` for backward compatibility
+- Trade history endpoint `/api/trades/history` now works correctly
+
+## Phase 10 Features
 
 ### 1. Push Notifications (Mobile)
 - `/app/mobile/src/services/NotificationService.js`
