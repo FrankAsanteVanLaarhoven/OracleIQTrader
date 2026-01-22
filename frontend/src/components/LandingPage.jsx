@@ -485,6 +485,16 @@ const LandingPage = ({ onGetStarted }) => {
           </div>
         </div>
       </footer>
+
+      {/* Demo Mode Modal */}
+      <AnimatePresence>
+        {showDemo && (
+          <DemoMode 
+            onClose={() => setShowDemo(false)} 
+            onSignUp={onGetStarted}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
