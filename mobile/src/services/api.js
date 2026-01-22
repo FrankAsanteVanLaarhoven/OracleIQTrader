@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // Backend API URL - same as web app
-const API_BASE_URL = 'https://smart-oracle-trade.preview.emergentagent.com/api';
+const API_BASE_URL = 'https://trade-ai-platform-7.preview.emergentagent.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -7,7 +7,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://smart-oracle-trade.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://trade-ai-platform-7.preview.emergentagent.com').rstrip('/')
 
 class TestHealthAndBasicAPIs:
     """Basic health and connectivity tests"""
