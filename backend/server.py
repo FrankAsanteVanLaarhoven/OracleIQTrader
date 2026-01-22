@@ -135,11 +135,11 @@ class TradeExecution(BaseModel):
     user_id: Optional[str] = None
     action: str
     symbol: str
-    quantity: int
+    quantity: float  # Float to support fractional crypto trades (e.g., 0.5 BTC)
     price: float
-    status: str
+    status: str = "completed"  # Default for backward compatibility with old trades
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    consensus_confidence: float
+    consensus_confidence: float = 0.85  # Default for backward compatibility with old trades
 
 class User(BaseModel):
     user_id: str
