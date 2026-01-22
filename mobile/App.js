@@ -4,11 +4,13 @@ import { StatusBar } from 'expo-status-bar';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
+import SplashScreen from './src/components/SplashScreen';
 import NotificationService from './src/services/NotificationService';
 import OfflineCacheService from './src/services/OfflineCacheService';
 import { colors } from './src/theme';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [isReady, setIsReady] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
 
@@ -29,7 +31,6 @@ export default function App() {
           },
           (response) => {
             console.log('Notification tapped:', response);
-            // Handle notification navigation here
             const data = response.notification.request.content.data;
             if (data?.type === 'price_alert') {
               // Navigate to price screen
@@ -60,6 +61,15 @@ export default function App() {
 
     initialize();
   }, []);
+
+  // Show animated splash screen
+  if (showSplash) {
+    return (
+      <SplashScreen 
+        onFinish={() => setShowSplash(false)} 
+      />
+    );
+  }
 
   if (!isReady) {
     return (
