@@ -145,6 +145,7 @@ yarn install && yarn start
 │       └── ml_training.py
 ├── frontend/
 │   └── src/components/
+│       ├── LandingPage.jsx       ← SOTA landing page
 │       └── ExchangeSettings.jsx
 ├── mobile/
 │   ├── app.json              ← Push notification config
