@@ -128,6 +128,8 @@ yarn install && yarn start
 - ✅ Voice commands
 - ✅ Multi-language (i18n)
 - ✅ Dark/Light themes
+- ✅ SOTA Landing Page for PWA
+- ✅ Animated Splash Screen (mobile)
 
 ## Project Structure
 
