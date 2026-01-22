@@ -1,27 +1,60 @@
 # Cognitive Oracle Trading Platform - PRD
 
-## Status: P10 Complete ✅ | Landing Page Fixed ✅
+## Status: P11 Complete ✅ | Demo Mode + ML Training + AI Sentiment
 
 All features implemented and production-ready.
 
-## Latest Updates (January 22, 2026)
+## Latest Updates (January 22, 2026 - P11)
 
-### Landing Page Fix
-- Fixed LandingPage component integration in `/app/frontend/src/App.js`
-- Unauthenticated users now see SOTA landing page with:
-  - Hero section: "Trade Smarter With AI Oracle"
-  - Stats: $2.4B+ volume, 50K+ traders, 99.9% uptime
-  - Features section: AI Analysis, Trading Bot, Real-time Analytics, Competitions
-  - CTA buttons: "Start Trading Free", "Launch App"
-- Authenticated users see Dashboard with splash screen
+### 1. Demo Mode (NEW)
+- Full interactive demo for unauthenticated users
+- `/app/frontend/src/components/DemoMode.jsx` - React component
+- `/app/backend/modules/demo_mode.py` - Backend module
+- Features accessible in demo:
+  - Simulated portfolio ($100K+ with live fluctuations)
+  - AI Trading Bot status and positions
+  - ML Price predictions (BTC, ETH, SOL)
+  - Social sentiment analysis
+  - Trading competitions leaderboard
+- API Endpoints:
+  - `GET /api/demo/status` - Demo features list
+  - `GET /api/demo/portfolio` - Simulated portfolio
+  - `GET /api/demo/bot` - AI bot status
+  - `GET /api/demo/prediction/{symbol}` - ML predictions
+  - `GET /api/demo/sentiment/{symbol}` - Sentiment data
+  - `GET /api/demo/competition` - Competition status
+  - `POST /api/demo/trade` - Execute demo trade
 
-### Trade History Bug Fix
-- Fixed `TradeExecution` model in `/app/backend/server.py`
-- Changed `quantity: int` to `quantity: float` (supports fractional crypto)
-- Added default values for `status` and `consensus_confidence` for backward compatibility
-- Trade history endpoint `/api/trades/history` now works correctly
+### 2. Full ML Training Pipeline (NEW)
+- XGBoost/GradientBoosting models for price prediction
+- `/app/backend/modules/ml_training.py` - Enhanced training module
+- Feature engineering with 20+ technical indicators:
+  - RSI, MACD, Bollinger Bands, ATR, OBV
+  - Price momentum, volatility, trend signals
+- Model types: direction, volatility, trend, anomaly
+- API Endpoints:
+  - `POST /api/ml/train/full/{symbol}` - Train new model
+  - `GET /api/ml/models` - List trained models
+  - `GET /api/ml/model/{symbol}/{type}` - Model info
+  - `POST /api/ml/predict/trained/{symbol}` - Predictions
+- Trained models: BTC, ETH, SOL (direction)
 
-## Phase 10 Features
+### 3. AI-Powered Sentiment Analysis (NEW)
+- GPT-4o-mini via Emergent LLM Key for intelligent analysis
+- `/app/backend/modules/ai_sentiment.py` - AI sentiment module
+- Analyzes social media text for trading signals
+- Returns: sentiment, confidence, reasoning, key points, trading signal
+- API Endpoints:
+  - `GET /api/ai/sentiment/status` - AI analyzer status
+  - `POST /api/ai/sentiment/analyze` - Analyze text batch
+  - `GET /api/ai/sentiment/{symbol}` - Full AI sentiment
+
+### Landing Page Enhancement
+- Added "Try Demo Mode" button on landing page
+- Demo mode accessible without login
+- CTA for sign-up throughout demo experience
+
+## Phase 10 Features (Previous)
 
 ### 1. Push Notifications (Mobile)
 - `/app/mobile/src/services/NotificationService.js`
