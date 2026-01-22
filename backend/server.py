@@ -3237,6 +3237,320 @@ async def get_reddit_sentiment(symbol: str):
     finally:
         await client.close()
 
+# ============ DEMO MODE ENDPOINTS ============
+from modules.demo_mode import (
+    get_demo_user, get_demo_portfolio, get_demo_trades, get_demo_alerts,
+    get_demo_bot, get_demo_prediction, get_demo_competition, get_demo_sentiment,
+    execute_demo_trade, get_demo_stats
+)
+
+@api_router.get("/demo/status")
+async def demo_status():
+    """Get demo mode status and features"""
+    return get_demo_stats()
+
+@api_router.get("/demo/user")
+async def demo_user():
+    """Get demo user profile"""
+    return get_demo_user()
+
+@api_router.get("/demo/portfolio")
+async def demo_portfolio():
+    """Get demo portfolio with live fluctuations"""
+    return get_demo_portfolio()
+
+@api_router.get("/demo/trades")
+async def demo_trades(limit: int = 10):
+    """Get demo trade history"""
+    return get_demo_trades(limit)
+
+@api_router.get("/demo/alerts")
+async def demo_alerts():
+    """Get demo price alerts"""
+    return get_demo_alerts()
+
+@api_router.get("/demo/bot")
+async def demo_bot():
+    """Get demo AI trading bot status"""
+    return get_demo_bot()
+
+@api_router.get("/demo/prediction/{symbol}")
+async def demo_prediction(symbol: str):
+    """Get demo ML prediction for a symbol"""
+    return get_demo_prediction(symbol.upper())
+
+@api_router.get("/demo/competition")
+async def demo_competition():
+    """Get demo competition status"""
+    return get_demo_competition()
+
+@api_router.get("/demo/sentiment/{symbol}")
+async def demo_sentiment(symbol: str):
+    """Get demo social sentiment"""
+    return get_demo_sentiment(symbol.upper())
+
+@api_router.post("/demo/trade")
+async def demo_trade(action: str, symbol: str, quantity: float, price: float):
+    """Execute a demo trade (simulated)"""
+    return execute_demo_trade(action.upper(), symbol.upper(), quantity, price)
+
+
+# ============ AI SENTIMENT ENDPOINTS ============
+from modules.ai_sentiment import analyze_social_sentiment, get_ai_sentiment_status, ai_analyzer
+
+@api_router.get("/ai/sentiment/status")
+async def ai_sentiment_status():
+    """Get AI sentiment analyzer status"""
+    return await get_ai_sentiment_status()
+
+@api_router.post("/ai/sentiment/analyze")
+async def ai_sentiment_analyze(texts: List[str], symbol: str = "BTC"):
+    """Analyze texts using AI-powered sentiment analysis"""
+    if not texts:
+        raise HTTPException(status_code=400, detail="No texts provided")
+    return await analyze_social_sentiment(texts, symbol.upper())
+
+@api_router.get("/ai/sentiment/{symbol}")
+async def ai_sentiment_for_symbol(symbol: str):
+    """Get AI sentiment analysis for a symbol (fetches from social and analyzes)"""
+    # Get social posts first
+    try:
+        from modules.real_social_integration import get_social_sentiment as get_raw_social
+        social_data = await get_raw_social(symbol.upper())
+        
+        # Extract texts from social posts
+        texts = []
+        if "twitter" in social_data and isinstance(social_data["twitter"], dict):
+            sample_posts = social_data["twitter"].get("sample_posts", [])
+            texts.extend([p.get("text", "") for p in sample_posts])
+        if "reddit" in social_data and isinstance(social_data["reddit"], dict):
+            sample_posts = social_data["reddit"].get("sample_posts", [])
+            texts.extend([p.get("text", "") for p in sample_posts])
+        
+        # If we have texts, analyze with AI
+        if texts:
+            ai_result = await analyze_social_sentiment(texts, symbol.upper())
+            return {
+                "symbol": symbol.upper(),
+                "ai_analysis": ai_result,
+                "raw_social": social_data,
+                "source": "ai_enhanced"
+            }
+        else:
+            # Return raw social data if no texts available
+            return {
+                "symbol": symbol.upper(),
+                "ai_analysis": None,
+                "raw_social": social_data,
+                "source": "social_only"
+            }
+    except Exception as e:
+        logger.error(f"AI sentiment error: {str(e)}")
+        return {
+            "symbol": symbol.upper(),
+            "error": str(e),
+            "ai_status": await get_ai_sentiment_status()
+        }
+
+
+# ============ ENHANCED ML TRAINING ENDPOINTS ============
+from modules.ml_training import ml_trainer, TrainingConfig, ModelType, FeatureEngineer
+import pandas as pd
+
+@api_router.post("/ml/train/full/{symbol}")
+async def train_full_model(symbol: str, model_type: str = "direction", periods: int = 500):
+    """Train a full ML model with historical data"""
+    try:
+        # Fetch historical data from CoinGecko or generate synthetic
+        symbol = symbol.upper()
+        
+        # Try to get real historical data
+        historical_data = []
+        try:
+            async with httpx.AsyncClient() as client:
+                # Get historical prices from CoinGecko
+                coingecko_ids = {
+                    "BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana",
+                    "XRP": "ripple", "ADA": "cardano", "DOGE": "dogecoin"
+                }
+                coin_id = coingecko_ids.get(symbol, symbol.lower())
+                
+                response = await client.get(
+                    f"https://api.coingecko.com/api/v3/coins/{coin_id}/ohlc",
+                    params={"vs_currency": "usd", "days": "90"}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    for candle in data:
+                        historical_data.append({
+                            "timestamp": datetime.fromtimestamp(candle[0] / 1000),
+                            "open": candle[1],
+                            "high": candle[2],
+                            "low": candle[3],
+                            "close": candle[4],
+                            "volume": random.uniform(1000000, 10000000)  # CoinGecko OHLC doesn't include volume
+                        })
+        except Exception as e:
+            logger.warning(f"Failed to fetch historical data: {e}")
+        
+        # If no real data, generate synthetic
+        if len(historical_data) < 100:
+            logger.info("Generating synthetic training data")
+            base_price = {"BTC": 45000, "ETH": 3000, "SOL": 100}.get(symbol, 100)
+            
+            for i in range(periods):
+                timestamp = datetime.now(timezone.utc) - timedelta(hours=periods-i)
+                volatility = random.uniform(0.02, 0.05)
+                change = random.gauss(0, volatility)
+                
+                price = base_price * (1 + change)
+                high = price * (1 + abs(random.gauss(0, 0.01)))
+                low = price * (1 - abs(random.gauss(0, 0.01)))
+                
+                historical_data.append({
+                    "timestamp": timestamp,
+                    "open": base_price,
+                    "high": high,
+                    "low": low,
+                    "close": price,
+                    "volume": random.uniform(1000000, 50000000)
+                })
+                base_price = price
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(historical_data)
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df.set_index('timestamp', inplace=True)
+        df = df.sort_index()
+        
+        # Create training config
+        config = TrainingConfig(
+            model_type=ModelType(model_type),
+            symbol=symbol
+        )
+        
+        # Prepare data and train
+        X, y = ml_trainer.prepare_data(df, config)
+        
+        if len(X) < 50:
+            return {"success": False, "error": "Insufficient data for training"}
+        
+        # Train model
+        result = ml_trainer.train_sklearn_model(X, y, config)
+        
+        # Save model
+        model_path = ml_trainer.save_model(result['model_key'])
+        
+        return {
+            "success": True,
+            "symbol": symbol,
+            "model_type": model_type,
+            "training_samples": len(X),
+            "metrics": result['metrics'],
+            "model_path": model_path,
+            "feature_importance": result.get('feature_importance', {}),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Training error: {str(e)}")
+        return {"success": False, "error": str(e)}
+
+@api_router.get("/ml/models")
+async def list_ml_models():
+    """List all trained ML models"""
+    return {
+        "models": ml_trainer.list_models(),
+        "model_types": [t.value for t in ModelType],
+        "supported_symbols": ["BTC", "ETH", "SOL", "XRP", "ADA", "DOGE"],
+        "status": "ready"
+    }
+
+@api_router.get("/ml/model/{symbol}/{model_type}")
+async def get_ml_model_info(symbol: str, model_type: str):
+    """Get info about a specific trained model"""
+    model_key = f"{symbol.upper()}_{model_type}"
+    return ml_trainer.get_model_info(model_key)
+
+@api_router.post("/ml/predict/trained/{symbol}")
+async def predict_with_trained_model(symbol: str, model_type: str = "direction"):
+    """Make prediction using a trained model"""
+    try:
+        symbol = symbol.upper()
+        model_key = f"{symbol}_{model_type}"
+        
+        # Get latest market data for features
+        async with httpx.AsyncClient() as client:
+            coingecko_ids = {
+                "BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana",
+                "XRP": "ripple", "ADA": "cardano", "DOGE": "dogecoin"
+            }
+            coin_id = coingecko_ids.get(symbol, symbol.lower())
+            
+            response = await client.get(
+                f"https://api.coingecko.com/api/v3/coins/{coin_id}/ohlc",
+                params={"vs_currency": "usd", "days": "30"}
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=500, detail="Failed to fetch market data")
+            
+            data = response.json()
+            
+        # Convert to DataFrame
+        df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+        df.set_index('timestamp', inplace=True)
+        df['volume'] = [random.uniform(1000000, 10000000) for _ in range(len(df))]
+        
+        # Generate features
+        feature_engineer = FeatureEngineer()
+        features = feature_engineer.generate_features(df)
+        
+        if len(features) == 0:
+            return {"success": False, "error": "Insufficient data for prediction"}
+        
+        # Get latest features
+        latest_features = features.iloc[-1].values
+        
+        # Make prediction
+        result = ml_trainer.predict(model_key, latest_features)
+        
+        # Map prediction to label
+        direction_labels = {0: "bearish", 1: "bullish"}
+        volatility_labels = {0: "low", 1: "medium", 2: "high"}
+        trend_labels = {0: "strong_down", 1: "down", 2: "neutral", 3: "up", 4: "strong_up"}
+        
+        if model_type == "direction":
+            label = direction_labels.get(result['prediction'], "unknown")
+        elif model_type == "volatility":
+            label = volatility_labels.get(result['prediction'], "unknown")
+        elif model_type == "trend":
+            label = trend_labels.get(result['prediction'], "unknown")
+        else:
+            label = str(result['prediction'])
+        
+        return {
+            "success": True,
+            "symbol": symbol,
+            "model_type": model_type,
+            "prediction": label,
+            "raw_prediction": result['prediction'],
+            "confidence": result['confidence'],
+            "probabilities": result['probabilities'],
+            "current_price": df['close'].iloc[-1],
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "model_used": model_key
+        }
+        
+    except ValueError as e:
+        return {"success": False, "error": str(e), "hint": "Model may not be trained yet. Use /api/ml/train/full/{symbol} first."}
+    except Exception as e:
+        logger.error(f"Prediction error: {str(e)}")
+        return {"success": False, "error": str(e)}
+
+
 # Include the router
 app.include_router(api_router)
 
