@@ -185,26 +185,28 @@ class MLModelTrainer:
         """Prepare features and labels for training"""
         features = self.feature_engineer.generate_features(df)
         
-        # Create labels based on model type
+        # Create labels based on model type - use the same index as features
+        df_aligned = df.loc[features.index]
+        
         if config.model_type == ModelType.DIRECTION:
             # Binary: 1 if price goes up in prediction_horizon, 0 otherwise
-            future_returns = df['close'].pct_change(config.prediction_horizon).shift(-config.prediction_horizon)
+            future_returns = df_aligned['close'].pct_change(config.prediction_horizon).shift(-config.prediction_horizon)
             labels = (future_returns > 0).astype(int)
         elif config.model_type == ModelType.VOLATILITY:
             # Categorical: Low, Medium, High volatility
-            future_vol = df['close'].pct_change().rolling(config.prediction_horizon).std().shift(-config.prediction_horizon)
+            future_vol = df_aligned['close'].pct_change().rolling(config.prediction_horizon).std().shift(-config.prediction_horizon)
             labels = pd.cut(future_vol, bins=3, labels=[0, 1, 2]).astype(float)
         elif config.model_type == ModelType.TREND:
             # Categorical: Strong Down, Down, Neutral, Up, Strong Up
-            future_returns = df['close'].pct_change(config.prediction_horizon).shift(-config.prediction_horizon)
+            future_returns = df_aligned['close'].pct_change(config.prediction_horizon).shift(-config.prediction_horizon)
             labels = pd.cut(future_returns, bins=5, labels=[0, 1, 2, 3, 4]).astype(float)
         else:
             # Default to direction
-            future_returns = df['close'].pct_change(config.prediction_horizon).shift(-config.prediction_horizon)
+            future_returns = df_aligned['close'].pct_change(config.prediction_horizon).shift(-config.prediction_horizon)
             labels = (future_returns > 0).astype(int)
         
-        # Align features and labels
-        valid_idx = ~(features.isna().any(axis=1) | labels.isna())
+        # Align features and labels - remove rows with NaN labels
+        valid_idx = ~labels.isna()
         X = features[valid_idx].values
         y = labels[valid_idx].values
         
