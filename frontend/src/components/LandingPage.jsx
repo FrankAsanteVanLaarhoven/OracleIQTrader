@@ -252,13 +252,18 @@ const LandingPage = ({ onGetStarted }) => {
             <button 
               onClick={onGetStarted}
               className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold text-lg hover:shadow-2xl hover:shadow-teal-500/30 transition-all flex items-center gap-2"
+              data-testid="start-trading-btn"
             >
               Start Trading Free
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="group px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-semibold text-lg hover:bg-white/10 transition-all flex items-center gap-2">
+            <button 
+              onClick={() => setShowDemo(true)}
+              className="group px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-semibold text-lg hover:bg-white/10 transition-all flex items-center gap-2"
+              data-testid="try-demo-btn"
+            >
               <Play className="w-5 h-5" />
-              Watch Demo
+              Try Demo Mode
             </button>
           </motion.div>
 
