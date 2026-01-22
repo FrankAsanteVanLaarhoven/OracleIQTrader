@@ -303,16 +303,17 @@ class TestTradeExecution:
         print(f"SUCCESS: Trade executed - {data['action']} {data['quantity']} {data['symbol']} at ${data['price']:,.2f}")
     
     def test_get_trade_history(self):
-        """Test GET /api/trades/history - KNOWN BUG: Returns 500 due to schema mismatch with old trades"""
+        """Test GET /api/trades/history - Returns trade history"""
         response = requests.get(f"{BASE_URL}/api/trades/history")
-        # This endpoint has a known bug - old trades have float quantity and missing fields
-        # Marking as expected failure for now
-        if response.status_code == 500 or response.status_code == 520:
-            print(f"KNOWN BUG: Trade history returns {response.status_code} - schema mismatch with old trades (quantity float vs int, missing status/consensus_confidence)")
-            pytest.skip("Known bug: Trade history endpoint has schema mismatch with old trades")
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
+        if data:
+            trade = data[0]
+            assert 'action' in trade
+            assert 'symbol' in trade
+            assert 'quantity' in trade
+            assert 'price' in trade
         print(f"SUCCESS: Trade history returned {len(data)} trades")
 
 
