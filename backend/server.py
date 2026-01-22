@@ -3383,8 +3383,9 @@ async def train_full_model(symbol: str, model_type: str = "direction", periods: 
                 if response.status_code == 200:
                     data = response.json()
                     for candle in data:
+                        # Use naive datetime (no timezone) for pandas compatibility
                         historical_data.append({
-                            "timestamp": datetime.fromtimestamp(candle[0] / 1000),
+                            "timestamp": datetime.utcfromtimestamp(candle[0] / 1000),
                             "open": candle[1],
                             "high": candle[2],
                             "low": candle[3],
@@ -3400,7 +3401,8 @@ async def train_full_model(symbol: str, model_type: str = "direction", periods: 
             base_price = {"BTC": 45000, "ETH": 3000, "SOL": 100}.get(symbol, 100)
             
             for i in range(periods):
-                timestamp = datetime.now(timezone.utc) - timedelta(hours=periods-i)
+                # Use naive datetime for pandas compatibility
+                timestamp = datetime.utcnow() - timedelta(hours=periods-i)
                 volatility = random.uniform(0.02, 0.05)
                 change = random.gauss(0, volatility)
                 
