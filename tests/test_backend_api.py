@@ -112,7 +112,7 @@ class TestMLPredictions:
         assert 'symbol' in data
         assert 'price_direction' in data  # Actual response structure
         assert 'volatility' in data
-        assert 'sentiment' in data
+        assert 'overall_sentiment' in data  # Actual field name
         assert 'risk_level' in data
         print(f"SUCCESS: ML comprehensive prediction for BTC - direction: {data['price_direction']['direction']}")
     
