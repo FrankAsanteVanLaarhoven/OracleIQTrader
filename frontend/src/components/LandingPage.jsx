@@ -6,10 +6,12 @@ import {
   Wallet, Bell, Award, ArrowRight, Check, Sparkles,
   LineChart, PieChart, Activity, Lock, Cpu, Layers
 } from 'lucide-react';
+import DemoMode from './DemoMode';
 
 const LandingPage = ({ onGetStarted }) => {
   const [activeFeature, setActiveFeature] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [showDemo, setShowDemo] = useState(false);
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll();
   
