@@ -88,6 +88,7 @@ const Dashboard = () => {
   const { isAuthenticated, loginWithGoogle } = useAuth();
   const { t } = useTranslation();
   const [showSplash, setShowSplash] = useState(true);
+  const [showLanding, setShowLanding] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [voiceActive, setVoiceActive] = useState(false);
   const [gestureReady, setGestureReady] = useState(true);
@@ -143,6 +144,20 @@ const Dashboard = () => {
     addSystemMessage(messages[Math.floor(Math.random() * messages.length)]);
   };
 
+  // Handle "Get Started" from landing page - triggers Google login or shows dashboard
+  const handleGetStarted = () => {
+    if (!isAuthenticated) {
+      loginWithGoogle();
+    }
+    setShowLanding(false);
+  };
+
+  // Show Landing Page for unauthenticated users who haven't clicked "Get Started"
+  if (!isAuthenticated && showLanding) {
+    return <LandingPage onGetStarted={handleGetStarted} />;
+  }
+
+  // Show Splash Screen (brief animation) before dashboard
   if (showSplash) {
     return <AnimatePresence><SplashScreen onComplete={() => setShowSplash(false)} /></AnimatePresence>;
   }
