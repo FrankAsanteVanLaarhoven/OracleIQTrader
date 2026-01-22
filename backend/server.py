@@ -3199,6 +3199,44 @@ async def cancel_exchange_order(exchange: str, order_id: str, symbol: str = "BTC
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============ REAL SOCIAL MEDIA ENDPOINTS ============
+
+from modules.real_social_integration import get_social_sentiment, get_social_status
+
+@api_router.get("/social/status")
+async def social_integration_status():
+    """Get status of social media integrations"""
+    return await get_social_status()
+
+@api_router.get("/social/sentiment/{symbol}")
+async def get_symbol_social_sentiment(symbol: str):
+    """Get combined social sentiment for a symbol"""
+    return await get_social_sentiment(symbol.upper())
+
+@api_router.get("/social/twitter/{symbol}")
+async def get_twitter_sentiment(symbol: str):
+    """Get Twitter sentiment for a symbol"""
+    from modules.real_social_integration import TwitterClient
+    client = TwitterClient()
+    if not client.is_configured:
+        return {"error": "Twitter API not configured", "configured": False}
+    try:
+        return await client.get_crypto_sentiment(symbol.upper())
+    finally:
+        await client.close()
+
+@api_router.get("/social/reddit/{symbol}")
+async def get_reddit_sentiment(symbol: str):
+    """Get Reddit sentiment for a symbol"""
+    from modules.real_social_integration import RedditClient
+    client = RedditClient()
+    if not client.is_configured:
+        return {"error": "Reddit API not configured", "configured": False}
+    try:
+        return await client.get_crypto_sentiment(symbol.upper())
+    finally:
+        await client.close()
+
 # Include the router
 app.include_router(api_router)
 
