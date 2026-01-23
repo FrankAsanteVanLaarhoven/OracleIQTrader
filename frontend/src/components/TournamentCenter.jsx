@@ -311,6 +311,16 @@ const TournamentCenter = () => {
           </div>
         </div>
       </GlassCard>
+
+      {/* Spectator Mode Modal */}
+      <AnimatePresence>
+        {showSpectator && activeTournament && (
+          <SpectatorMode 
+            tournamentId={activeTournament.id}
+            onClose={() => setShowSpectator(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
