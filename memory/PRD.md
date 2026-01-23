@@ -1,33 +1,50 @@
 # Cognitive Oracle Trading Platform - PRD
 
-## Status: P11 Complete ✅ | Demo Mode + ML Training + AI Sentiment
+## Status: P12 Complete ✅ | Tournament + LSTM + Real Exchange
 
 All features implemented and production-ready.
 
-## Latest Updates (January 22, 2026 - P11)
+## Latest Updates (January 23, 2026 - P12)
 
-### 1. Demo Mode (NEW)
-- Full interactive demo for unauthenticated users
-- `/app/frontend/src/components/DemoMode.jsx` - React component
-- `/app/backend/modules/demo_mode.py` - Backend module
-- Features accessible in demo:
-  - Simulated portfolio ($100K+ with live fluctuations)
-  - AI Trading Bot status and positions
-  - ML Price predictions (BTC, ETH, SOL)
-  - Social sentiment analysis
-  - Trading competitions leaderboard
+### 1. Paper Trading Tournament (NEW)
+- Weekly competitions with $100K virtual portfolios
+- Prize system: Pro Credits + Badges + Titles
+- `/app/backend/modules/tournament.py` - Tournament engine
+- `/app/frontend/src/components/TournamentCenter.jsx` - UI component
 - API Endpoints:
-  - `GET /api/demo/status` - Demo features list
-  - `GET /api/demo/portfolio` - Simulated portfolio
-  - `GET /api/demo/bot` - AI bot status
-  - `GET /api/demo/prediction/{symbol}` - ML predictions
-  - `GET /api/demo/sentiment/{symbol}` - Sentiment data
-  - `GET /api/demo/competition` - Competition status
-  - `POST /api/demo/trade` - Execute demo trade
+  - `GET /api/tournament/active` - Active tournaments
+  - `GET /api/tournament/{id}/leaderboard` - Rankings
+  - `POST /api/tournament/{id}/register` - Join tournament
+  - `POST /api/tournament/{id}/trade` - Execute tournament trade
+- Prizes: 1st=100 credits+badge, 2nd=50 credits, 3rd=25 credits
 
-### 2. Full ML Training Pipeline (NEW)
-- XGBoost/GradientBoosting models for price prediction
-- `/app/backend/modules/ml_training.py` - Enhanced training module
+### 2. LSTM Deep Learning Model (NEW)
+- TensorFlow 2.20 LSTM for time-series prediction
+- `/app/backend/modules/lstm_model.py` - LSTM predictor
+- Features: Bidirectional LSTM, BatchNorm, Dropout
+- 20+ technical indicators (RSI, MACD, Bollinger, etc.)
+- API Endpoints:
+  - `GET /api/ml/lstm/status` - TensorFlow status
+  - `POST /api/ml/lstm/train/{symbol}` - Train LSTM model
+  - `POST /api/ml/lstm/predict/{symbol}` - Get prediction
+- BTC model trained: 60% direction accuracy, 3.96% MAPE
+
+### 3. Real Exchange Trading (Testnet) (NEW)
+- Connect to Binance, Coinbase, Kraken (testnet by default)
+- `/app/backend/modules/real_trading.py` - Exchange adapters
+- Security: Testnet-first approach, confirmation dialogs
+- API Endpoints:
+  - `POST /api/exchange/connect` - Add exchange keys
+  - `GET /api/exchange/{exchange}/balances` - Get balances
+  - `POST /api/exchange/{exchange}/order` - Place order
+  - `GET /api/exchange/status/{user_id}` - Connected exchanges
+
+### 4. Enhanced ML Training
+- Historical data from Yahoo Finance (2 years)
+- Improved feature engineering
+- Cross-validation support
+
+## Phase 11 Features (Previous)
 - Feature engineering with 20+ technical indicators:
   - RSI, MACD, Bollinger Bands, ATR, OBV
   - Price momentum, volatility, trend signals
