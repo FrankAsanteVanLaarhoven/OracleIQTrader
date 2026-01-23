@@ -1,10 +1,37 @@
 # Cognitive Oracle Trading Platform - PRD
 
-## Status: P13 Complete ✅ | LSTM Trained + Mobile Ready
+## Status: P14 Complete ✅ | Transformer Ensemble + Spectator Mode
 
 All features implemented and production-ready.
 
-## Latest Updates (January 23, 2026 - P13)
+## Latest Updates (January 23, 2026 - P14)
+
+### Transformer Ensemble Model
+- Attention-based Transformer model for price prediction
+- `/app/backend/modules/transformer_model.py`
+- Ensemble combines LSTM (60% weight) + Transformer (40% weight)
+- BTC Transformer: 30.8% direction accuracy, 4.82% MAPE
+- API: `POST /api/ml/ensemble/predict/{symbol}`
+
+### Tournament Spectator Mode
+- Real-time WebSocket trade feed
+- Watch other traders' trades live
+- `/app/backend/modules/tournament_websocket.py`
+- `/app/frontend/src/components/SpectatorMode.jsx`
+- Features:
+  - Live trade animations
+  - Sound notifications (optional)
+  - Pause/resume feed
+  - Most active traders stats
+- API: `WS /ws/tournament/{tournament_id}`
+
+### Mobile App Ready
+- Full React Native app in `/app/mobile/`
+- Run: `cd /app/mobile && npx expo start`
+- Features: Dashboard, Markets, Trade, Portfolio, Settings
+- QR Scanner, Biometric auth included
+
+## Phase 13 Summary
 
 ### LSTM Models Trained
 - **BTC**: 60% direction accuracy, 3.96% MAPE
