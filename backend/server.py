@@ -3679,25 +3679,25 @@ async def predict_lstm(symbol: str):
                 logger.warning(f"CoinGecko fallback error: {e}")
         
         # Final fallback: generate synthetic data based on current price
-        if data is None or len(data) < 60:
+        if data is None or len(data) < 120:
             base_prices = {"BTC": 45000, "ETH": 3000, "SOL": 100, "XRP": 0.5, "ADA": 0.5, "DOGE": 0.1}
             base_price = base_prices.get(symbol, 100)
             
-            dates = pd.date_range(end=datetime.now(), periods=100, freq='D')
+            dates = pd.date_range(end=datetime.now(), periods=200, freq='D')
             prices = [base_price]
-            for _ in range(99):
+            for _ in range(199):
                 change = random.gauss(0, 0.02)
                 prices.append(prices[-1] * (1 + change))
             
             data = pd.DataFrame({
                 'open': prices,
-                'high': [p * 1.01 for p in prices],
-                'low': [p * 0.99 for p in prices],
+                'high': [p * (1 + abs(random.gauss(0, 0.01))) for p in prices],
+                'low': [p * (1 - abs(random.gauss(0, 0.01))) for p in prices],
                 'close': prices,
                 'volume': [random.uniform(1e6, 1e8) for _ in prices]
             }, index=dates)
         
-        if len(data) < 60:
+        if len(data) < 120:
             return {"success": False, "error": "Insufficient data for prediction"}
         
         result = await predict_with_lstm(symbol, data)
