@@ -388,6 +388,13 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* Paper Trading Tournament */}
+              {activeTab === 'tournament' && (
+                <motion.div key="tournament" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-6xl mx-auto">
+                  <TournamentCenter />
+                </motion.div>
+              )}
+
               {/* Trading Competitions */}
               {activeTab === 'competitions' && (
                 <motion.div key="competitions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
