@@ -3813,6 +3813,110 @@ async def disconnect_from_exchange(exchange: str, user_id: str):
     return disconnect_exchange(user_id, exchange)
 
 
+# ============ TRANSFORMER & ENSEMBLE MODEL ENDPOINTS ============
+from modules.transformer_model import (
+    train_transformer_model, predict_with_transformer, get_transformer_status,
+    get_transformer_predictor, get_ensemble_predictor
+)
+from modules.lstm_model import predict_with_lstm, get_lstm_predictor
+
+@api_router.get("/ml/transformer/status")
+async def transformer_status():
+    """Get Transformer model status"""
+    return get_transformer_status()
+
+@api_router.post("/ml/transformer/train/{symbol}")
+async def train_transformer(symbol: str):
+    """Train Transformer model for a symbol"""
+    try:
+        symbol = symbol.upper()
+        
+        # Generate training data
+        base_prices = {"BTC": 45000, "ETH": 3000, "SOL": 100, "XRP": 0.5, "ADA": 0.5}
+        base_price = base_prices.get(symbol, 100)
+        
+        dates = pd.date_range(end=datetime.now(), periods=300, freq='D')
+        prices = [base_price]
+        for _ in range(299):
+            change = random.gauss(0, 0.02)
+            prices.append(prices[-1] * (1 + change))
+        
+        data = pd.DataFrame({
+            'open': prices,
+            'high': [p * (1 + abs(random.gauss(0, 0.01))) for p in prices],
+            'low': [p * (1 - abs(random.gauss(0, 0.01))) for p in prices],
+            'close': prices,
+            'volume': [random.uniform(1e6, 1e8) for _ in prices]
+        }, index=dates)
+        
+        result = await train_transformer_model(symbol, data)
+        return result
+        
+    except Exception as e:
+        logger.error(f"Transformer training error: {str(e)}")
+        return {"success": False, "error": str(e)}
+
+@api_router.post("/ml/ensemble/predict/{symbol}")
+async def ensemble_predict(symbol: str):
+    """Get ensemble prediction (LSTM + Transformer combined)"""
+    try:
+        symbol = symbol.upper()
+        
+        # Generate prediction data
+        base_prices = {"BTC": 45000, "ETH": 3000, "SOL": 100, "XRP": 0.5, "ADA": 0.5}
+        base_price = base_prices.get(symbol, 100)
+        
+        dates = pd.date_range(end=datetime.now(), periods=200, freq='D')
+        prices = [base_price]
+        for _ in range(199):
+            change = random.gauss(0, 0.02)
+            prices.append(prices[-1] * (1 + change))
+        
+        data = pd.DataFrame({
+            'open': prices,
+            'high': [p * (1 + abs(random.gauss(0, 0.01))) for p in prices],
+            'low': [p * (1 - abs(random.gauss(0, 0.01))) for p in prices],
+            'close': prices,
+            'volume': [random.uniform(1e6, 1e8) for _ in prices]
+        }, index=dates)
+        
+        # Get predictions from both models
+        lstm_pred = await predict_with_lstm(symbol, data)
+        transformer_pred = await predict_with_transformer(symbol, data)
+        
+        # Combine with ensemble
+        ensemble = get_ensemble_predictor(symbol)
+        result = ensemble.predict(lstm_pred, transformer_pred)
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Ensemble prediction error: {str(e)}")
+        return {"success": False, "error": str(e)}
+
+
+# ============ TOURNAMENT WEBSOCKET ENDPOINTS ============
+from fastapi import WebSocket, WebSocketDisconnect
+from modules.tournament_websocket import handle_tournament_websocket, get_spectator_stats, ws_manager
+
+@app.websocket("/ws/tournament/{tournament_id}")
+async def tournament_websocket(websocket: WebSocket, tournament_id: str):
+    """WebSocket endpoint for tournament spectator mode"""
+    await websocket.accept()
+    await handle_tournament_websocket(websocket, tournament_id)
+
+@api_router.get("/tournament/{tournament_id}/spectators")
+async def tournament_spectators(tournament_id: str):
+    """Get spectator count for a tournament"""
+    return get_spectator_stats(tournament_id)
+
+@api_router.post("/tournament/{tournament_id}/spectator/start")
+async def start_spectator_simulation(tournament_id: str):
+    """Start trade simulation for spectator mode (demo)"""
+    ws_manager.start_simulation(tournament_id)
+    return {"success": True, "message": f"Simulation started for tournament {tournament_id}"}
+
+
 # Include the router
 app.include_router(api_router)
 
