@@ -1,0 +1,1 @@
+{"symbol": "XRP", "lookback": 60, "forecast_horizon": 24, "lstm_units": [128, 64, 32]}
