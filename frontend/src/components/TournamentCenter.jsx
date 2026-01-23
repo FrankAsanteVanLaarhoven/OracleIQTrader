@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Trophy, Users, Clock, TrendingUp, TrendingDown, Medal,
   ChevronRight, Zap, Target, Award, Crown, Star,
-  ArrowUp, ArrowDown, DollarSign, BarChart3, Activity
+  ArrowUp, ArrowDown, DollarSign, BarChart3, Activity, Eye, Radio
 } from 'lucide-react';
 import GlassCard from './GlassCard';
+import SpectatorMode from './SpectatorMode';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -15,6 +16,7 @@ const TournamentCenter = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRegistered, setUserRegistered] = useState(false);
+  const [showSpectator, setShowSpectator] = useState(false);
 
   useEffect(() => {
     fetchTournaments();
