@@ -92,16 +92,30 @@ const TournamentCenter = () => {
           </h1>
           <p className="text-slate-400 mt-1">Compete with traders worldwide for prizes</p>
         </div>
-        {!userRegistered && activeTournament && (
-          <button
-            onClick={() => setUserRegistered(true)}
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold hover:shadow-lg hover:shadow-amber-500/25 transition-all flex items-center gap-2"
-            data-testid="join-tournament-btn"
-          >
-            <Zap size={18} />
-            Join Tournament
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {/* Spectator Mode Button */}
+          {activeTournament && (
+            <button
+              onClick={() => setShowSpectator(true)}
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 font-semibold hover:bg-purple-500/30 transition-all flex items-center gap-2"
+              data-testid="spectator-mode-btn"
+            >
+              <Eye size={18} />
+              <span className="hidden sm:inline">Watch Live</span>
+              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            </button>
+          )}
+          {!userRegistered && activeTournament && (
+            <button
+              onClick={() => setUserRegistered(true)}
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold hover:shadow-lg hover:shadow-amber-500/25 transition-all flex items-center gap-2"
+              data-testid="join-tournament-btn"
+            >
+              <Zap size={18} />
+              Join Tournament
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Tournament Info Cards */}
