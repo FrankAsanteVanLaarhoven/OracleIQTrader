@@ -3917,6 +3917,169 @@ async def start_spectator_simulation(tournament_id: str):
     return {"success": True, "message": f"Simulation started for tournament {tournament_id}"}
 
 
+# ============ BRIDGEWATER-STYLE QUANTITATIVE RESEARCH ============
+
+# Macro Economic Engine
+from modules.macro_engine import (
+    get_economic_indicators, get_debt_cycle_analysis, get_economic_phase,
+    get_central_bank_policies, get_global_liquidity, get_dalio_principles
+)
+
+@api_router.get("/quant/macro/indicators")
+async def macro_indicators():
+    """Get all economic indicators"""
+    return get_economic_indicators()
+
+@api_router.get("/quant/macro/debt-cycle")
+async def debt_cycle():
+    """Analyze current debt cycle position (Ray Dalio framework)"""
+    return get_debt_cycle_analysis()
+
+@api_router.get("/quant/macro/economic-phase")
+async def economic_phase():
+    """Get current economic machine phase"""
+    return get_economic_phase()
+
+@api_router.get("/quant/macro/central-banks")
+async def central_banks():
+    """Get central bank policy summary"""
+    return get_central_bank_policies()
+
+@api_router.get("/quant/macro/liquidity")
+async def global_liquidity():
+    """Get global liquidity conditions"""
+    return get_global_liquidity()
+
+@api_router.get("/quant/macro/dalio-principles")
+async def dalio_principles():
+    """Apply Ray Dalio's Principles to current market"""
+    return get_dalio_principles()
+
+
+# Market Inefficiency Detector
+from modules.inefficiency_detector import (
+    get_inefficiency_signals, get_pairs_trades, get_signal_summary,
+    analyze_mean_reversion, analyze_momentum
+)
+
+@api_router.get("/quant/inefficiency/signals")
+async def inefficiency_signals():
+    """Get all detected market inefficiencies"""
+    return get_inefficiency_signals()
+
+@api_router.get("/quant/inefficiency/pairs")
+async def pairs_trades():
+    """Get pairs trading opportunities"""
+    return get_pairs_trades()
+
+@api_router.get("/quant/inefficiency/summary")
+async def inefficiency_summary():
+    """Get summary of all signals"""
+    return get_signal_summary()
+
+@api_router.post("/quant/inefficiency/analyze-reversion")
+async def analyze_reversion(prices: List[float]):
+    """Analyze mean reversion opportunity"""
+    return analyze_mean_reversion(prices)
+
+@api_router.post("/quant/inefficiency/analyze-momentum")
+async def analyze_momentum_signal(prices: List[float]):
+    """Analyze momentum signal"""
+    return analyze_momentum(prices)
+
+
+# Portfolio Optimization
+from modules.portfolio_optimizer import (
+    get_all_weather_portfolio, get_risk_parity_portfolio,
+    get_pure_alpha_strategy, get_strategy_comparison, get_drawdown_protection
+)
+
+@api_router.get("/quant/portfolio/all-weather")
+async def all_weather_portfolio(growth: str = "rising", inflation: str = "falling"):
+    """Get All Weather portfolio allocation (Ray Dalio's flagship)"""
+    return get_all_weather_portfolio(growth, inflation)
+
+@api_router.get("/quant/portfolio/risk-parity")
+async def risk_parity_portfolio():
+    """Get Risk Parity portfolio allocation"""
+    return get_risk_parity_portfolio()
+
+@api_router.get("/quant/portfolio/pure-alpha")
+async def pure_alpha_portfolio():
+    """Get Pure Alpha strategy (market-neutral)"""
+    return get_pure_alpha_strategy()
+
+@api_router.get("/quant/portfolio/strategies")
+async def portfolio_strategies():
+    """Compare all available portfolio strategies"""
+    return get_strategy_comparison()
+
+@api_router.get("/quant/portfolio/drawdown-protection")
+async def drawdown_protection(current_drawdown: float = 0.0):
+    """Get drawdown protection recommendations"""
+    return get_drawdown_protection(current_drawdown)
+
+
+# AI Research Analyst
+from modules.ai_research_analyst import (
+    generate_market_commentary, generate_trade_thesis,
+    generate_research_report, apply_dalio_principles as apply_principles,
+    get_ai_analyst_status
+)
+
+@api_router.get("/quant/ai/status")
+async def ai_analyst_status():
+    """Get AI research analyst status"""
+    return get_ai_analyst_status()
+
+@api_router.post("/quant/ai/commentary")
+async def ai_market_commentary(market_data: Dict = {}):
+    """Generate AI market commentary"""
+    return await generate_market_commentary(market_data)
+
+@api_router.post("/quant/ai/thesis/{asset}")
+async def ai_trade_thesis(asset: str, context: Dict = {}):
+    """Generate AI trade thesis for an asset"""
+    return await generate_trade_thesis(asset, context)
+
+@api_router.post("/quant/ai/report")
+async def ai_research_report(topic: str = "Market Outlook", data: Dict = {}):
+    """Generate AI research report"""
+    return await generate_research_report(topic, data)
+
+@api_router.post("/quant/ai/principles")
+async def ai_dalio_principles(context: Dict = {}):
+    """Apply Ray Dalio's Principles to a decision"""
+    return await apply_principles(context)
+
+
+# Institutional Dashboard
+from modules.institutional_dashboard import (
+    get_systemic_risk_dashboard, get_institutional_advisory,
+    get_full_institutional_report, get_available_client_types
+)
+
+@api_router.get("/quant/institutional/systemic-risk")
+async def systemic_risk_dashboard():
+    """Get systemic risk dashboard"""
+    return get_systemic_risk_dashboard()
+
+@api_router.get("/quant/institutional/advisory/{client_type}")
+async def institutional_advisory(client_type: str):
+    """Get advisory for specific client type (central_bank, hedge_fund, government, etc.)"""
+    return get_institutional_advisory(client_type)
+
+@api_router.get("/quant/institutional/full-report")
+async def full_institutional_report():
+    """Get comprehensive institutional report"""
+    return get_full_institutional_report()
+
+@api_router.get("/quant/institutional/client-types")
+async def client_types():
+    """Get available client types for advisory"""
+    return get_available_client_types()
+
+
 # Include the router
 app.include_router(api_router)
 
