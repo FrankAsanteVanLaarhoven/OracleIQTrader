@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Ship, Factory, AlertTriangle, Globe, TrendingUp, TrendingDown,
   Package, Truck, MapPin, BarChart3, Shield, Zap, Clock,
-  DollarSign, Activity, ChevronRight, Search, RefreshCw
+  DollarSign, Activity, ChevronRight, Search, RefreshCw, Bell, Plus, Trash2, Check, X
 } from 'lucide-react';
 import GlassCard from './GlassCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
