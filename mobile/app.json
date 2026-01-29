@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Oracle Trading",
-    "slug": "oracle-trading",
+    "name": "OracleIQTrader",
+    "slug": "oracleiq-trader",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.oracle.trading",
+      "bundleIdentifier": "com.oracleiqtrader.app",
       "buildNumber": "1",
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to scan QR codes for API key import.",
@@ -29,7 +29,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#050505"
       },
-      "package": "com.oracle.trading",
+      "package": "com.oracleiqtrader.app",
       "versionCode": 1,
       "permissions": [
         "CAMERA",
@@ -59,13 +59,13 @@
       [
         "expo-barcode-scanner",
         {
-          "cameraPermission": "Allow Oracle Trading to access camera for scanning QR codes."
+          "cameraPermission": "Allow OracleIQTrader to access camera for scanning QR codes."
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Oracle Trading to access camera for scanning API key QR codes."
+          "cameraPermission": "Allow OracleIQTrader to access camera for scanning API key QR codes."
         }
       ]
     ],
