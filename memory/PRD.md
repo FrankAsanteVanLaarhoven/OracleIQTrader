@@ -1,10 +1,46 @@
 # OracleIQTrader.com - PRD
 
-## Status: P16 Complete ✅ | Hybrid Platform + Prediction Markets
+## Status: P17 Complete ✅ | Copy Trading + Mobile Ready
 
 All features implemented and production-ready.
 
-## Latest Updates (January 29, 2026 - P16)
+## Latest Updates (January 29, 2026 - P17)
+
+### Copy Trading Infrastructure (`/app/backend/modules/copy_trading.py`)
+- **Master Traders System** - 6 institutional/professional traders
+  - Bridgewater Alpha Fund (Ray Dalio style)
+  - Citadel Momentum (High-frequency)
+  - Renaissance Quant (ML-driven)
+  - DeFi Alpha Hunter (Arbitrage)
+  - Steady Eddie Conservative (Low-risk)
+  - Trend Surfer Pro (Trend following)
+  
+- **Copy Relationship Management**
+  - One-click follow/unfollow
+  - Pause/resume copying
+  - Custom copy ratios (0.1x - 2x)
+  - Max trade size limits
+  - Stop-loss/take-profit automation
+  
+- **Fee Structure**
+  - Performance fees (15-30% of profits)
+  - Management fees (1-3% annual)
+  - Transparent fee tracking
+  
+- **APIs**: `/api/copy/*` (12 endpoints)
+
+### Frontend Component
+- **CopyTradingHub.jsx** - Full copy trading interface
+  - Discover traders with sorting/filtering
+  - Top performers leaderboard
+  - Active copies management
+  - Trade modal with fee disclosure
+
+### Mobile App Ready
+- **Expo Tunnel**: `https://yqkso_o-anonymous-8081.exp.direct`
+- Test with Expo Go app on iOS/Android
+
+## Previous Updates (January 29, 2026 - P16)
 
 ### Hybrid Institutional/Retail Platform
 
