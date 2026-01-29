@@ -125,7 +125,7 @@ const QuantitativeCenter = () => {
             Bridgewater Quantitative Research
           </h2>
           <p className="text-slate-500 text-sm font-mono mt-1">
-            Ray Dalio's Principles-based Institutional Analysis
+            Ray Dalio&apos;s Principles-based Institutional Analysis
           </p>
         </div>
         <button
