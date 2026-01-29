@@ -406,6 +406,13 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* Prediction Markets Hub */}
+              {activeTab === 'prediction-markets' && (
+                <motion.div key="prediction-markets" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-6xl mx-auto">
+                  <PredictionHub />
+                </motion.div>
+              )}
+
               {/* Trading Competitions */}
               {activeTab === 'competitions' && (
                 <motion.div key="competitions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
