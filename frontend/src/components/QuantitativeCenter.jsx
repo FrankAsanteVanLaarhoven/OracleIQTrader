@@ -23,10 +23,32 @@ const QuantitativeCenter = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    fetchAllData();
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [macro, inefficiency, portfolio, ai, institutional] = await Promise.all([
+          fetch(`${API}/quant/macro/dalio-principles`).then(r => r.json()).catch(() => null),
+          fetch(`${API}/quant/inefficiency/summary`).then(r => r.json()).catch(() => null),
+          fetch(`${API}/quant/portfolio/all-weather`).then(r => r.json()).catch(() => null),
+          fetch(`${API}/quant/ai/status`).then(r => r.json()).catch(() => null),
+          fetch(`${API}/quant/institutional/systemic-risk`).then(r => r.json()).catch(() => null),
+        ]);
+        
+        setMacroData(macro);
+        setInefficiencyData(inefficiency);
+        setPortfolioData(portfolio);
+        setAiStatus(ai);
+        setInstitutionalData(institutional);
+      } catch (error) {
+        console.error('Error fetching quant data:', error);
+      }
+      setLoading(false);
+    };
+    fetchData();
   }, []);
 
-  const fetchAllData = async () => {
+  const handleRefresh = async () => {
+    setRefreshing(true);
     setLoading(true);
     try {
       const [macro, inefficiency, portfolio, ai, institutional] = await Promise.all([
@@ -46,11 +68,6 @@ const QuantitativeCenter = () => {
       console.error('Error fetching quant data:', error);
     }
     setLoading(false);
-  };
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await fetchAllData();
     setRefreshing(false);
   };
 
