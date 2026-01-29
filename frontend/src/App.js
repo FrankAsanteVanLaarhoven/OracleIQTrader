@@ -162,14 +162,14 @@ const Dashboard = () => {
     setShowLanding(false);
   };
 
+  // Show Splash Screen FIRST (before landing page)
+  if (showSplash) {
+    return <AnimatePresence><SplashScreen onComplete={() => setShowSplash(false)} /></AnimatePresence>;
+  }
+
   // Show Landing Page for unauthenticated users who haven't clicked "Get Started"
   if (!isAuthenticated && showLanding) {
     return <LandingPage onGetStarted={handleGetStarted} />;
-  }
-
-  // Show Splash Screen (brief animation) before dashboard
-  if (showSplash) {
-    return <AnimatePresence><SplashScreen onComplete={() => setShowSplash(false)} /></AnimatePresence>;
   }
 
   return (
