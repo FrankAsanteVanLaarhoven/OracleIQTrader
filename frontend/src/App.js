@@ -68,6 +68,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const NAV_TABS = [
   { id: 'dashboard', label: 'Trading', icon: LayoutDashboard, labelKey: 'nav.trading' },
   { id: 'playground', label: 'Playground', icon: Banknote, labelKey: 'Playground' },
+  { id: 'quantitative', label: 'Quant', icon: Scale, labelKey: 'Quant Research' },
   { id: 'bot', label: 'AI Bot', icon: Bot, labelKey: 'AI Bot' },
   { id: 'training', label: 'Training', icon: GraduationCap, labelKey: 'Training' },
   { id: 'predictions', label: 'ML Predict', icon: Sparkles, labelKey: 'ML Predict' },
