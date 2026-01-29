@@ -269,12 +269,18 @@ const CopyTradingHub = () => {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-black/40 border border-white/10 p-1 rounded-lg">
+        <TabsList className="bg-black/40 border border-white/10 p-1 rounded-lg flex flex-wrap gap-1">
           <TabsTrigger value="discover" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400" data-testid="tab-discover">
             <Users size={14} className="mr-1" /> Discover Traders
           </TabsTrigger>
           <TabsTrigger value="top" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400" data-testid="tab-top">
             <Award size={14} className="mr-1" /> Top Performers
+          </TabsTrigger>
+          <TabsTrigger value="live-feed" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-400" data-testid="tab-live">
+            <Activity size={14} className="mr-1" /> Live Feed
+            {liveTradeEvents.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-emerald-500/30 text-xs">{liveTradeEvents.length}</span>
+            )}
           </TabsTrigger>
           <TabsTrigger value="my-copies" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400" data-testid="tab-copies">
             <Copy size={14} className="mr-1" /> My Copies ({userCopies.length})
@@ -310,6 +316,114 @@ const CopyTradingHub = () => {
                 getRiskBadge={getRiskBadge}
               />
             ))}
+          </div>
+        </TabsContent>
+
+        {/* Live Feed Tab */}
+        <TabsContent value="live-feed" className="mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Live Trade Events */}
+            <GlassCard title="Live Trade Stream" icon="📡" accent="emerald">
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {liveTradeEvents.length === 0 ? (
+                  <p className="text-slate-500 text-sm text-center py-8">
+                    {wsConnected ? 'Waiting for trades from master traders...' : 'Connecting to live stream...'}
+                  </p>
+                ) : (
+                  liveTradeEvents.map((event, idx) => (
+                    <motion.div
+                      key={event.event?.event_id || idx}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className={`p-3 rounded-lg border ${
+                        event.type === 'trade_copied' 
+                          ? 'bg-emerald-500/10 border-emerald-500/30' 
+                          : 'bg-blue-500/10 border-blue-500/30'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-white text-sm font-medium">
+                          {event.event?.master_name || event.master_name}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          event.event?.action === 'buy' || event.your_trade?.action === 'buy'
+                            ? 'bg-emerald-500/20 text-emerald-400'
+                            : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {(event.event?.action || event.your_trade?.action || '').toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-300">
+                        {event.message || `${event.event?.action} ${event.event?.quantity} ${event.event?.symbol}`}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {new Date(event.event?.timestamp || event.timestamp).toLocaleTimeString()}
+                      </p>
+                    </motion.div>
+                  ))
+                )}
+              </div>
+            </GlassCard>
+
+            {/* Your Copied Trades */}
+            <GlassCard title="Your Copied Trades" icon="📋" accent="purple">
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {copiedTrades.length === 0 ? (
+                  <p className="text-slate-500 text-sm text-center py-8">
+                    Your copied trades will appear here in real-time
+                  </p>
+                ) : (
+                  copiedTrades.map((trade, idx) => (
+                    <div key={trade.trade_id || idx} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-white text-sm">{trade.symbol}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          trade.action === 'buy' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {trade.action?.toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-slate-400">
+                        <span>Qty: {trade.copied_quantity?.toFixed(4)}</span>
+                        <span>@ ${trade.price?.toLocaleString()}</span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1">
+                        Copy Ratio: {trade.copy_ratio}x • {trade.status}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </GlassCard>
+          </div>
+
+          {/* Test Simulate Button (for demo) */}
+          <div className="mt-4 flex justify-center">
+            <Button
+              onClick={async () => {
+                try {
+                  await fetch(`${API}/copy-trading/ws/simulate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      master_trader_id: 'MTR-001',
+                      master_name: 'Bridgewater Alpha Fund',
+                      action: Math.random() > 0.5 ? 'buy' : 'sell',
+                      symbol: ['BTC', 'ETH', 'SOL'][Math.floor(Math.random() * 3)],
+                      quantity: (Math.random() * 2).toFixed(4),
+                      price: 45000 + Math.random() * 5000
+                    })
+                  });
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
+              variant="outline"
+              className="border-amber-500/30 text-amber-400"
+              data-testid="simulate-trade-btn"
+            >
+              <Zap size={14} className="mr-2" /> Simulate Master Trade (Demo)
+            </Button>
           </div>
         </TabsContent>
 
