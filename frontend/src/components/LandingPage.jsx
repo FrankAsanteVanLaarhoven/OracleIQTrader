@@ -212,7 +212,7 @@ const LandingPage = ({ onGetStarted }) => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-teal-500/20 border border-purple-500/30 mb-8"
           >
             <span className="px-2 py-0.5 rounded-full bg-purple-500 text-white text-xs font-bold">PRO</span>
-            <span className="text-sm text-white font-medium">Create specialized AI agents for your workflow</span>
+            <span className="text-sm text-white font-medium">Next-Gen Algorithmic Trading Platform</span>
           </motion.div>
 
           {/* Main Title */}
