@@ -4284,6 +4284,98 @@ async def connect_polymarket_api(data: dict):
 
 
 
+# ============ COPY TRADING ============
+
+from modules.copy_trading import (
+    get_master_traders, get_master_trader, get_top_performers, get_trending_traders,
+    start_copy_trading, stop_copy_trading, pause_copy_trading, resume_copy_trading,
+    update_copy_settings, get_user_copies, get_copy_portfolio, add_funds_to_copy
+)
+
+@api_router.get("/copy/traders")
+async def list_master_traders(sort_by: str = "total_return", risk_level: str = None):
+    """Get all master traders available for copying"""
+    return get_master_traders(sort_by, risk_level)
+
+@api_router.get("/copy/traders/top")
+async def top_performing_traders(period: str = "monthly"):
+    """Get top performing traders"""
+    return get_top_performers(period)
+
+@api_router.get("/copy/traders/trending")
+async def trending_master_traders():
+    """Get trending traders by follower growth"""
+    return get_trending_traders()
+
+@api_router.get("/copy/trader/{trader_id}")
+async def get_single_master_trader(trader_id: str):
+    """Get details of a single master trader"""
+    return get_master_trader(trader_id)
+
+@api_router.post("/copy/start")
+async def start_copying(data: dict):
+    """Start copying a master trader"""
+    return start_copy_trading(
+        data.get("follower_id", "demo_user"),
+        data.get("master_trader_id"),
+        data.get("amount", 0),
+        data.get("settings")
+    )
+
+@api_router.post("/copy/stop")
+async def stop_copying(data: dict):
+    """Stop copying a master trader"""
+    return stop_copy_trading(
+        data.get("follower_id", "demo_user"),
+        data.get("relationship_id")
+    )
+
+@api_router.post("/copy/pause")
+async def pause_copying(data: dict):
+    """Pause copying (no new trades)"""
+    return pause_copy_trading(
+        data.get("follower_id", "demo_user"),
+        data.get("relationship_id")
+    )
+
+@api_router.post("/copy/resume")
+async def resume_copying(data: dict):
+    """Resume copying"""
+    return resume_copy_trading(
+        data.get("follower_id", "demo_user"),
+        data.get("relationship_id")
+    )
+
+@api_router.post("/copy/settings")
+async def update_copy_trading_settings(data: dict):
+    """Update copy trading settings"""
+    return update_copy_settings(
+        data.get("follower_id", "demo_user"),
+        data.get("relationship_id"),
+        data.get("settings", {})
+    )
+
+@api_router.get("/copy/relationships/{user_id}")
+async def get_user_copy_relationships(user_id: str):
+    """Get user's copy trading relationships"""
+    return get_user_copies(user_id)
+
+@api_router.get("/copy/portfolio/{user_id}")
+async def get_user_copy_portfolio(user_id: str):
+    """Get user's copy trading portfolio summary"""
+    return get_copy_portfolio(user_id)
+
+@api_router.post("/copy/add-funds")
+async def add_copy_funds(data: dict):
+    """Add more funds to a copy relationship"""
+    return add_funds_to_copy(
+        data.get("follower_id", "demo_user"),
+        data.get("relationship_id"),
+        data.get("amount", 0)
+    )
+
+
+
 
 # Include the router
 app.include_router(api_router)
