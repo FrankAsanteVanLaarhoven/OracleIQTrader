@@ -602,7 +602,8 @@ const StatCard = ({ icon: Icon, label, value, color }) => {
     amber: 'text-amber-400 bg-amber-500/20',
     blue: 'text-blue-400 bg-blue-500/20',
     purple: 'text-purple-400 bg-purple-500/20',
-    emerald: 'text-emerald-400 bg-emerald-500/20'
+    emerald: 'text-emerald-400 bg-emerald-500/20',
+    red: 'text-red-400 bg-red-500/20'
   };
   
   return (
@@ -616,6 +617,248 @@ const StatCard = ({ icon: Icon, label, value, color }) => {
           <p className="text-xl font-bold text-white">{value}</p>
         </div>
       </div>
+    </div>
+  );
+};
+
+// Alerts Panel
+const AlertsPanel = ({ 
+  alerts, presets, history, stats, ports, suppliers, markets,
+  showCreateAlert, setShowCreateAlert, newAlert, setNewAlert,
+  onCreateAlert, onDeleteAlert, onToggleAlert, onQuickSetup, onCheckAlerts, refreshing
+}) => {
+  const getPriorityColor = (priority) => {
+    const colors = {
+      low: 'text-slate-400 bg-slate-500/20',
+      medium: 'text-amber-400 bg-amber-500/20',
+      high: 'text-orange-400 bg-orange-500/20',
+      critical: 'text-red-400 bg-red-500/20'
+    };
+    return colors[priority] || colors.medium;
+  };
+
+  const getAlertTypeIcon = (type) => {
+    const icons = {
+      port_congestion: Ship,
+      supplier_risk: Factory,
+      geopolitical_risk: Globe,
+      commodity_price: DollarSign,
+      market_event: BarChart3,
+      delivery_delay: Truck
+    };
+    return icons[type] || Bell;
+  };
+
+  return (
+    <div className="space-y-6" data-testid="alerts-panel">
+      {/* Stats Overview */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard icon={Bell} label="Active Alerts" value={stats.enabled_alerts} color="blue" />
+          <StatCard icon={AlertTriangle} label="Triggered Today" value={stats.triggered_today} color="amber" />
+          <StatCard icon={Check} label="Total History" value={stats.total_triggered_history} color="emerald" />
+          <StatCard icon={X} label="Disabled" value={stats.disabled_alerts} color="red" />
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className="flex flex-wrap gap-3">
+        <Button onClick={() => setShowCreateAlert(true)} className="bg-teal-500 hover:bg-teal-600">
+          <Plus size={16} className="mr-2" /> Create Alert
+        </Button>
+        <Button onClick={onCheckAlerts} disabled={refreshing} variant="outline" className="border-amber-500/30 text-amber-400">
+          <RefreshCw size={16} className={`mr-2 ${refreshing ? 'animate-spin' : ''}`} /> Check Now
+        </Button>
+      </div>
+
+      {/* Create Alert Modal */}
+      <AnimatePresence>
+        {showCreateAlert && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <GlassCard title="Create New Alert" icon="🔔" accent="teal">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-slate-500 block mb-1">Alert Type</label>
+                  <select
+                    value={newAlert.alert_type}
+                    onChange={(e) => setNewAlert({ ...newAlert, alert_type: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
+                  >
+                    <option value="port_congestion">Port Congestion</option>
+                    <option value="supplier_risk">Supplier Risk</option>
+                    <option value="geopolitical_risk">Geopolitical Risk</option>
+                    <option value="commodity_price">Commodity Price</option>
+                    <option value="market_event">Market Event</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500 block mb-1">Target Entity</label>
+                  <select
+                    value={newAlert.target_entity}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      let name = val;
+                      if (newAlert.alert_type === 'port_congestion') {
+                        name = ports.find(p => p.port_id === val)?.name || val;
+                      } else if (newAlert.alert_type === 'supplier_risk') {
+                        name = suppliers.find(s => s.supplier_id === val)?.name || val;
+                      }
+                      setNewAlert({ ...newAlert, target_entity: val, entity_name: name });
+                    }}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
+                  >
+                    <option value="">Select...</option>
+                    {newAlert.alert_type === 'port_congestion' && ports.map(p => (
+                      <option key={p.port_id} value={p.port_id}>{p.name}</option>
+                    ))}
+                    {newAlert.alert_type === 'supplier_risk' && suppliers.map(s => (
+                      <option key={s.supplier_id} value={s.supplier_id}>{s.name}</option>
+                    ))}
+                    {newAlert.alert_type === 'geopolitical_risk' && (
+                      <option value="global">Global Risk Index</option>
+                    )}
+                    {newAlert.alert_type === 'market_event' && markets.map(m => (
+                      <option key={m.market_id} value={m.market_id}>{m.title?.substring(0, 40)}...</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500 block mb-1">Condition</label>
+                  <select
+                    value={newAlert.condition}
+                    onChange={(e) => setNewAlert({ ...newAlert, condition: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
+                  >
+                    <option value="above">Above</option>
+                    <option value="below">Below</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500 block mb-1">Threshold</label>
+                  <input
+                    type="number"
+                    value={newAlert.threshold}
+                    onChange={(e) => setNewAlert({ ...newAlert, threshold: parseFloat(e.target.value) })}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500 block mb-1">Priority</label>
+                  <select
+                    value={newAlert.priority}
+                    onChange={(e) => setNewAlert({ ...newAlert, priority: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-4">
+                <Button onClick={onCreateAlert} className="bg-teal-500 hover:bg-teal-600">
+                  <Check size={16} className="mr-2" /> Create Alert
+                </Button>
+                <Button onClick={() => setShowCreateAlert(false)} variant="outline">
+                  Cancel
+                </Button>
+              </div>
+            </GlassCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Active Alerts */}
+        <GlassCard title="Active Alerts" icon="🔔" accent="blue">
+          {alerts.length === 0 ? (
+            <p className="text-slate-500 text-sm text-center py-6">No alerts configured. Create one or use a preset below.</p>
+          ) : (
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {alerts.map((alert) => {
+                const Icon = getAlertTypeIcon(alert.alert_type);
+                return (
+                  <div key={alert.alert_id} className={`p-3 rounded-lg border ${alert.enabled ? 'bg-white/5 border-white/10' : 'bg-white/2 border-white/5 opacity-60'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Icon size={16} className="text-teal-400" />
+                        <span className="text-white text-sm font-medium">{alert.entity_name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-0.5 rounded ${getPriorityColor(alert.priority)}`}>
+                          {alert.priority}
+                        </span>
+                        <button 
+                          onClick={() => onToggleAlert(alert.alert_id, alert.enabled)}
+                          className={`p-1 rounded ${alert.enabled ? 'text-emerald-400' : 'text-slate-500'}`}
+                        >
+                          {alert.enabled ? <Check size={14} /> : <X size={14} />}
+                        </button>
+                        <button onClick={() => onDeleteAlert(alert.alert_id)} className="p-1 text-red-400 hover:text-red-300">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      {alert.condition} {alert.threshold} • Type: {alert.alert_type?.replace('_', ' ')}
+                    </p>
+                    {alert.current_value !== null && (
+                      <p className="text-xs text-slate-500 mt-1">Current: {alert.current_value?.toFixed(2)}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </GlassCard>
+
+        {/* Quick Setup Presets */}
+        <GlassCard title="Quick Setup" icon="⚡" accent="amber">
+          <div className="space-y-3">
+            {presets.map((preset, idx) => (
+              <div key={idx} className="p-3 rounded-lg bg-white/5 border border-white/10 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{preset.icon}</span>
+                  <div>
+                    <p className="text-white text-sm font-medium">{preset.name}</p>
+                    <p className="text-xs text-slate-500">{preset.description}</p>
+                  </div>
+                </div>
+                <Button size="sm" onClick={() => onQuickSetup(preset)} className="bg-amber-500/20 text-amber-400 hover:bg-amber-500/30">
+                  <Plus size={14} />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+      </div>
+
+      {/* Alert History */}
+      {history.length > 0 && (
+        <GlassCard title="Recent Triggered Alerts" icon="📜" accent="purple">
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {history.slice(0, 10).map((item, idx) => (
+              <div key={idx} className="p-3 rounded-lg bg-white/5 border-l-2 border-purple-500">
+                <div className="flex items-center justify-between mb-1">
+                  <span className={`text-xs px-2 py-0.5 rounded ${getPriorityColor(item.priority)}`}>
+                    {item.priority}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    {new Date(item.triggered_at).toLocaleString()}
+                  </span>
+                </div>
+                <p className="text-sm text-white">{item.message}</p>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+      )}
     </div>
   );
 };
