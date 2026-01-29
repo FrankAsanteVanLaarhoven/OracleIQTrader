@@ -1,4 +1,4 @@
-// SOTA Splash Screen - Animated launch screen for Oracle Trading
+// SOTA Splash Screen - Animated launch screen for OracleIQTrader
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View,

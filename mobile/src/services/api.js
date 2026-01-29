@@ -1,4 +1,4 @@
-// API Service for Oracle Trading Mobile App
+// API Service for OracleIQTrader Mobile App
 import axios from 'axios';
 
 // Backend API URL - same as web app

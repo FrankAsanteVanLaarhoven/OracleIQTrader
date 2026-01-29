@@ -1,4 +1,4 @@
-// Oracle Trading Mobile App - Main Entry Point
+// OracleIQTrader Mobile App - Main Entry Point
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, StyleSheet } from 'react-native';

@@ -1,4 +1,4 @@
-// Oracle Trading Mobile App - Theme Configuration
+// OracleIQTrader Mobile App - Theme Configuration
 // Matches the web app's glassmorphism design system
 
 export const colors = {

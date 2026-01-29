@@ -1,4 +1,4 @@
-// Push Notification Service for Oracle Trading Mobile App
+// Push Notification Service for OracleIQTrader Mobile App
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
