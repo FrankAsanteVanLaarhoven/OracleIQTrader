@@ -660,20 +660,19 @@ const InstitutionalPanel = ({ data }) => {
   ];
 
   useEffect(() => {
-    fetchAdvisory(selectedClient);
+    const loadAdvisory = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${API}/quant/institutional/advisory/${selectedClient}`);
+        const responseData = await res.json();
+        setAdvisory(responseData);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+    };
+    loadAdvisory();
   }, [selectedClient]);
-
-  const fetchAdvisory = async (clientType) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API}/quant/institutional/advisory/${clientType}`);
-      const data = await res.json();
-      setAdvisory(data);
-    } catch (e) {
-      console.error(e);
-    }
-    setLoading(false);
-  };
 
   if (!data) return <EmptyState message="Institutional data unavailable" />;
 
