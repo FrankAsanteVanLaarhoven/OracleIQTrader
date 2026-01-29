@@ -100,7 +100,7 @@ eas submit --platform android
 ## API Configuration
 
 The app connects to the same backend API as the web app:
-- API URL: `https://trade-ai-platform-7.preview.emergentagent.com/api`
+- API URL: `https://oracleiq-trader.preview.emergentagent.com/api`
 
 ### Exchange API Keys
 
