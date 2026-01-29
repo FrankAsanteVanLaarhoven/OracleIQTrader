@@ -153,6 +153,12 @@ const CopyTradingHub = () => {
       const data = await res.json();
       
       if (data.success) {
+        // Subscribe to real-time trades from this trader
+        subscribeToTrader(selectedTrader.trader_id, {
+          copy_ratio: 1.0,
+          max_trade_size: parseFloat(copyAmount) * 0.1 // Max 10% per trade
+        });
+        
         setCopyAmount('');
         setSelectedTrader(null);
         // Refresh data
@@ -168,13 +174,19 @@ const CopyTradingHub = () => {
     }
   };
 
-  const handleStopCopy = async (relationshipId) => {
+  const handleStopCopy = async (relationshipId, traderId) => {
     try {
       await fetch(`${API}/copy/stop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ follower_id: userId, relationship_id: relationshipId })
       });
+      
+      // Unsubscribe from real-time trades
+      if (traderId) {
+        unsubscribeFromTrader(traderId);
+      }
+      
       // Refresh
       const copiesRes = await fetch(`${API}/copy/relationships/${userId}`).then(r => r.json());
       setUserCopies(copiesRes || []);
