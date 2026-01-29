@@ -73,6 +73,7 @@ const NAV_TABS = [
   { id: 'playground', label: 'Playground', icon: Banknote, labelKey: 'Playground' },
   { id: 'copy-trading', label: 'Copy', icon: Copy, labelKey: 'Copy Trading' },
   { id: 'prediction-markets', label: 'Predict', icon: Target, labelKey: 'Prediction Markets' },
+  { id: 'supply-chain', label: 'Supply', icon: Ship, labelKey: 'Supply Chain' },
   { id: 'quantitative', label: 'Quant', icon: Scale, labelKey: 'Quant Research' },
   { id: 'bot', label: 'AI Bot', icon: Bot, labelKey: 'AI Bot' },
   { id: 'training', label: 'Training', icon: GraduationCap, labelKey: 'Training' },
