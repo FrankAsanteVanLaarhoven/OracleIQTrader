@@ -4377,6 +4377,102 @@ async def add_copy_funds(data: dict):
 
 
 
+
+# ============ SUPPLY CHAIN TRADING ============
+
+from modules.supply_chain import (
+    get_supply_chain_markets, get_supply_chain_market, get_high_impact_events,
+    buy_supply_chain_position, get_suppliers, get_supplier, get_at_risk_suppliers,
+    get_ports, get_congested_ports, get_scf_instruments, get_scf_instrument,
+    trade_scf_instrument, get_control_tower, get_geopolitical_risk, get_commodity_dashboard
+)
+
+@api_router.get("/supply-chain/markets")
+async def supply_chain_markets(event_type: str = None, region: str = None):
+    """Get all supply chain prediction markets"""
+    return get_supply_chain_markets(event_type, region)
+
+@api_router.get("/supply-chain/market/{market_id}")
+async def supply_chain_market(market_id: str):
+    """Get single supply chain market"""
+    return get_supply_chain_market(market_id)
+
+@api_router.get("/supply-chain/high-impact")
+async def high_impact_supply_events():
+    """Get high-impact supply chain events"""
+    return get_high_impact_events()
+
+@api_router.post("/supply-chain/trade")
+async def trade_supply_chain_market(data: dict):
+    """Trade supply chain prediction market"""
+    return buy_supply_chain_position(
+        data.get("user_id", "demo_user"),
+        data.get("market_id"),
+        data.get("side"),
+        data.get("amount", 0)
+    )
+
+@api_router.get("/supply-chain/suppliers")
+async def list_suppliers(region: str = None, risk_level: str = None):
+    """Get all monitored suppliers"""
+    return get_suppliers(region, risk_level)
+
+@api_router.get("/supply-chain/supplier/{supplier_id}")
+async def get_single_supplier(supplier_id: str):
+    """Get single supplier details"""
+    return get_supplier(supplier_id)
+
+@api_router.get("/supply-chain/suppliers/at-risk")
+async def at_risk_suppliers():
+    """Get suppliers above risk threshold"""
+    return get_at_risk_suppliers()
+
+@api_router.get("/supply-chain/ports")
+async def list_ports(region: str = None):
+    """Get all tracked ports"""
+    return get_ports(region)
+
+@api_router.get("/supply-chain/ports/congested")
+async def congested_ports():
+    """Get congested ports"""
+    return get_congested_ports()
+
+@api_router.get("/supply-chain/instruments")
+async def list_scf_instruments(commodity: str = None):
+    """Get all SCF derivative instruments"""
+    return get_scf_instruments(commodity)
+
+@api_router.get("/supply-chain/instrument/{instrument_id}")
+async def get_single_scf_instrument(instrument_id: str):
+    """Get single SCF instrument"""
+    return get_scf_instrument(instrument_id)
+
+@api_router.post("/supply-chain/instrument/trade")
+async def trade_scf(data: dict):
+    """Trade SCF derivative instrument"""
+    return trade_scf_instrument(
+        data.get("user_id", "demo_user"),
+        data.get("instrument_id"),
+        data.get("side"),
+        data.get("quantity", 0)
+    )
+
+@api_router.get("/supply-chain/control-tower")
+async def control_tower_summary():
+    """Get supply chain control tower overview"""
+    return get_control_tower()
+
+@api_router.get("/supply-chain/geopolitical-risk")
+async def geopolitical_risk_index():
+    """Get geopolitical risk index"""
+    return get_geopolitical_risk()
+
+@api_router.get("/supply-chain/commodity/{commodity}")
+async def commodity_risk_dashboard(commodity: str):
+    """Get risk dashboard for specific commodity"""
+    return get_commodity_dashboard(commodity)
+
+
 # Include the router
 app.include_router(api_router)
 
