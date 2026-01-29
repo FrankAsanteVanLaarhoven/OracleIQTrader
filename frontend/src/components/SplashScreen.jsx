@@ -100,7 +100,7 @@ const SplashScreen = ({ onComplete }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
         >
-          Cognitive Oracle Trading Platform v1.0
+          OracleIQTrader.com - AI Trading Platform v1.0
         </motion.p>
       </div>
     </motion.div>

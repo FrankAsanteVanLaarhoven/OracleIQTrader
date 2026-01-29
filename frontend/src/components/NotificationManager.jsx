@@ -51,7 +51,7 @@ const NotificationManager = () => {
       
       if (result === 'granted') {
         // Show test notification
-        new Notification('Cognitive Oracle', {
+        new Notification('OracleIQTrader', {
           body: 'Push notifications enabled! You will receive trading alerts.',
           icon: '/logo192.png',
           tag: 'welcome'

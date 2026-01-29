@@ -35,7 +35,7 @@ const LoginPage = () => {
             <Zap className="text-teal-400" size={36} />
           </motion.div>
           <h1 className="font-heading text-3xl font-bold uppercase tracking-wider text-white mb-2">
-            Cognitive Oracle
+            OracleIQTrader
           </h1>
           <p className="text-slate-500 font-mono text-sm">
             AI-Powered Trading Platform

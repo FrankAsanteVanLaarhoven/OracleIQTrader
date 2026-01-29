@@ -192,7 +192,7 @@ const Dashboard = () => {
                       <Zap className="text-teal-400" size={16} />
                     </div>
                     <div className="hidden sm:block">
-                      <h1 className="font-heading text-base md:text-lg font-bold uppercase tracking-wider text-white">Oracle</h1>
+                      <h1 className="font-heading text-base md:text-lg font-bold uppercase tracking-wider text-white">OracleIQTrader</h1>
                       <p className="text-[10px] text-slate-500 font-mono hidden md:block">AI Trading</p>
                     </div>
                   </div>

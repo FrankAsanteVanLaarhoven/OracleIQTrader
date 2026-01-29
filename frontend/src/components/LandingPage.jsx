@@ -227,7 +227,7 @@ const LandingPage = ({ onGetStarted }) => {
             </span>
             <br />
             <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
-              With AI Oracle
+              With OracleIQTrader
             </span>
           </motion.h1>
 
@@ -472,7 +472,7 @@ const LandingPage = ({ onGetStarted }) => {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
                 <Zap className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold">ORACLE TRADING</span>
+              <span className="font-bold">OracleIQTrader</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-slate-500">
               <a href="#" className="hover:text-white transition-colors">Privacy</a>
@@ -480,7 +480,7 @@ const LandingPage = ({ onGetStarted }) => {
               <a href="#" className="hover:text-white transition-colors">Support</a>
             </div>
             <div className="text-sm text-slate-500">
-              © 2026 Oracle Trading. All rights reserved.
+              © 2026 OracleIQTrader.com. All rights reserved.
             </div>
           </div>
         </div>
