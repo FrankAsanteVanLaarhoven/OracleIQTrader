@@ -424,6 +424,13 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* Supply Chain Hub */}
+              {activeTab === 'supply-chain' && (
+                <motion.div key="supply-chain" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-7xl mx-auto">
+                  <SupplyChainHub />
+                </motion.div>
+              )}
+
               {/* Trading Competitions */}
               {activeTab === 'competitions' && (
                 <motion.div key="competitions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
