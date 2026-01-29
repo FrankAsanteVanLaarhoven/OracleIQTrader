@@ -386,7 +386,7 @@ const Dashboard = () => {
               )}
 
               {/* ML Predictions */}
-              {activeTab === 'predictions' && (
+              {activeTab === 'ml-predictions' && (
                 <motion.div key="predictions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
                   <MLPredictions />
                 </motion.div>
