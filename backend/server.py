@@ -3917,6 +3917,82 @@ async def start_spectator_simulation(tournament_id: str):
     return {"success": True, "message": f"Simulation started for tournament {tournament_id}"}
 
 
+# ============ COPY TRADING REAL-TIME WEBSOCKET ============
+from modules.copy_trading_ws import (
+    copy_trading_ws_manager, TradeAction, simulate_master_trades
+)
+
+@app.websocket("/ws/copy-trading/{user_id}")
+async def copy_trading_websocket(websocket: WebSocket, user_id: str):
+    """WebSocket endpoint for real-time copy trading updates"""
+    await copy_trading_ws_manager.connect(websocket, user_id)
+    try:
+        while True:
+            data = await websocket.receive_json()
+            
+            # Handle subscription commands
+            if data.get("action") == "subscribe":
+                trader_id = data.get("trader_id")
+                settings = data.get("settings", {})
+                copy_trading_ws_manager.subscribe_to_trader(user_id, trader_id, settings)
+                await websocket.send_json({
+                    "type": "subscribed",
+                    "trader_id": trader_id,
+                    "message": f"Now receiving trades from {trader_id}"
+                })
+            
+            elif data.get("action") == "unsubscribe":
+                trader_id = data.get("trader_id")
+                copy_trading_ws_manager.unsubscribe_from_trader(user_id, trader_id)
+                await websocket.send_json({
+                    "type": "unsubscribed",
+                    "trader_id": trader_id,
+                    "message": f"Stopped receiving trades from {trader_id}"
+                })
+            
+            elif data.get("action") == "ping":
+                await websocket.send_json({"type": "pong", "timestamp": datetime.now(timezone.utc).isoformat()})
+    
+    except WebSocketDisconnect:
+        copy_trading_ws_manager.disconnect(websocket, user_id)
+    except Exception as e:
+        logger.error(f"Copy trading WS error for {user_id}: {e}")
+        copy_trading_ws_manager.disconnect(websocket, user_id)
+
+@api_router.get("/copy-trading/ws/stats")
+async def copy_trading_ws_stats():
+    """Get copy trading WebSocket statistics"""
+    return copy_trading_ws_manager.get_stats()
+
+@api_router.get("/copy-trading/ws/events")
+async def copy_trading_events(limit: int = 50):
+    """Get recent trade events"""
+    return copy_trading_ws_manager.get_recent_events(limit)
+
+@api_router.get("/copy-trading/ws/trades/{user_id}")
+async def copy_trading_user_trades(user_id: str, limit: int = 50):
+    """Get a user's copied trade history"""
+    return copy_trading_ws_manager.get_user_copied_trades(user_id, limit)
+
+@api_router.post("/copy-trading/ws/simulate")
+async def simulate_trade_for_test(data: dict):
+    """Simulate a master trader trade for testing (demo only)"""
+    event = await copy_trading_ws_manager.propagate_trade(
+        master_trader_id=data.get("master_trader_id", "MTR-001"),
+        master_name=data.get("master_name", "Test Trader"),
+        action=TradeAction(data.get("action", "buy")),
+        symbol=data.get("symbol", "BTC"),
+        quantity=float(data.get("quantity", 0.5)),
+        price=float(data.get("price", 45000))
+    )
+    return {"success": True, "event": event.to_dict()}
+
+@api_router.get("/copy-trading/ws/followers/{trader_id}")
+async def get_trader_followers(trader_id: str):
+    """Get list of followers for a trader"""
+    return {"trader_id": trader_id, "followers": copy_trading_ws_manager.get_trader_followers(trader_id)}
+
+
 # ============ BRIDGEWATER-STYLE QUANTITATIVE RESEARCH ============
 
 # Macro Economic Engine
