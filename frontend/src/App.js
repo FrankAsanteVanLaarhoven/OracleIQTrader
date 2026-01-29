@@ -154,9 +154,9 @@ const Dashboard = () => {
     addSystemMessage(messages[Math.floor(Math.random() * messages.length)]);
   };
 
-  // Handle "Get Started" from landing page - triggers Google login or shows dashboard
-  const handleGetStarted = () => {
-    if (!isAuthenticated) {
+  // Handle "Get Started" from landing page - shows dashboard (guest mode allowed)
+  const handleGetStarted = (requireAuth = false) => {
+    if (requireAuth && !isAuthenticated) {
       loginWithGoogle();
     }
     setShowLanding(false);
