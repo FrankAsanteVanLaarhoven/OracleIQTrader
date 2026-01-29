@@ -1,10 +1,59 @@
 # OracleIQTrader.com - PRD
 
-## Status: P15.1 Complete ✅ | Branding + Mobile Testing Ready + Refactoring Started
+## Status: P16 Complete ✅ | Hybrid Platform + Prediction Markets
 
 All features implemented and production-ready.
 
-## Latest Updates (January 29, 2026 - P15.1)
+## Latest Updates (January 29, 2026 - P16)
+
+### Hybrid Institutional/Retail Platform
+
+#### 1. Advanced Risk Modeling Engine (`/app/backend/modules/risk_modeling.py`)
+- **Sharpe Ratio** - Risk-adjusted return measure
+- **Sortino Ratio** - Downside risk-adjusted return
+- **Calmar Ratio** - Return over max drawdown
+- **Value at Risk (VaR)** - 95% and 99% confidence levels
+- **Conditional VaR (CVaR)** - Expected shortfall / tail risk
+- **Max Drawdown Analysis** - Peak-to-trough decline tracking
+- **Tail Risk Analysis** - Skewness, kurtosis, fat tails detection
+- **Correlation Matrix** - Multi-asset portfolio correlations
+- **Risk Grade System** - A+ to F portfolio risk scoring
+- APIs: `/api/risk/*`
+
+#### 2. Algorithmic Execution Engine (`/app/backend/modules/algo_execution.py`)
+- **VWAP Orders** - Volume Weighted Average Price execution
+- **TWAP Orders** - Time Weighted Average Price execution
+- **Iceberg Orders** - Hidden large orders with visible slices
+- **POV Orders** - Percentage of Volume participation
+- **Smart Order Routing** - Auto-selects best algorithm based on market conditions
+- APIs: `/api/algo/*`
+
+#### 3. Prediction Markets System (`/app/backend/modules/prediction_markets.py`)
+- **Sports Markets** - NFL, NBA, MLS, UFC, MLB, NHL, EPL, UCL
+- **Political Markets** - Elections, Fed decisions, GDP forecasts
+- **Crypto Markets** - BTC/ETH price targets, ETF flows
+- **Trading Engine** - Buy/sell YES/NO shares, real-time pricing
+- **Leaderboard** - Top predictors ranking
+- **Kalshi API Scaffolding** - CFTC-regulated integration ready
+- **Polymarket API Scaffolding** - Crypto-based integration ready
+- APIs: `/api/predictions/*`
+
+#### 4. Frontend Components
+- **PredictionHub.jsx** - Full prediction markets trading interface
+  - Trending, Sports, Politics, Crypto tabs
+  - Interactive trade modal (YES/NO shares)
+  - User positions tracking
+  - Leaderboard display
+  - Search functionality
+
+### API Endpoints Added (35+ new endpoints)
+- `/api/risk/portfolio-analysis` - Full portfolio risk report
+- `/api/risk/sharpe`, `/api/risk/var`, `/api/risk/tail-risk`
+- `/api/algo/vwap`, `/api/algo/twap`, `/api/algo/iceberg`, `/api/algo/smart`
+- `/api/predictions/markets`, `/api/predictions/sports`, `/api/predictions/politics`
+- `/api/predictions/buy`, `/api/predictions/sell`, `/api/predictions/leaderboard`
+
+## Previous Updates (January 29, 2026 - P15.1)
 
 ### Branding Update: OracleIQTrader
 - Updated platform name from "Oracle Trading" to **OracleIQTrader**
