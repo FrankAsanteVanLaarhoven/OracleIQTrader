@@ -1,8 +1,11 @@
 // API Service for OracleIQTrader Mobile App
 import axios from 'axios';
+import Constants from 'expo-constants';
 
-// Backend API URL - same as web app
-const API_BASE_URL = 'https://oracleiq-trader.preview.emergentagent.com/api';
+// Backend API URL - reads from Expo config or falls back to preview URL
+const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 
+  process.env.EXPO_PUBLIC_BACKEND_URL || 
+  'https://oracleiq-trader.preview.emergentagent.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
