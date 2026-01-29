@@ -51,6 +51,7 @@ import TradingCompetitions from './components/TradingCompetitions';
 import BenzingaNews from './components/BenzingaNews';
 import ExchangeSettings from './components/ExchangeSettings';
 import TournamentCenter from './components/TournamentCenter';
+import QuantitativeCenter from './components/QuantitativeCenter';
 import axios from 'axios';
 
 // Icons
@@ -58,7 +59,7 @@ import {
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
   Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings,
-  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal
+  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
