@@ -415,6 +415,13 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* Copy Trading Hub */}
+              {activeTab === 'copy-trading' && (
+                <motion.div key="copy-trading" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-6xl mx-auto">
+                  <CopyTradingHub />
+                </motion.div>
+              )}
+
               {/* Trading Competitions */}
               {activeTab === 'competitions' && (
                 <motion.div key="competitions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
