@@ -33,7 +33,32 @@ const PredictionHub = () => {
   const userId = 'demo_user';
 
   useEffect(() => {
-    fetchAllData();
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const [trendingRes, sportsRes, politicalRes, cryptoRes, leaderRes, positionsRes, balanceRes] = await Promise.all([
+          fetch(`${API}/predictions/trending`).then(r => r.json()),
+          fetch(`${API}/predictions/sports`).then(r => r.json()),
+          fetch(`${API}/predictions/politics`).then(r => r.json()),
+          fetch(`${API}/predictions/crypto`).then(r => r.json()),
+          fetch(`${API}/predictions/leaderboard`).then(r => r.json()),
+          fetch(`${API}/predictions/positions/${userId}`).then(r => r.json()),
+          fetch(`${API}/predictions/balance/${userId}`).then(r => r.json()),
+        ]);
+        
+        setMarkets(trendingRes || []);
+        setSportsMarkets(sportsRes || []);
+        setPoliticalMarkets(politicalRes || []);
+        setCryptoMarkets(cryptoRes || []);
+        setLeaderboard(leaderRes || []);
+        setUserPositions(positionsRes || []);
+        setUserBalance(balanceRes?.balance || 10000);
+      } catch (error) {
+        console.error('Error fetching prediction data:', error);
+      }
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   const fetchAllData = async () => {
