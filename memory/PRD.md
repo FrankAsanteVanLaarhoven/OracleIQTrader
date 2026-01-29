@@ -1,10 +1,73 @@
 # OracleIQTrader.com - PRD
 
-## Status: P17 Complete ✅ | Copy Trading + Mobile Ready
+## Status: P18 Complete ✅ | Supply Chain Trading Hub Live
 
 All features implemented and production-ready.
 
-## Latest Updates (January 29, 2026 - P17)
+## Latest Updates (January 29, 2026 - P18)
+
+### Supply Chain Trading Hub (`/app/backend/modules/supply_chain.py`)
+Complete supply chain risk management and trading platform.
+
+#### Backend APIs (6 endpoints):
+- **Control Tower** (`/api/supply-chain/control-tower`) - Real-time supply chain dashboard
+  - Overview stats (suppliers, ports, markets, instruments)
+  - Global risk assessment
+  - Top high-impact events
+  - Congestion hotspots
+  
+- **Event Markets** (`/api/supply-chain/markets`) - 8 tradeable supply chain events
+  - Geopolitical events (Taiwan Strait, Red Sea, etc.)
+  - Port congestion events
+  - Tariff/trade policy changes
+  - Supplier disruption events
+  - YES/NO binary trading
+
+- **Supplier Risk** (`/api/supply-chain/suppliers`) - 10 monitored suppliers
+  - Risk scoring (0-100)
+  - Financial health metrics
+  - Delivery reliability
+  - Quality scores
+  - ESG ratings
+
+- **Port Intelligence** (`/api/supply-chain/ports`) - 8 major ports
+  - Real-time congestion levels
+  - Vessel queue tracking
+  - Average wait times
+  - Week-over-week trends
+
+- **SCF Derivatives** (`/api/supply-chain/instruments`) - 7 trading instruments
+  - Semiconductor futures
+  - Rare earth derivatives
+  - Shipping index futures
+  - Energy hedging products
+  - Live pricing with 24h changes
+
+- **Geopolitical Risk** (`/api/supply-chain/geopolitical-risk`) - Risk index
+  - Global risk level (Low/Moderate/Elevated/High/Critical)
+  - Key risk events tracking
+
+#### Frontend Component (`SupplyChainHub.jsx`):
+- **5 Tab Interface:**
+  1. Control Tower - Executive dashboard with stats and risk overview
+  2. Event Markets - Binary trading on supply chain events
+  3. Suppliers - Risk monitoring with detailed metrics
+  4. Ports - Congestion tracking with visual indicators
+  5. SCF Derivatives - Tradeable instruments with Buy/Sell buttons
+
+### Testing Results (Iteration 13)
+- Backend: 24/24 tests passed (100%)
+- Frontend: 100% - All Supply Chain features working
+- Test file: `/app/backend/tests/test_supply_chain_api.py`
+
+### ⚠️ MOCKED Data Note
+Supply Chain module uses SIMULATED data. No real integration with:
+- Z2Data (supplier risk)
+- SAP IBP (supply chain planning)
+- Marine Traffic (port data)
+- Real commodity exchanges
+
+## Previous Updates (January 29, 2026 - P17)
 
 ### Copy Trading Infrastructure (`/app/backend/modules/copy_trading.py`)
 - **Master Traders System** - 6 institutional/professional traders
