@@ -397,6 +397,13 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* Quantitative Research Center */}
+              {activeTab === 'quantitative' && (
+                <motion.div key="quantitative" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-7xl mx-auto">
+                  <QuantitativeCenter />
+                </motion.div>
+              )}
+
               {/* Trading Competitions */}
               {activeTab === 'competitions' && (
                 <motion.div key="competitions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
