@@ -4473,6 +4473,98 @@ async def commodity_risk_dashboard(commodity: str):
     return get_commodity_dashboard(commodity)
 
 
+# ============ Supply Chain Alert Endpoints ============
+from modules.supply_chain_alerts import (
+    supply_chain_alert_engine, SCAlertType, SCAlertCondition, SCAlertPriority
+)
+
+@api_router.get("/supply-chain/alerts/presets")
+async def get_alert_presets():
+    """Get preset alert configurations for quick setup"""
+    return supply_chain_alert_engine.get_preset_alerts()
+
+@api_router.get("/supply-chain/alerts")
+async def get_user_sc_alerts(user_id: str = "demo_user"):
+    """Get all supply chain alerts for a user"""
+    alerts = supply_chain_alert_engine.get_user_alerts(user_id)
+    return [a.model_dump() for a in alerts]
+
+@api_router.post("/supply-chain/alerts")
+async def create_sc_alert(data: dict):
+    """Create a new supply chain alert"""
+    try:
+        alert = supply_chain_alert_engine.create_alert(
+            user_id=data.get("user_id", "demo_user"),
+            alert_type=SCAlertType(data.get("alert_type")),
+            target_entity=data.get("target_entity"),
+            entity_name=data.get("entity_name"),
+            condition=SCAlertCondition(data.get("condition")),
+            threshold=float(data.get("threshold")),
+            priority=SCAlertPriority(data.get("priority", "medium")),
+            notification_channels=data.get("notification_channels", ["web", "push"]),
+            cooldown_minutes=data.get("cooldown_minutes", 60)
+        )
+        return {"success": True, "alert": alert.model_dump()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@api_router.put("/supply-chain/alerts/{alert_id}")
+async def update_sc_alert(alert_id: str, data: dict):
+    """Update an existing supply chain alert"""
+    alert = supply_chain_alert_engine.update_alert(
+        alert_id=alert_id,
+        enabled=data.get("enabled"),
+        threshold=data.get("threshold"),
+        priority=SCAlertPriority(data["priority"]) if data.get("priority") else None
+    )
+    if alert:
+        return {"success": True, "alert": alert.model_dump()}
+    return {"success": False, "error": "Alert not found"}
+
+@api_router.delete("/supply-chain/alerts/{alert_id}")
+async def delete_sc_alert(alert_id: str):
+    """Delete a supply chain alert"""
+    success = supply_chain_alert_engine.delete_alert(alert_id)
+    return {"success": success}
+
+@api_router.get("/supply-chain/alerts/history")
+async def get_alert_history(user_id: str = "demo_user", limit: int = 50):
+    """Get history of triggered alerts"""
+    history = supply_chain_alert_engine.get_triggered_history(user_id, limit)
+    return [h.model_dump() for h in history]
+
+@api_router.get("/supply-chain/alerts/stats")
+async def get_alert_stats():
+    """Get alert system statistics"""
+    return supply_chain_alert_engine.get_alert_stats()
+
+@api_router.post("/supply-chain/alerts/check")
+async def check_sc_alerts_now():
+    """Manually trigger alert check against current supply chain data"""
+    # Build current supply chain data from existing functions
+    ports_data = get_ports()
+    suppliers_data = get_suppliers()
+    geo_risk = get_geopolitical_risk()
+    instruments_data = get_scf_instruments()
+    markets_data = get_supply_chain_markets()
+    
+    supply_chain_data = {
+        "ports": {p["port_id"]: {"congestion_level": p.get("congestion", {}).get("level", 0)} for p in ports_data},
+        "suppliers": {s["supplier_id"]: {"risk_score": s.get("risk_score", 0)} for s in suppliers_data},
+        "geopolitical_risk": geo_risk,
+        "commodities": {i["commodity"]: {"price": i.get("pricing", {}).get("current_price", 0)} for i in instruments_data},
+        "markets": {m["market_id"]: {"yes_price": m.get("yes_price", 0)} for m in markets_data}
+    }
+    
+    triggered = await supply_chain_alert_engine.check_alerts(supply_chain_data)
+    return {
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+        "alerts_checked": len(supply_chain_alert_engine.alerts),
+        "alerts_triggered": len(triggered),
+        "triggered": [t.model_dump() for t in triggered]
+    }
+
+
 # Include the router
 app.include_router(api_router)
 
