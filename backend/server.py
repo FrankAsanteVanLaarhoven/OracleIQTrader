@@ -4111,6 +4111,211 @@ async def startup_event():
     await social_manager.load_credentials()
     logger.info("Social manager initialized")
 
+
+# ============ INSTITUTIONAL INFRASTRUCTURE ============
+
+# Advanced Risk Modeling
+from modules.risk_modeling import (
+    get_portfolio_risk_analysis, get_sharpe_ratio, get_var_analysis,
+    get_correlation_analysis, get_tail_risk
+)
+
+@api_router.post("/risk/portfolio-analysis")
+async def portfolio_risk_analysis(data: dict):
+    """Get comprehensive portfolio risk analysis (Sharpe, Sortino, VaR, CVaR)"""
+    prices = data.get("prices", [])
+    portfolio_value = data.get("portfolio_value", 100000)
+    return get_portfolio_risk_analysis(prices, portfolio_value)
+
+@api_router.post("/risk/sharpe")
+async def sharpe_ratio(data: dict):
+    """Calculate Sharpe Ratio"""
+    return get_sharpe_ratio(data.get("prices", []))
+
+@api_router.post("/risk/var")
+async def value_at_risk(data: dict):
+    """Calculate Value at Risk (VaR)"""
+    return get_var_analysis(data.get("prices", []), data.get("confidence", 0.95))
+
+@api_router.post("/risk/correlation")
+async def correlation_matrix(data: dict):
+    """Calculate correlation matrix between assets"""
+    return get_correlation_analysis(data.get("asset_prices", {}))
+
+@api_router.post("/risk/tail-risk")
+async def tail_risk_analysis(data: dict):
+    """Get tail risk analysis (skewness, kurtosis)"""
+    return get_tail_risk(data.get("prices", []))
+
+
+# Algorithmic Execution Engine
+from modules.algo_execution import (
+    create_vwap_order, create_twap_order, create_iceberg_order,
+    create_smart_order, get_algo_order, cancel_algo_order,
+    get_all_algo_orders, get_algo_analytics
+)
+
+@api_router.post("/algo/vwap")
+async def algo_vwap_order(data: dict):
+    """Create VWAP (Volume Weighted Average Price) order"""
+    return await create_vwap_order(
+        data.get("symbol"), data.get("side"), data.get("quantity"),
+        data.get("duration_minutes", 60)
+    )
+
+@api_router.post("/algo/twap")
+async def algo_twap_order(data: dict):
+    """Create TWAP (Time Weighted Average Price) order"""
+    return await create_twap_order(
+        data.get("symbol"), data.get("side"), data.get("quantity"),
+        data.get("duration_minutes", 60), data.get("slices", 12)
+    )
+
+@api_router.post("/algo/iceberg")
+async def algo_iceberg_order(data: dict):
+    """Create Iceberg (Hidden) order"""
+    return await create_iceberg_order(
+        data.get("symbol"), data.get("side"), data.get("quantity"),
+        data.get("visible_quantity"), data.get("limit_price")
+    )
+
+@api_router.post("/algo/smart")
+async def algo_smart_order(data: dict):
+    """Create Smart order with intelligent routing"""
+    return await create_smart_order(
+        data.get("symbol"), data.get("side"), data.get("quantity"),
+        data.get("urgency", "medium")
+    )
+
+@api_router.get("/algo/order/{order_id}")
+async def get_algo_order_status(order_id: str):
+    """Get algorithmic order status"""
+    return get_algo_order(order_id)
+
+@api_router.delete("/algo/order/{order_id}")
+async def cancel_algorithmic_order(order_id: str):
+    """Cancel an algorithmic order"""
+    return cancel_algo_order(order_id)
+
+@api_router.get("/algo/orders")
+async def get_all_algorithmic_orders():
+    """Get all algorithmic orders"""
+    return get_all_algo_orders()
+
+@api_router.get("/algo/analytics")
+async def get_execution_analytics():
+    """Get algorithmic execution performance analytics"""
+    return get_algo_analytics()
+
+
+# ============ PREDICTION MARKETS ============
+
+from modules.prediction_markets import (
+    get_all_prediction_markets, get_sports_markets, get_political_markets,
+    get_crypto_markets, get_prediction_market, buy_prediction_shares,
+    sell_prediction_shares, get_user_prediction_positions, get_user_prediction_balance,
+    get_prediction_leaderboard, get_trending_predictions, search_predictions,
+    create_prediction_market, get_market_trade_history, connect_kalshi, connect_polymarket
+)
+
+@api_router.get("/predictions/markets")
+async def prediction_markets(category: str = None):
+    """Get all prediction markets"""
+    return get_all_prediction_markets(category)
+
+@api_router.get("/predictions/sports")
+async def sports_predictions(league: str = None):
+    """Get sports prediction markets (NFL, NBA, MLS, UFC)"""
+    return get_sports_markets(league)
+
+@api_router.get("/predictions/politics")
+async def political_predictions():
+    """Get political and economic prediction markets"""
+    return get_political_markets()
+
+@api_router.get("/predictions/crypto")
+async def crypto_predictions():
+    """Get crypto prediction markets"""
+    return get_crypto_markets()
+
+@api_router.get("/predictions/trending")
+async def trending_predictions():
+    """Get trending prediction markets"""
+    return get_trending_predictions()
+
+@api_router.get("/predictions/leaderboard")
+async def predictions_leaderboard():
+    """Get prediction markets leaderboard"""
+    return get_prediction_leaderboard()
+
+@api_router.get("/predictions/search")
+async def search_prediction_markets(q: str):
+    """Search prediction markets"""
+    return search_predictions(q)
+
+@api_router.get("/predictions/market/{market_id}")
+async def get_single_prediction_market(market_id: str):
+    """Get single prediction market details"""
+    return get_prediction_market(market_id)
+
+@api_router.get("/predictions/market/{market_id}/history")
+async def prediction_market_history(market_id: str):
+    """Get trade history for a prediction market"""
+    return get_market_trade_history(market_id)
+
+@api_router.post("/predictions/buy")
+async def buy_prediction(data: dict):
+    """Buy YES or NO shares in a prediction market"""
+    return buy_prediction_shares(
+        data.get("user_id", "demo_user"),
+        data.get("market_id"),
+        data.get("side"),
+        data.get("amount")
+    )
+
+@api_router.post("/predictions/sell")
+async def sell_prediction(data: dict):
+    """Sell YES or NO shares in a prediction market"""
+    return sell_prediction_shares(
+        data.get("user_id", "demo_user"),
+        data.get("market_id"),
+        data.get("side"),
+        data.get("shares")
+    )
+
+@api_router.get("/predictions/positions/{user_id}")
+async def user_prediction_positions(user_id: str):
+    """Get user's prediction market positions"""
+    return get_user_prediction_positions(user_id)
+
+@api_router.get("/predictions/balance/{user_id}")
+async def user_prediction_balance(user_id: str):
+    """Get user's prediction market balance"""
+    return get_user_prediction_balance(user_id)
+
+@api_router.post("/predictions/create")
+async def create_new_prediction_market(data: dict):
+    """Create a new prediction market"""
+    return create_prediction_market(
+        data.get("title"),
+        data.get("category"),
+        data.get("resolution_date"),
+        data.get("description", ""),
+        data.get("tags", [])
+    )
+
+@api_router.post("/predictions/kalshi/connect")
+async def connect_kalshi_api(data: dict):
+    """Connect to Kalshi API (CFTC-regulated)"""
+    return await connect_kalshi(data.get("api_key"), data.get("api_secret"))
+
+@api_router.post("/predictions/polymarket/connect")
+async def connect_polymarket_api(data: dict):
+    """Connect to Polymarket API (crypto-based)"""
+    return await connect_polymarket(data.get("wallet_address"))
+
+
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
