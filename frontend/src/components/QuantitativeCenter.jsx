@@ -477,28 +477,26 @@ const InefficiencyPanel = ({ data }) => {
 // Portfolio Optimizer Panel Component
 const PortfolioPanel = ({ data }) => {
   const [strategies, setStrategies] = useState([]);
-  const [selectedStrategy, setSelectedStrategy] = useState('all_weather');
   const [riskParity, setRiskParity] = useState(null);
   const [pureAlpha, setPureAlpha] = useState(null);
 
   useEffect(() => {
-    fetchStrategies();
+    const loadStrategies = async () => {
+      try {
+        const [strategiesRes, riskParityRes, pureAlphaRes] = await Promise.all([
+          fetch(`${API}/quant/portfolio/strategies`).then(r => r.json()),
+          fetch(`${API}/quant/portfolio/risk-parity`).then(r => r.json()),
+          fetch(`${API}/quant/portfolio/pure-alpha`).then(r => r.json()),
+        ]);
+        setStrategies(strategiesRes?.strategies || []);
+        setRiskParity(riskParityRes);
+        setPureAlpha(pureAlphaRes);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    loadStrategies();
   }, []);
-
-  const fetchStrategies = async () => {
-    try {
-      const [strategiesRes, riskParityRes, pureAlphaRes] = await Promise.all([
-        fetch(`${API}/quant/portfolio/strategies`).then(r => r.json()),
-        fetch(`${API}/quant/portfolio/risk-parity`).then(r => r.json()),
-        fetch(`${API}/quant/portfolio/pure-alpha`).then(r => r.json()),
-      ]);
-      setStrategies(strategiesRes?.strategies || []);
-      setRiskParity(riskParityRes);
-      setPureAlpha(pureAlphaRes);
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   if (!data) return <EmptyState message="Portfolio data unavailable" />;
 
