@@ -204,8 +204,6 @@ const PredictionHub = () => {
                 key={market.market_id} 
                 market={market} 
                 onSelect={() => setSelectedMarket(market)}
-                getCategoryIcon={getCategoryIcon}
-                getCategoryColor={getCategoryColor}
               />
             ))}
           </div>
@@ -243,8 +241,6 @@ const PredictionHub = () => {
                 key={market.market_id} 
                 market={market} 
                 onSelect={() => setSelectedMarket(market)}
-                getCategoryIcon={getCategoryIcon}
-                getCategoryColor={getCategoryColor}
               />
             ))}
           </div>
@@ -274,8 +270,6 @@ const PredictionHub = () => {
                 key={market.market_id} 
                 market={market} 
                 onSelect={() => setSelectedMarket(market)}
-                getCategoryIcon={getCategoryIcon}
-                getCategoryColor={getCategoryColor}
               />
             ))}
           </div>
@@ -289,8 +283,6 @@ const PredictionHub = () => {
                 key={market.market_id} 
                 market={market} 
                 onSelect={() => setSelectedMarket(market)}
-                getCategoryIcon={getCategoryIcon}
-                getCategoryColor={getCategoryColor}
               />
             ))}
           </div>
