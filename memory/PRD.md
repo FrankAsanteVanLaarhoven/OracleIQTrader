@@ -1,10 +1,37 @@
-# Cognitive Oracle Trading Platform - PRD
+# OracleIQTrader.com - PRD
 
-## Status: P15 Complete ✅ | Bridgewater-Style Quantitative Research System
+## Status: P15.1 Complete ✅ | Branding + Mobile Testing Ready + Refactoring Started
 
 All features implemented and production-ready.
 
-## Latest Updates (January 29, 2026 - P15)
+## Latest Updates (January 29, 2026 - P15.1)
+
+### Branding Update: OracleIQTrader
+- Updated platform name from "Oracle Trading" to **OracleIQTrader**
+- Files updated:
+  - `/app/frontend/public/index.html` - Title & meta tags
+  - `/app/frontend/src/App.js` - Header branding
+  - `/app/frontend/src/components/LandingPage.jsx` - Hero, navbar, footer
+  - `/app/frontend/src/components/SplashScreen.jsx` - Splash text
+  - `/app/frontend/src/components/LoginPage.jsx` - Login header
+  - `/app/frontend/src/components/NotificationManager.jsx` - Notifications
+  - `/app/mobile/app.json` - Mobile app name, bundle IDs
+  - Mobile source files updated
+
+### Mobile App Testing Ready
+- **Expo Tunnel URL**: `https://yqkso_o-anonymous-8081.exp.direct`
+- **How to test**:
+  1. Install "Expo Go" app on your phone (iOS App Store / Google Play)
+  2. Scan the QR code or open the URL above
+  3. The OracleIQTrader mobile app will load
+
+### Server Refactoring Started
+- Created `/app/backend/routes/` directory structure
+- Completed `/app/backend/routes/quant.py` (25 routes migrated)
+- Created `/app/backend/REFACTORING_PLAN.md` with full migration path
+- **Status**: In progress - quant routes extracted, 145 more routes to migrate
+
+## Previous Updates (January 29, 2026 - P15)
 
 ### Bridgewater-Style Quantitative Research System
 Comprehensive institutional-grade analysis based on Ray Dalio's principles.
