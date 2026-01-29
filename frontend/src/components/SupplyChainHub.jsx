@@ -273,6 +273,9 @@ const SupplyChainHub = () => {
           <TabsTrigger value="control-tower" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400">
             <Activity size={14} className="mr-1" /> Control Tower
           </TabsTrigger>
+          <TabsTrigger value="alerts" className="data-[state=active]:bg-red-500/20 data-[state=active]:text-red-400">
+            <Bell size={14} className="mr-1" /> Alerts {alerts.length > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full bg-red-500/30 text-xs">{alerts.length}</span>}
+          </TabsTrigger>
           <TabsTrigger value="markets" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400">
             <BarChart3 size={14} className="mr-1" /> Event Markets
           </TabsTrigger>
@@ -290,6 +293,29 @@ const SupplyChainHub = () => {
         {/* Control Tower Tab */}
         <TabsContent value="control-tower" className="mt-6">
           <ControlTowerPanel data={controlTower} getRiskColor={getRiskColor} getRiskBg={getRiskBg} />
+        </TabsContent>
+
+        {/* Alerts Tab */}
+        <TabsContent value="alerts" className="mt-6">
+          <AlertsPanel 
+            alerts={alerts}
+            presets={alertPresets}
+            history={alertHistory}
+            stats={alertStats}
+            ports={ports}
+            suppliers={suppliers}
+            markets={markets}
+            showCreateAlert={showCreateAlert}
+            setShowCreateAlert={setShowCreateAlert}
+            newAlert={newAlert}
+            setNewAlert={setNewAlert}
+            onCreateAlert={handleCreateAlert}
+            onDeleteAlert={handleDeleteAlert}
+            onToggleAlert={handleToggleAlert}
+            onQuickSetup={handleQuickSetup}
+            onCheckAlerts={handleCheckAlerts}
+            refreshing={refreshing}
+          />
         </TabsContent>
 
         {/* Markets Tab */}
