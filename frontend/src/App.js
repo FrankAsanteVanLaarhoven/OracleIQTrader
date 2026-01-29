@@ -54,6 +54,7 @@ import TournamentCenter from './components/TournamentCenter';
 import QuantitativeCenter from './components/QuantitativeCenter';
 import PredictionHub from './components/PredictionHub';
 import CopyTradingHub from './components/CopyTradingHub';
+import SupplyChainHub from './components/SupplyChainHub';
 import axios from 'axios';
 
 // Icons
