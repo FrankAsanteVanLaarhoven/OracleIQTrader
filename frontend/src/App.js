@@ -52,6 +52,7 @@ import BenzingaNews from './components/BenzingaNews';
 import ExchangeSettings from './components/ExchangeSettings';
 import TournamentCenter from './components/TournamentCenter';
 import QuantitativeCenter from './components/QuantitativeCenter';
+import PredictionHub from './components/PredictionHub';
 import axios from 'axios';
 
 // Icons
@@ -59,7 +60,7 @@ import {
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
   Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings,
-  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale
+  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale, Target
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -68,10 +69,11 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const NAV_TABS = [
   { id: 'dashboard', label: 'Trading', icon: LayoutDashboard, labelKey: 'nav.trading' },
   { id: 'playground', label: 'Playground', icon: Banknote, labelKey: 'Playground' },
+  { id: 'prediction-markets', label: 'Predict', icon: Target, labelKey: 'Prediction Markets' },
   { id: 'quantitative', label: 'Quant', icon: Scale, labelKey: 'Quant Research' },
   { id: 'bot', label: 'AI Bot', icon: Bot, labelKey: 'AI Bot' },
   { id: 'training', label: 'Training', icon: GraduationCap, labelKey: 'Training' },
-  { id: 'predictions', label: 'ML Predict', icon: Sparkles, labelKey: 'ML Predict' },
+  { id: 'ml-predictions', label: 'ML Predict', icon: Sparkles, labelKey: 'ML Predict' },
   { id: 'tournament', label: 'Tournament', icon: Trophy, labelKey: 'Tournament' },
   { id: 'competitions', label: 'Compete', icon: Medal, labelKey: 'Compete' },
   { id: 'avatar', label: 'Avatar', icon: User, labelKey: 'Avatar' },
