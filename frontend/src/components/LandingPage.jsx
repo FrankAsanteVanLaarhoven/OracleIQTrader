@@ -181,7 +181,7 @@ const LandingPage = ({ onGetStarted }) => {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
               <Zap className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold tracking-wider">ORACLE</span>
+            <span className="text-xl font-bold tracking-wider">OracleIQ</span>
           </div>
           
           <div className="hidden md:flex items-center gap-8">
