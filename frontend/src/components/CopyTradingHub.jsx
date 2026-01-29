@@ -240,6 +240,16 @@ const CopyTradingHub = () => {
             Mirror Institutional Strategies • One-Click Follow
           </p>
         </div>
+        {/* Connection Status */}
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${wsConnected ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+          {wsConnected ? <Wifi size={14} /> : <WifiOff size={14} />}
+          <span className="text-xs font-mono">{wsConnected ? 'Live Connected' : 'Reconnecting...'}</span>
+          {wsConnected && liveTradeEvents.length > 0 && (
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-emerald-500/30 text-xs animate-pulse">
+              {liveTradeEvents.length}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Portfolio Summary */}
