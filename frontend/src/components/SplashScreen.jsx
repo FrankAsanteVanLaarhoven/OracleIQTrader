@@ -63,7 +63,6 @@ const SplashScreen = ({ onComplete }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <span className="text-slate-500">💡</span>
           <h1 className="font-heading text-xl md:text-2xl font-medium text-slate-300 tracking-wide">
             Next-Gen Algorithmic Trading Platform
           </h1>
