@@ -1,10 +1,70 @@
 # OracleIQTrader.com - PRD
 
-## Status: P18 Complete ✅ | Supply Chain Trading Hub Live
+## Status: P19 Complete ✅ | Supply Chain Alerts + Real-time Copy Trading
 
 All features implemented and production-ready.
 
-## Latest Updates (January 29, 2026 - P18)
+## Latest Updates (January 29, 2026 - P19)
+
+### Supply Chain Alert Notifications (`/app/backend/modules/supply_chain_alerts.py`)
+Real-time alerts for supply chain risk events.
+
+#### Features:
+- **6 Alert Types:** Port Congestion, Supplier Risk, Geopolitical Risk, Commodity Price, Market Event, Delivery Delay
+- **Quick Setup Presets:** One-click alert creation for common scenarios
+- **Customizable Thresholds:** Above/Below conditions with priority levels
+- **Alert History:** Track triggered alerts over time
+- **Cooldown System:** Prevent alert spam with configurable cooldown periods
+
+#### Backend APIs (8 endpoints):
+- `GET /api/supply-chain/alerts/presets` - 6 preset configurations
+- `GET/POST /api/supply-chain/alerts` - CRUD operations
+- `PUT/DELETE /api/supply-chain/alerts/{id}` - Update/delete alerts
+- `GET /api/supply-chain/alerts/history` - Triggered alerts
+- `GET /api/supply-chain/alerts/stats` - System statistics
+- `POST /api/supply-chain/alerts/check` - Manual alert check
+
+#### Frontend (AlertsPanel in SupplyChainHub):
+- Stats overview cards
+- Create Alert form with type, entity, condition, threshold, priority
+- Active alerts list with enable/disable toggle
+- Quick Setup presets for one-click creation
+- Alert history display
+
+### Real-time Copy Trading WebSocket (`/app/backend/modules/copy_trading_ws.py`)
+Live trade propagation when master traders execute.
+
+#### Features:
+- **WebSocket Connection:** Real-time bidirectional communication
+- **Trade Propagation:** Instant notification when master traders trade
+- **Auto-Copy:** Trades automatically copied with configurable ratios
+- **Live Feed:** See all trades in real-time
+- **Connection Status:** Visual indicator of live connection
+
+#### Backend APIs (6 endpoints):
+- `WS /ws/copy-trading/{user_id}` - WebSocket for real-time updates
+- `GET /api/copy-trading/ws/stats` - Connection statistics
+- `GET /api/copy-trading/ws/events` - Recent trade events
+- `GET /api/copy-trading/ws/trades/{user_id}` - User's copied trades
+- `POST /api/copy-trading/ws/simulate` - Simulate trade for testing
+- `GET /api/copy-trading/ws/followers/{trader_id}` - Follower list
+
+#### Frontend (CopyTradingHub Live Feed tab):
+- Connection status indicator (Live Connected / Reconnecting)
+- Live Trade Stream panel with real-time events
+- Your Copied Trades panel
+- Simulate Trade button for demo
+
+### Testing Results (Iterations 14 & 15)
+- Supply Chain Alerts: 21/21 backend tests passed (100%)
+- Copy Trading WS: 19/19 backend tests passed (100%)
+
+### ⚠️ MOCKED Data Note
+Both features use IN-MEMORY storage (not persisted to MongoDB):
+- Supply Chain Alerts - Data resets on server restart
+- Copy Trading WebSocket - Trade events not persisted
+
+## Previous Updates (January 29, 2026 - P18)
 
 ### Supply Chain Trading Hub (`/app/backend/modules/supply_chain.py`)
 Complete supply chain risk management and trading platform.
