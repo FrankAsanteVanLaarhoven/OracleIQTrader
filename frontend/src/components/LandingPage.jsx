@@ -223,11 +223,11 @@ const LandingPage = ({ onGetStarted }) => {
             className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
           >
             <span className="bg-gradient-to-r from-white via-white to-slate-400 bg-clip-text text-transparent">
-              Trade Smarter
+              Create Specialized
             </span>
             <br />
             <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
-              With OracleIQTrader
+              AI Trading Agents
             </span>
           </motion.h1>
 
@@ -236,7 +236,17 @@ const LandingPage = ({ onGetStarted }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10"
+            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-4"
+          >
+            Let's make something incredible!
+          </motion.p>
+          
+          {/* Secondary Text */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55 }}
+            className="text-base md:text-lg text-slate-500 max-w-3xl mx-auto mb-10"
           >
             Harness the power of machine learning, real-time analytics, and autonomous trading 
             to maximize your crypto and stock portfolio performance.
