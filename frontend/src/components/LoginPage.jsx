@@ -104,7 +104,7 @@ const LoginPage = () => {
 
         {/* Footer */}
         <p className="text-center text-slate-600 text-xs font-mono mt-6">
-          Powered by Emergent AI • Enterprise Grade Security
+          Powered by OracleIQ AI • Enterprise Grade Security
         </p>
       </motion.div>
     </div>
