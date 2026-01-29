@@ -328,23 +328,22 @@ const InefficiencyPanel = ({ data }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchSignals();
+    const loadSignals = async () => {
+      setLoading(true);
+      try {
+        const [signalsRes, pairsRes] = await Promise.all([
+          fetch(`${API}/quant/inefficiency/signals`).then(r => r.json()),
+          fetch(`${API}/quant/inefficiency/pairs`).then(r => r.json()),
+        ]);
+        setSignals(signalsRes || []);
+        setPairs(pairsRes || []);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+    };
+    loadSignals();
   }, []);
-
-  const fetchSignals = async () => {
-    setLoading(true);
-    try {
-      const [signalsRes, pairsRes] = await Promise.all([
-        fetch(`${API}/quant/inefficiency/signals`).then(r => r.json()),
-        fetch(`${API}/quant/inefficiency/pairs`).then(r => r.json()),
-      ]);
-      setSignals(signalsRes || []);
-      setPairs(pairsRes || []);
-    } catch (e) {
-      console.error(e);
-    }
-    setLoading(false);
-  };
 
   if (!data) return <EmptyState message="Inefficiency data unavailable" />;
 
