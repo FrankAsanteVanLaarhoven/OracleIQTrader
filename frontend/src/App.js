@@ -156,9 +156,12 @@ const Dashboard = () => {
 
   // Handle "Get Started" from landing page - shows dashboard (guest mode allowed)
   const handleGetStarted = (requireAuth = false) => {
+    console.log('handleGetStarted called with requireAuth:', requireAuth);
     if (requireAuth && !isAuthenticated) {
+      console.log('Calling loginWithGoogle');
       loginWithGoogle();
     }
+    console.log('Setting showLanding to false');
     setShowLanding(false);
   };
 
