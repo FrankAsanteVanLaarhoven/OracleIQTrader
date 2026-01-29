@@ -328,9 +328,9 @@ const PredictionHub = () => {
 
 // Market Card Component
 const MarketCard = ({ market, onSelect, getCategoryIcon, getCategoryColor, showLeague }) => {
-  const CategoryIcon = getCategoryIcon(market.category);
   const yesPrice = market.yes_price || 0.5;
   const noPrice = market.no_price || 0.5;
+  const Icon = getCategoryIcon(market.category);
   
   return (
     <motion.div
@@ -342,7 +342,7 @@ const MarketCard = ({ market, onSelect, getCategoryIcon, getCategoryColor, showL
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className={`p-2 rounded-lg ${getCategoryColor(market.category)}`}>
-            <CategoryIcon size={16} />
+            <Icon size={16} />
           </div>
           {showLeague && market.league && (
             <span className="text-xs px-2 py-0.5 rounded bg-white/10 text-slate-400">{market.league}</span>
