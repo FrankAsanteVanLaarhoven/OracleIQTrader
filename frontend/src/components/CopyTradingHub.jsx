@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, TrendingUp, TrendingDown, Shield, Zap, Award,
   DollarSign, Percent, BarChart3, Play, Pause, X, Plus,
-  ChevronRight, Star, Check, AlertTriangle, Copy, Settings
+  ChevronRight, Star, Check, AlertTriangle, Copy, Settings, Wifi, WifiOff, Activity
 } from 'lucide-react';
 import GlassCard from './GlassCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -12,6 +12,7 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const WS_URL = process.env.REACT_APP_BACKEND_URL?.replace('https://', 'wss://').replace('http://', 'ws://');
 
 const CopyTradingHub = () => {
   const [activeTab, setActiveTab] = useState('discover');
@@ -23,8 +24,95 @@ const CopyTradingHub = () => {
   const [selectedTrader, setSelectedTrader] = useState(null);
   const [copyAmount, setCopyAmount] = useState('');
   const [sortBy, setSortBy] = useState('total_return');
+  
+  // Real-time state
+  const [wsConnected, setWsConnected] = useState(false);
+  const [liveTradeEvents, setLiveTradeEvents] = useState([]);
+  const [copiedTrades, setCopiedTrades] = useState([]);
+  const wsRef = useRef(null);
 
   const userId = 'demo_user';
+
+  // WebSocket connection for real-time trades
+  useEffect(() => {
+    const connectWs = () => {
+      if (!WS_URL) return;
+      
+      const ws = new WebSocket(`${WS_URL}/ws/copy-trading/${userId}`);
+      
+      ws.onopen = () => {
+        console.log('Copy trading WebSocket connected');
+        setWsConnected(true);
+      };
+      
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          if (data.type === 'trade_copied') {
+            // Add to live events
+            setLiveTradeEvents(prev => [data, ...prev.slice(0, 49)]);
+            setCopiedTrades(prev => [data.your_trade, ...prev.slice(0, 99)]);
+            
+            // Show notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('Trade Copied!', {
+                body: data.message,
+                icon: '/logo192.png'
+              });
+            }
+          } else if (data.type === 'master_activity') {
+            setLiveTradeEvents(prev => [data, ...prev.slice(0, 49)]);
+          }
+        } catch (e) {
+          console.error('WS message parse error:', e);
+        }
+      };
+      
+      ws.onclose = () => {
+        console.log('Copy trading WebSocket disconnected');
+        setWsConnected(false);
+        // Reconnect after 5 seconds
+        setTimeout(connectWs, 5000);
+      };
+      
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        setWsConnected(false);
+      };
+      
+      wsRef.current = ws;
+    };
+    
+    connectWs();
+    
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, []);
+
+  // Subscribe to trader when starting to copy
+  const subscribeToTrader = useCallback((traderId, settings = {}) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        action: 'subscribe',
+        trader_id: traderId,
+        settings
+      }));
+    }
+  }, []);
+
+  // Unsubscribe when stopping copy
+  const unsubscribeFromTrader = useCallback((traderId) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        action: 'unsubscribe',
+        trader_id: traderId
+      }));
+    }
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
