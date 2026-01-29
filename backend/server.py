@@ -4080,38 +4080,6 @@ async def client_types():
     return get_available_client_types()
 
 
-# Include the router
-app.include_router(api_router)
-
-# CORS configuration - handle all origins dynamically
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=["http://localhost:3000", "https://trade-ai-platform-7.preview.emergentagent.com"],
-    allow_origin_regex=r"https://.*\.preview\.emergentagent\.com",
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.on_event("startup")
-async def startup_event():
-    # Load pending alerts from database
-    await alert_manager.load_alerts_from_db()
-    logger.info("Alert manager initialized")
-    
-    # Start price streaming background task
-    asyncio.create_task(price_streamer())
-    logger.info("Price streamer started")
-    
-    # Start trade crawler background task
-    asyncio.create_task(trade_crawler_task())
-    logger.info("Trade crawler started")
-    
-    # Load social media credentials
-    await social_manager.load_credentials()
-    logger.info("Social manager initialized")
-
-
 # ============ INSTITUTIONAL INFRASTRUCTURE ============
 
 # Advanced Risk Modeling
@@ -4316,6 +4284,37 @@ async def connect_polymarket_api(data: dict):
 
 
 
+
+# Include the router
+app.include_router(api_router)
+
+# CORS configuration - handle all origins dynamically
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["http://localhost:3000", "https://trade-ai-platform-7.preview.emergentagent.com"],
+    allow_origin_regex=r"https://.*\.preview\.emergentagent\.com",
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.on_event("startup")
+async def startup_event():
+    # Load pending alerts from database
+    await alert_manager.load_alerts_from_db()
+    logger.info("Alert manager initialized")
+    
+    # Start price streaming background task
+    asyncio.create_task(price_streamer())
+    logger.info("Price streamer started")
+    
+    # Start trade crawler background task
+    asyncio.create_task(trade_crawler_task())
+    logger.info("Trade crawler started")
+    
+    # Load social media credentials
+    await social_manager.load_credentials()
+    logger.info("Social manager initialized")
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
