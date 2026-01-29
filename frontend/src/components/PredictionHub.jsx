@@ -327,10 +327,22 @@ const PredictionHub = () => {
 };
 
 // Market Card Component
-const MarketCard = ({ market, onSelect, getCategoryIcon, getCategoryColor, showLeague }) => {
+const MarketCard = ({ market, onSelect, showLeague }) => {
   const yesPrice = market.yes_price || 0.5;
   const noPrice = market.no_price || 0.5;
-  const Icon = getCategoryIcon(market.category);
+  
+  const getCategoryStyle = (category) => {
+    const styles = {
+      sports: { icon: Gamepad2, color: 'text-emerald-400 bg-emerald-500/20' },
+      politics: { icon: Vote, color: 'text-blue-400 bg-blue-500/20' },
+      crypto: { icon: Coins, color: 'text-amber-400 bg-amber-500/20' },
+      economics: { icon: Building2, color: 'text-purple-400 bg-purple-500/20' },
+    };
+    return styles[category] || { icon: Globe, color: 'text-slate-400 bg-slate-500/20' };
+  };
+  
+  const style = getCategoryStyle(market.category);
+  const IconComponent = style.icon;
   
   return (
     <motion.div
@@ -341,8 +353,8 @@ const MarketCard = ({ market, onSelect, getCategoryIcon, getCategoryColor, showL
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className={`p-2 rounded-lg ${getCategoryColor(market.category)}`}>
-            <Icon size={16} />
+          <div className={`p-2 rounded-lg ${style.color}`}>
+            <IconComponent size={16} />
           </div>
           {showLeague && market.league && (
             <span className="text-xs px-2 py-0.5 rounded bg-white/10 text-slate-400">{market.league}</span>
