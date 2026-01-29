@@ -53,6 +53,7 @@ import ExchangeSettings from './components/ExchangeSettings';
 import TournamentCenter from './components/TournamentCenter';
 import QuantitativeCenter from './components/QuantitativeCenter';
 import PredictionHub from './components/PredictionHub';
+import CopyTradingHub from './components/CopyTradingHub';
 import axios from 'axios';
 
 // Icons
@@ -60,7 +61,7 @@ import {
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
   Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings,
-  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale, Target
+  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale, Target, Copy
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -69,6 +70,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const NAV_TABS = [
   { id: 'dashboard', label: 'Trading', icon: LayoutDashboard, labelKey: 'nav.trading' },
   { id: 'playground', label: 'Playground', icon: Banknote, labelKey: 'Playground' },
+  { id: 'copy-trading', label: 'Copy', icon: Copy, labelKey: 'Copy Trading' },
   { id: 'prediction-markets', label: 'Predict', icon: Target, labelKey: 'Prediction Markets' },
   { id: 'quantitative', label: 'Quant', icon: Scale, labelKey: 'Quant Research' },
   { id: 'bot', label: 'AI Bot', icon: Bot, labelKey: 'AI Bot' },
