@@ -22,6 +22,21 @@ const SupplyChainHub = () => {
   const [geoRisk, setGeoRisk] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Alert state
+  const [alerts, setAlerts] = useState([]);
+  const [alertPresets, setAlertPresets] = useState([]);
+  const [alertHistory, setAlertHistory] = useState([]);
+  const [alertStats, setAlertStats] = useState(null);
+  const [showCreateAlert, setShowCreateAlert] = useState(false);
+  const [newAlert, setNewAlert] = useState({
+    alert_type: 'port_congestion',
+    target_entity: '',
+    entity_name: '',
+    condition: 'above',
+    threshold: 80,
+    priority: 'medium'
+  });
 
   useEffect(() => {
     const loadData = async () => {
@@ -42,6 +57,9 @@ const SupplyChainHub = () => {
         setPorts(portsRes || []);
         setInstruments(instrumentsRes || []);
         setGeoRisk(geoRes);
+        
+        // Load alert data
+        await loadAlertData();
       } catch (error) {
         console.error('Error fetching supply chain data:', error);
       }
@@ -49,6 +67,127 @@ const SupplyChainHub = () => {
     };
     loadData();
   }, []);
+
+  const loadAlertData = async () => {
+    try {
+      const [alertsRes, presetsRes, historyRes, statsRes] = await Promise.all([
+        fetch(`${API}/supply-chain/alerts?user_id=demo_user`).then(r => r.json()),
+        fetch(`${API}/supply-chain/alerts/presets`).then(r => r.json()),
+        fetch(`${API}/supply-chain/alerts/history?user_id=demo_user`).then(r => r.json()),
+        fetch(`${API}/supply-chain/alerts/stats`).then(r => r.json()),
+      ]);
+      setAlerts(alertsRes || []);
+      setAlertPresets(presetsRes || []);
+      setAlertHistory(historyRes || []);
+      setAlertStats(statsRes);
+    } catch (error) {
+      console.error('Error loading alert data:', error);
+    }
+  };
+
+  const handleCreateAlert = async () => {
+    try {
+      const res = await fetch(`${API}/supply-chain/alerts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...newAlert, user_id: 'demo_user' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        await loadAlertData();
+        setShowCreateAlert(false);
+        setNewAlert({
+          alert_type: 'port_congestion',
+          target_entity: '',
+          entity_name: '',
+          condition: 'above',
+          threshold: 80,
+          priority: 'medium'
+        });
+      }
+    } catch (error) {
+      console.error('Error creating alert:', error);
+    }
+  };
+
+  const handleDeleteAlert = async (alertId) => {
+    try {
+      await fetch(`${API}/supply-chain/alerts/${alertId}`, { method: 'DELETE' });
+      await loadAlertData();
+    } catch (error) {
+      console.error('Error deleting alert:', error);
+    }
+  };
+
+  const handleToggleAlert = async (alertId, enabled) => {
+    try {
+      await fetch(`${API}/supply-chain/alerts/${alertId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: !enabled })
+      });
+      await loadAlertData();
+    } catch (error) {
+      console.error('Error toggling alert:', error);
+    }
+  };
+
+  const handleQuickSetup = async (preset) => {
+    // Find a relevant entity based on alert type
+    let targetEntity = '';
+    let entityName = '';
+    
+    if (preset.alert_type === 'port_congestion' && ports.length > 0) {
+      targetEntity = ports[0].port_id;
+      entityName = ports[0].name;
+    } else if (preset.alert_type === 'supplier_risk' && suppliers.length > 0) {
+      targetEntity = suppliers[0].supplier_id;
+      entityName = suppliers[0].name;
+    } else if (preset.alert_type === 'geopolitical_risk') {
+      targetEntity = 'global';
+      entityName = 'Global Risk Index';
+    } else if (preset.alert_type === 'market_event' && markets.length > 0) {
+      targetEntity = markets[0].market_id;
+      entityName = markets[0].title?.substring(0, 30) + '...';
+    }
+    
+    try {
+      const res = await fetch(`${API}/supply-chain/alerts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: 'demo_user',
+          alert_type: preset.alert_type,
+          target_entity: targetEntity,
+          entity_name: entityName,
+          condition: preset.condition,
+          threshold: preset.threshold,
+          priority: preset.priority
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        await loadAlertData();
+      }
+    } catch (error) {
+      console.error('Error creating preset alert:', error);
+    }
+  };
+
+  const handleCheckAlerts = async () => {
+    try {
+      setRefreshing(true);
+      const res = await fetch(`${API}/supply-chain/alerts/check`, { method: 'POST' });
+      const data = await res.json();
+      await loadAlertData();
+      if (data.alerts_triggered > 0) {
+        alert(`${data.alerts_triggered} alert(s) triggered!`);
+      }
+    } catch (error) {
+      console.error('Error checking alerts:', error);
+    }
+    setRefreshing(false);
+  };
 
   const handleRefresh = async () => {
     setRefreshing(true);
