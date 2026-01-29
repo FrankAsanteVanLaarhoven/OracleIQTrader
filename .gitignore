@@ -92,3 +92,7 @@ frontend/node_modules/.cache/default-development/4.pack
 app-archive.tar.gz
 app-export.tar.gz
 exports/app_full.tar.gz
+-e 
+# Environment files
+*.env
+*.env.*
