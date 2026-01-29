@@ -65,7 +65,7 @@ const SplashScreen = ({ onComplete }) => {
         >
           <span className="text-slate-500">💡</span>
           <h1 className="font-heading text-xl md:text-2xl font-medium text-slate-300 tracking-wide">
-            Create specialized AI agents for your workflow
+            Next-Gen Algorithmic Trading Platform
           </h1>
           <span className="px-2 py-0.5 rounded text-xs font-mono bg-teal-500/20 text-teal-400 border border-teal-500/30">
             PRO
@@ -88,7 +88,7 @@ const SplashScreen = ({ onComplete }) => {
               whileTap={{ scale: 0.98 }}
               data-testid="enter-platform-btn"
             >
-              Let's make something incredible!
+              Launch OracleIQ
             </motion.button>
           )}
         </AnimatePresence>
