@@ -4648,8 +4648,8 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["http://localhost:3000", "https://oracleiq-trader.preview.emergentagent.com"],
-    allow_origin_regex=r"https://.*\.preview\.emergentagent\.com",
+    allow_origins=["http://localhost:3000", "https://srv1304213.hstgr.cloud", "https://oracleiqtrader.com"],
+    allow_origin_regex=r"https://.*\.(hstgr\.cloud|oracleiqtrader\.com)",
     allow_methods=["*"],
     allow_headers=["*"],
 )

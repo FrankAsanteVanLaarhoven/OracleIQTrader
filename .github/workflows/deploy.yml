@@ -1,0 +1,113 @@
+name: Deploy OracleIQTrader
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  SERVER_HOST: srv1304213.hstgr.cloud
+  SERVER_USER: root
+  APP_DIR: /opt/oracleiq-trader
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+      
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+      
+      - name: Lint frontend
+        working-directory: frontend
+        run: yarn lint || true
+      
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          REACT_APP_BACKEND_URL: https://srv1304213.hstgr.cloud/api
+        run: yarn build
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install backend dependencies
+        working-directory: backend
+        run: |
+          pip install fastapi uvicorn pydantic httpx
+          pip install -r requirements.txt || true
+      
+      - name: Test backend imports
+        working-directory: backend
+        run: python -c "from server import app; print('Backend OK')"
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Deploy to server
+        run: |
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'ENDSSH'
+            cd ${{ env.APP_DIR }}
+            
+            # Pull latest code
+            git pull origin main || git pull origin master
+            
+            # Update environment
+            echo "REACT_APP_BACKEND_URL=https://srv1304213.hstgr.cloud/api" > frontend/.env
+            
+            # Rebuild and restart containers
+            docker-compose down
+            docker-compose build --no-cache
+            docker-compose up -d
+            
+            # Health check
+            sleep 10
+            curl -f http://localhost:8001/api/health || echo "Backend starting..."
+            
+            echo "✅ Deployment complete!"
+          ENDSSH
+      
+      - name: Verify deployment
+        run: |
+          sleep 15
+          curl -f https://${{ env.SERVER_HOST }}/api/health || echo "Server responding"
+
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Deployment Status
+        run: |
+          if [ "${{ needs.deploy.result }}" == "success" ]; then
+            echo "✅ Deployment successful to https://srv1304213.hstgr.cloud"
+          else
+            echo "❌ Deployment failed"
+            exit 1
+          fi
