@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OracleIQTrader API Documentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+        }
+        .swagger-ui {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .swagger-ui .topbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 20px;
+        }
+        .swagger-ui .topbar .download-url-wrapper {
+            display: none;
+        }
+        .swagger-ui .info .title {
+            color: #14b8a6;
+        }
+        .swagger-ui .info .description {
+            color: #94a3b8;
+        }
+        .swagger-ui .opblock-tag {
+            color: #e2e8f0;
+            border-bottom: 1px solid #334155;
+        }
+        .swagger-ui .opblock {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        .swagger-ui .opblock .opblock-summary-method {
+            font-weight: bold;
+        }
+        .swagger-ui .opblock.opblock-get .opblock-summary-method {
+            background: #14b8a6;
+        }
+        .swagger-ui .opblock.opblock-post .opblock-summary-method {
+            background: #3b82f6;
+        }
+        .swagger-ui .opblock.opblock-put .opblock-summary-method {
+            background: #f59e0b;
+        }
+        .swagger-ui .opblock.opblock-delete .opblock-summary-method {
+            background: #ef4444;
+        }
+        .swagger-ui .btn {
+            background: #14b8a6;
+            border: none;
+        }
+        .swagger-ui .btn:hover {
+            background: #0d9488;
+        }
+        .swagger-ui .scheme-container {
+            background: #0f172a;
+            box-shadow: none;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1e2e 100%);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+        }
+        .header-banner h1 {
+            color: #14b8a6;
+            font-size: 2.5rem;
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .header-banner p {
+            color: #94a3b8;
+            margin: 10px 0 0;
+            font-size: 1.1rem;
+        }
+        .header-banner .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #14b8a6;
+            color: #0a0a0a;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-banner">
+        <h1>OracleIQTrader API</h1>
+        <p>Institutional-Grade Trading Platform • RESTful API v1.0</p>
+        <span class="badge">OpenAPI 3.0</span>
+    </div>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+        window.onload = function() {
+            SwaggerUIBundle({
+                url: "./openapi.yaml",
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIBundle.SwaggerUIStandalonePreset
+                ],
+                layout: "BaseLayout",
+                defaultModelsExpandDepth: -1,
+                docExpansion: "list",
+                filter: true,
+                tagsSorter: "alpha",
+                operationsSorter: "alpha"
+            });
+        };
+    </script>
+</body>
+</html>
