@@ -204,7 +204,7 @@ class RiskAnalysisEngine:
         """
         Get execution audit trail from database
         """
-        if not self.db:
+        if self.db is None:
             return self._get_demo_executions(limit)
         
         try:
