@@ -1,10 +1,67 @@
 # OracleIQTrader.com - PRD
 
-## Status: P22 Complete ✅ | SOTA Landing Page + Risk Dashboard + Execution Audit Trail
+## Status: P23 Complete ✅ | Full SOTA Platform Implementation
 
 All features implemented and production-ready.
 
-## Latest Updates (January 30, 2026 - P22)
+## Latest Updates (January 30, 2026 - P23)
+
+### Tiered UX Mode (`/app/frontend/src/contexts/UXModeContext.jsx`)
+Simple/Pro mode toggle for different user experiences:
+
+#### Simple Mode (Beginners):
+- Basic trading (market/limit orders)
+- Price alerts
+- Portfolio tracking
+- Copy trading
+- News feed
+- No leverage, no options/futures
+
+#### Pro Mode (Full Depth):
+- All asset classes
+- Options & futures
+- Risk Dashboard
+- AI Agent Builder
+- API Access
+- Quantitative Research
+- All advanced features
+
+### TradingView Integration (`/app/frontend/src/components/TradingViewIntegration.jsx`)
+Professional charting powered by TradingView:
+- 100+ technical indicators
+- Real-time data
+- Multiple timeframes (1m to 1W)
+- Watchlist with custom symbols
+- RSI, MACD, MA overlays
+- Fullscreen mode
+
+### "How We Make Money" Dashboard (`/app/frontend/src/components/HowWeMakeMoney.jsx`)
+100% transparent revenue reporting:
+- Monthly revenue breakdown by source
+- Platform fees, Pro subscriptions, API access, Spread capture, Interest
+- Ethical commitments (Zero PFOF, No proprietary trading, etc.)
+- Platform metrics (users, trades, avg cost)
+- Historical revenue trend
+- "What We DON'T Do" section
+- Downloadable reports
+
+### Navigation Updates
+New tabs added:
+- `charts` - TradingView Integration
+- `transparency` - How We Make Money Dashboard
+
+### Copy-Trading WebSocket (`/app/backend/modules/copy_trading_ws.py`)
+Full real-time trade propagation already implemented:
+- WebSocket connections per user
+- Subscribe/unsubscribe to master traders
+- Copy ratio and max trade size settings
+- Real-time trade notifications
+- Copied trade history
+- Statistics tracking
+
+---
+
+## Previous Updates (January 30, 2026 - P22)
 
 ### SOTA Landing Page Rebuild (`/app/frontend/src/components/LandingPage.jsx`)
 Complete redesign with all requested sections:
