@@ -57,6 +57,8 @@ import CopyTradingHub from './components/CopyTradingHub';
 import SupplyChainHub from './components/SupplyChainHub';
 import AgentBuilder from './components/AgentBuilder';
 import GlassBoxPricing from './components/GlassBoxPricing';
+import ExecutionAuditTrail from './components/ExecutionAuditTrail';
+import RiskDashboard from './components/RiskDashboard';
 import axios from 'axios';
 
 // Icons
