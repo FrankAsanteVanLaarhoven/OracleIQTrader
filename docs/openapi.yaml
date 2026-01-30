@@ -369,6 +369,123 @@ paths:
         '200':
           description: Preferences updated
 
+  /risk/portfolio/{user_id}:
+    get:
+      tags: [Risk Analysis]
+      summary: Get comprehensive portfolio risk metrics
+      description: Returns VaR, Sharpe ratio, position heat map, and stress scenarios
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "demo_user"
+      responses:
+        '200':
+          description: Portfolio risk analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioRisk'
+
+  /risk/var/{user_id}:
+    get:
+      tags: [Risk Analysis]
+      summary: Calculate Value at Risk
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: confidence
+          in: query
+          schema:
+            type: number
+            enum: [0.95, 0.99]
+            default: 0.95
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: VaR calculation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaRResult'
+
+  /risk/stress-test/{user_id}:
+    get:
+      tags: [Risk Analysis]
+      summary: Get stress test scenarios
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Stress test results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StressTestResult'
+
+  /risk/ws/{user_id}:
+    get:
+      tags: [Risk Analysis]
+      summary: WebSocket endpoint for real-time risk updates
+      description: |
+        Connect via WebSocket to receive live risk metrics every 10 seconds.
+        
+        **Commands:**
+        - Send `refresh` for immediate update
+        - Send `ping` for keepalive (receives `pong`)
+        
+        **Message Types:**
+        - `risk_update`: Full portfolio risk data
+        - `risk_alert`: Alert when thresholds breached
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '101':
+          description: WebSocket connection established
+
+  /audit/executions/{user_id}:
+    get:
+      tags: [Audit Trail]
+      summary: Get execution audit trail
+      description: Full transparency on every trade execution
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Execution receipts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExecutionReceipt'
+
 components:
   securitySchemes:
     BearerAuth:
