@@ -1,10 +1,51 @@
 # OracleIQTrader.com - PRD
 
-## Status: P20 Complete ✅ | AI Trading Agent Builder
+## Status: P21 Complete ✅ | Glass-Box Pricing + MongoDB Persistence
 
 All features implemented and production-ready.
 
-## Latest Updates (January 30, 2026 - P20)
+## Latest Updates (January 30, 2026 - P21)
+
+### Glass-Box Pricing Engine (`/app/backend/modules/glass_box_pricing.py`)
+100% transparent, machine-readable fee breakdowns for every trade. Shows venue fee, spread, FX cost, and platform fee in real-time.
+
+#### Features:
+- **Public Fee Schedule:** Machine-readable JSON with all fees by asset class and tier
+- **Pre-Trade Cost Estimate:** See exact costs before confirming order
+- **Post-Trade Execution Receipt:** Full transparency on what was paid
+- **Competitor Comparison:** Side-by-side with IBKR, eToro, Trading212, Binance, Coinbase
+- **Cost Cap Guarantee:** Maximum execution cost with automatic rebates
+- **Two Tiers:** Free ($0/mo) and Pro ($29.99/mo with lower fees)
+
+#### Backend APIs (6 endpoints):
+- `GET /api/pricing/fee-schedule` - Complete public fee schedule
+- `GET /api/pricing/fee-schedule/{asset_class}` - Asset-specific fees
+- `POST /api/pricing/estimate` - Pre-trade cost estimate
+- `POST /api/pricing/execution-receipt` - Post-trade receipt
+- `GET /api/pricing/monthly-report/{user_id}` - Monthly cost summary
+- `GET /api/pricing/competitor-comparison` - Competitor fee comparison
+
+#### Frontend Component (`GlassBoxPricing.jsx`):
+- **3 Tab Interface:**
+  1. Cost Estimate - Order form with live cost calculation
+  2. Fee Schedule - Complete pricing by asset class and tier
+  3. vs Competitors - Comparison table with IBKR, eToro, Binance, etc.
+
+### AI Trading Agents Now Persisted to MongoDB
+- Agents survive server restarts
+- Decisions saved to `agent_decisions` collection
+- Full CRUD operations with MongoDB backend
+
+### Deployment Fix
+- Updated `/app/deploy/frontend/Dockerfile` with:
+  - `SKIP_PREFLIGHT_CHECK=true`
+  - `DISABLE_ESLINT_PLUGIN=true`
+  - `CI=false` for build
+  - Yarn resolutions for ajv conflicts in package.json
+
+---
+
+## Previous Updates (January 30, 2026 - P20)
 
 ### AI Trading Agent Builder (`/app/backend/modules/ai_trading_agents.py`)
 Create, customize, and deploy specialized AI trading agents through natural language prompts and parameter sliders.
