@@ -276,6 +276,7 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex items-center gap-2 md:gap-3">
+                  <UXModeToggle compact />
                   <ThemeToggle variant="simple" />
                   <LanguageSelector variant="compact" />
                   <StatusBadge variant="active" pulse className="hidden sm:flex"><Activity size={10} />{t('status.live')}</StatusBadge>
