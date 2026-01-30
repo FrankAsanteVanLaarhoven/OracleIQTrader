@@ -4662,6 +4662,14 @@ app.include_router(notification_router, prefix="/api")
 init_notification_db(db)
 
 
+# ==================== RISK ANALYSIS & AUDIT TRAIL ====================
+# Routes for portfolio risk metrics and execution audit trail
+from routes.risk_routes import risk_router, audit_router, init_risk_db
+app.include_router(risk_router, prefix="/api")
+app.include_router(audit_router, prefix="/api")
+init_risk_db(db)
+
+
 # Include the router
 app.include_router(api_router)
 
