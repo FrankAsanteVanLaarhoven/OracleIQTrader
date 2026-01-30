@@ -48,7 +48,7 @@ export default {
       "expo-secure-store"
     ],
     extra: {
-      apiUrl: process.env.EXPO_PUBLIC_BACKEND_URL || "https://smart-trade-agents-1.preview.emergentagent.com/api",
+      apiUrl: process.env.EXPO_PUBLIC_BACKEND_URL || "https://smart-trade-app-10.preview.emergentagent.com/api",
       wsUrl: process.env.EXPO_PUBLIC_WS_URL || "wss://oracleiq-trader.preview.emergentagent.com"
     }
   }
