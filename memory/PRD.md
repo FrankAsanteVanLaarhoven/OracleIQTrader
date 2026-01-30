@@ -1,10 +1,53 @@
 # OracleIQTrader.com - PRD
 
-## Status: P29 Complete ✅ | Full Refactoring + Real-Time Risk WebSocket
+## Status: P30 Complete ✅ | WebSocket Integration + API Docs Ready
 
-Server.py reduced by 566 lines, real-time risk streaming operational.
+Real-time Risk WebSocket connected, API documentation deployed.
 
-## Latest Updates (January 30, 2026 - P29)
+## Latest Updates (January 30, 2026 - P30)
+
+### Frontend WebSocket Integration Complete
+Updated `/frontend/src/components/RiskDashboard.jsx`:
+- Real-time WebSocket connection to `/api/risk/ws/{user_id}`
+- Auto-reconnect on disconnect (5 second delay)
+- Live/Offline status indicator with Wifi icon
+- Last update timestamp display
+- Risk alert banner with auto-dismiss
+- Refresh button uses WebSocket when connected, REST fallback
+- `AnimatePresence` for smooth alert animations
+
+### API Documentation Deployment Ready
+Created `/app/docs/`:
+- `index.html` - Interactive Swagger UI viewer
+- `openapi.yaml` - Updated with all new Risk/Audit endpoints
+- `DEPLOYMENT.md` - Multiple deployment options
+
+**New OpenAPI Endpoints Documented:**
+- `GET /risk/portfolio/{user_id}` - Full risk metrics
+- `GET /risk/var/{user_id}` - VaR calculator
+- `GET /risk/stress-test/{user_id}` - Stress scenarios
+- `WS /risk/ws/{user_id}` - Real-time streaming
+- `GET /audit/executions/{user_id}` - Execution trail
+
+### Docker Build Configuration
+Verified `/deploy/frontend/Dockerfile`:
+- `CI=false` to prevent warning failures
+- `SKIP_PREFLIGHT_CHECK=true` for ajv conflicts
+- `DISABLE_ESLINT_PLUGIN=true`
+- `NODE_OPTIONS="--max-old-space-size=4096"`
+
+---
+
+## API Documentation Deployment Options
+
+1. **GitHub Pages**: Push `/app/docs/` to repo, enable Pages
+2. **Vercel**: `npx vercel --prod` from docs folder
+3. **Netlify**: Drag & drop to netlify.com/drop
+4. **Nginx**: Add `/docs` location block
+
+---
+
+## Previous Updates (January 30, 2026 - P29)
 
 ### Server.py Refactoring Complete
 Reduced from 4921 → 4355 lines (566 lines extracted = 11.5% reduction):
