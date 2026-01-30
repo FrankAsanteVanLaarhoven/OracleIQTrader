@@ -8,6 +8,7 @@ import {
   Ship, Scale, Radio, FileText, Building, HelpCircle, Mail
 } from 'lucide-react';
 import DemoMode from './DemoMode';
+import DeviceShowcase from './DeviceShowcase';
 
 const LOGO_3D = "https://static.prod-images.emergentagent.com/jobs/a0a82ecc-3e60-429c-be59-f5b8a7b8a45e/images/9e4794f327719e73fa1fbd376c7f3d287a8340f4814b1f897ccd5f1707647dac.png";
 
