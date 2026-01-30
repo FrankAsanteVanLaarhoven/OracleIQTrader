@@ -4328,11 +4328,12 @@ app.include_router(alpaca_router, prefix="/api")
 app.include_router(api_router)
 
 # CORS configuration - handle all origins dynamically
+cors_origins = os.environ.get("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["http://localhost:3000", "https://srv1304213.hstgr.cloud", "https://oracleiqtrader.com"],
-    allow_origin_regex=r"https://.*\.(hstgr\.cloud|oracleiqtrader\.com)",
+    allow_origins=cors_origins if cors_origins != ["*"] else ["*"],
+    allow_origin_regex=r"https://.*\.(hstgr\.cloud|oracleiqtrader\.com|emergentagent\.com|preview\.emergentagent\.com)",
     allow_methods=["*"],
     allow_headers=["*"],
 )
