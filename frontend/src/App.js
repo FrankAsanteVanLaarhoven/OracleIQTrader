@@ -212,7 +212,7 @@ const Dashboard = () => {
 
                   {/* Desktop Navigation */}
                   <nav className="hidden lg:flex items-center gap-1">
-                    {NAV_TABS.map((tab) => (
+                    {PRIMARY_TABS.map((tab) => (
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
@@ -224,9 +224,39 @@ const Dashboard = () => {
                         data-testid={`nav-${tab.id}`}
                       >
                         <tab.icon size={14} />
-                        {tab.labelKey ? t(tab.labelKey) : tab.label}
+                        {tab.label}
                       </button>
                     ))}
+                    {/* More Dropdown */}
+                    <div className="relative group">
+                      <button
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+                          SECONDARY_TABS.some(t => t.id === activeTab)
+                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                            : 'text-slate-500 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <MoreHorizontal size={14} />
+                        More
+                      </button>
+                      <div className="absolute top-full left-0 mt-2 w-48 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 max-h-80 overflow-y-auto">
+                        {SECONDARY_TABS.map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`w-full flex items-center gap-2 px-4 py-2.5 text-xs font-mono transition-all ${
+                              activeTab === tab.id
+                                ? 'bg-purple-500/20 text-purple-400'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            }`}
+                            data-testid={`nav-${tab.id}`}
+                          >
+                            <tab.icon size={14} />
+                            {tab.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </nav>
                 </div>
 
