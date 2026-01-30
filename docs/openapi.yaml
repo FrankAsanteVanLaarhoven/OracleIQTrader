@@ -774,3 +774,119 @@ components:
           type: boolean
         news:
           type: boolean
+
+    PortfolioRisk:
+      type: object
+      properties:
+        total_value:
+          type: number
+        daily_var95:
+          type: number
+        daily_var99:
+          type: number
+        weekly_var95:
+          type: number
+        monthly_var95:
+          type: number
+        current_drawdown:
+          type: number
+        max_drawdown:
+          type: number
+        sharpe_ratio:
+          type: number
+        sortino_ratio:
+          type: number
+        beta:
+          type: number
+        risk_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PositionRisk'
+        stress_scenarios:
+          type: object
+
+    PositionRisk:
+      type: object
+      properties:
+        symbol:
+          type: string
+        allocation:
+          type: number
+        value:
+          type: number
+        var95:
+          type: number
+        heat:
+          type: integer
+        beta:
+          type: number
+        volatility:
+          type: number
+
+    VaRResult:
+      type: object
+      properties:
+        user_id:
+          type: string
+        confidence_level:
+          type: number
+        time_horizon_days:
+          type: integer
+        var_amount:
+          type: number
+        var_percent:
+          type: number
+        portfolio_value:
+          type: number
+
+    StressTestResult:
+      type: object
+      properties:
+        user_id:
+          type: string
+        portfolio_value:
+          type: number
+        scenarios:
+          type: object
+        worst_case:
+          type: number
+
+    ExecutionReceipt:
+      type: object
+      properties:
+        receipt_id:
+          type: string
+        order_id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        asset:
+          type: string
+        side:
+          type: string
+        quantity:
+          type: number
+        fill_price:
+          type: number
+        nbbo_bid:
+          type: number
+        nbbo_ask:
+          type: number
+        price_improvement:
+          type: number
+        latency_ms:
+          type: number
+        fees:
+          type: array
+          items:
+            type: object
+        total_fees_usd:
+          type: number
+        total_fees_bps:
+          type: number
+
