@@ -4746,140 +4746,17 @@ async def chat_with_agent(agent_id: str, data: dict):
 
 
 # ==================== GLASS-BOX PRICING ENGINE ====================
-# Transparent, machine-readable fee breakdowns for every trade
-
-from modules.glass_box_pricing import glass_box_engine
-
-glass_box_engine.set_db(db)
-
-@api_router.get("/pricing/fee-schedule")
-async def get_fee_schedule():
-    """Get complete public fee schedule - machine readable"""
-    return glass_box_engine.get_all_fee_schedules()
-
-@api_router.get("/pricing/fee-schedule/{asset_class}")
-async def get_asset_fee_schedule(asset_class: str, tier: str = "free"):
-    """Get fee schedule for specific asset class"""
-    return {
-        "asset_class": asset_class,
-        "tier": tier,
-        "fees": glass_box_engine.get_fee_schedule(asset_class, tier)
-    }
-
-@api_router.post("/pricing/estimate")
-async def estimate_order_costs(data: dict):
-    """Get pre-trade cost estimate for order ticket"""
-    try:
-        estimate = glass_box_engine.estimate_order_costs(
-            asset=data.get("asset", "BTC"),
-            asset_class=data.get("asset_class", "crypto"),
-            side=data.get("side", "buy"),
-            quantity=data.get("quantity", 1),
-            current_price=data.get("current_price", 45000),
-            spread_bps=data.get("spread_bps", 10),
-            tier=data.get("tier", "free")
-        )
-        return estimate.model_dump()
-    except Exception as e:
-        return {"error": str(e)}
-
-@api_router.post("/pricing/execution-receipt")
-async def generate_execution_receipt(data: dict):
-    """Generate post-trade execution receipt with full transparency"""
-    try:
-        receipt = glass_box_engine.generate_execution_receipt(
-            order_id=data.get("order_id", f"ORD-{uuid.uuid4().hex[:8]}"),
-            asset=data.get("asset", "BTC"),
-            asset_class=data.get("asset_class", "crypto"),
-            side=data.get("side", "buy"),
-            quantity=data.get("quantity", 1),
-            fill_price=data.get("fill_price", 45000),
-            nbbo_bid=data.get("nbbo_bid", 44990),
-            nbbo_ask=data.get("nbbo_ask", 45010),
-            venue=data.get("venue", "OracleIQ Internal"),
-            latency_ms=data.get("latency_ms", 12.5),
-            tier=data.get("tier", "free")
-        )
-        return receipt.model_dump()
-    except Exception as e:
-        return {"error": str(e)}
-
-@api_router.get("/pricing/monthly-report/{user_id}")
-async def get_monthly_cost_report(user_id: str):
-    """Get monthly trading cost summary vs competitors"""
-    return glass_box_engine.get_monthly_cost_report(user_id)
-
-@api_router.get("/pricing/competitor-comparison")
-async def get_competitor_comparison():
-    """Get fee comparison across major competitors"""
-    from modules.glass_box_pricing import COMPETITOR_FEES, AssetClass
-    return {
-        "oracleiq": {
-            ac.value: {
-                "free_tier_bps": glass_box_engine.get_fee_schedule(ac.value, "free").get("platform_bps", 0),
-                "pro_tier_bps": glass_box_engine.get_fee_schedule(ac.value, "pro").get("platform_bps", 0)
-            } for ac in AssetClass
-        },
-        "competitors": COMPETITOR_FEES,
-        "note": "All figures in basis points (bps). 100 bps = 1%"
-    }
+# Routes moved to /routes/pricing_routes.py
+from routes.pricing_routes import pricing_router, init_pricing_db
+app.include_router(pricing_router, prefix="/api")
+init_pricing_db(db)
 
 
 # ==================== PUSH NOTIFICATIONS ====================
-from modules.push_notifications import push_notification_service, NotificationPreferences, DeviceRegistration
-
-push_notification_service.set_db(db)
-
-@api_router.post("/notifications/register")
-async def register_device(data: dict):
-    """Register device for push notifications"""
-    try:
-        registration = DeviceRegistration(
-            token=data.get("token"),
-            platform=data.get("platform"),
-            device=data.get("device"),
-            user_id=data.get("user_id")
-        )
-        success = await push_notification_service.register_device(registration)
-        return {"success": success}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
-
-@api_router.delete("/notifications/unregister")
-async def unregister_device(token: str):
-    """Unregister device from push notifications"""
-    success = await push_notification_service.unregister_device(token)
-    return {"success": success}
-
-@api_router.get("/notifications/preferences")
-async def get_notification_preferences(user_id: str):
-    """Get notification preferences for user"""
-    prefs = push_notification_service.get_preferences(user_id)
-    return prefs.model_dump()
-
-@api_router.post("/notifications/preferences")
-async def update_notification_preferences(data: dict):
-    """Update notification preferences"""
-    user_id = data.pop("user_id", "demo_user")
-    prefs = NotificationPreferences(**data)
-    await push_notification_service.update_preferences(user_id, prefs)
-    return {"success": True}
-
-@api_router.post("/notifications/send")
-async def send_notification(data: dict):
-    """Send push notification to user (admin only)"""
-    user_id = data.get("user_id")
-    title = data.get("title")
-    body = data.get("body")
-    notification_data = data.get("data", {})
-    
-    results = await push_notification_service.send_to_user(user_id, title, body, notification_data)
-    return {"success": True, "sent": len(results)}
-
-@api_router.get("/notifications/stats")
-async def get_notification_stats():
-    """Get push notification statistics"""
-    return push_notification_service.get_stats()
+# Routes moved to /routes/notification_routes.py
+from routes.notification_routes import notification_router, init_notification_db
+app.include_router(notification_router, prefix="/api")
+init_notification_db(db)
 
 
 # Include the router
