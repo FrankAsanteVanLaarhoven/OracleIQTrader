@@ -6,43 +6,70 @@ import {
 } from 'lucide-react';
 import GlassCard from './GlassCard';
 
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
 const RiskDashboard = () => {
   const [portfolioRisk, setPortfolioRisk] = useState(null);
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    generateRiskData();
+    fetchRiskData();
   }, []);
 
-  const generateRiskData = () => {
+  const fetchRiskData = async () => {
     setLoading(true);
-    
-    // Simulated portfolio risk metrics
-    const mockPortfolio = {
-      totalValue: 127432.50,
-      dailyVaR: 2548.65,  // 95% VaR
-      weeklyVaR: 5697.89,
-      monthlyVaR: 12743.25,
-      currentDrawdown: -3.2,
-      maxDrawdown: -12.5,
-      sharpeRatio: 1.85,
-      sortinoRatio: 2.12,
-      beta: 1.15,
-      correlation: 0.78,
-      volatility: 18.5,
-    };
-
-    const mockPositions = [
-      { symbol: 'BTC', allocation: 35, value: 44601.38, var95: 1784.06, heat: 85, beta: 1.4, drawdown: -5.2 },
-      { symbol: 'ETH', allocation: 25, value: 31858.13, var95: 1274.33, heat: 72, beta: 1.3, drawdown: -4.1 },
-      { symbol: 'SOL', allocation: 15, value: 19114.88, var95: 955.74, heat: 68, beta: 1.5, drawdown: -8.3 },
-      { symbol: 'AAPL', allocation: 15, value: 19114.88, var95: 382.30, heat: 35, beta: 1.1, drawdown: -2.1 },
-      { symbol: 'TSLA', allocation: 10, value: 12743.25, var95: 509.73, heat: 55, beta: 1.8, drawdown: -6.5 },
-    ];
-
-    setPortfolioRisk(mockPortfolio);
-    setPositions(mockPositions);
+    try {
+      const response = await fetch(`${API}/risk/portfolio/demo_user`);
+      const data = await response.json();
+      
+      setPortfolioRisk({
+        totalValue: data.total_value,
+        dailyVaR: data.daily_var95,
+        weeklyVaR: data.weekly_var95,
+        monthlyVaR: data.monthly_var95,
+        currentDrawdown: data.current_drawdown,
+        maxDrawdown: data.max_drawdown,
+        sharpeRatio: data.sharpe_ratio,
+        sortinoRatio: data.sortino_ratio,
+        beta: data.beta,
+        correlation: data.correlation_to_market,
+        volatility: data.volatility_annual,
+        riskScore: data.risk_score,
+        stressScenarios: data.stress_scenarios,
+      });
+      
+      setPositions(data.positions.map(p => ({
+        symbol: p.symbol,
+        allocation: p.allocation,
+        value: p.value,
+        var95: p.var95,
+        heat: p.heat,
+        beta: p.beta,
+        drawdown: p.drawdown,
+        volatility: p.volatility,
+      })));
+    } catch (error) {
+      console.error('Error fetching risk data:', error);
+      // Fallback to mock data
+      setPortfolioRisk({
+        totalValue: 127432.50,
+        dailyVaR: 2548.65,
+        weeklyVaR: 5697.89,
+        monthlyVaR: 12743.25,
+        currentDrawdown: -3.2,
+        maxDrawdown: -12.5,
+        sharpeRatio: 1.85,
+        sortinoRatio: 2.12,
+        beta: 1.15,
+        correlation: 0.78,
+        volatility: 18.5,
+      });
+      setPositions([
+        { symbol: 'BTC', allocation: 35, value: 44601.38, var95: 1784.06, heat: 85, beta: 1.4, drawdown: -5.2 },
+        { symbol: 'ETH', allocation: 25, value: 31858.13, var95: 1274.33, heat: 72, beta: 1.3, drawdown: -4.1 },
+      ]);
+    }
     setLoading(false);
   };
 
