@@ -5,7 +5,7 @@ import Constants from 'expo-constants';
 // Backend API URL - reads from Expo config or falls back to preview URL
 const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 
   process.env.EXPO_PUBLIC_BACKEND_URL || 
-  'https://oracleiq-trader.preview.emergentagent.com/api';
+  'https://smart-trade-agents-1.preview.emergentagent.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

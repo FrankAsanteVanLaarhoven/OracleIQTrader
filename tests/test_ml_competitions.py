@@ -7,7 +7,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://oracleiq-trader.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://smart-trade-agents-1.preview.emergentagent.com').rstrip('/')
 
 
 class TestMLPredictions:
