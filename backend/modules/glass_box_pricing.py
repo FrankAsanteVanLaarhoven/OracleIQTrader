@@ -26,12 +26,11 @@ class AssetClass(str, Enum):
 class ExecutionVenue(str, Enum):
     NYSE = "NYSE"
     NASDAQ = "NASDAQ"
-    BINANCE = "Binance"
-    COINBASE = "Coinbase"
-    KRAKEN = "Kraken"
-    IBKR = "Interactive Brokers"
-    POLYMARKET = "Polymarket"
-    KALSHI = "Kalshi"
+    CRYPTO_EXCHANGE = "Crypto Exchange"
+    FIAT_EXCHANGE = "Fiat Exchange"
+    DERIVATIVES_VENUE = "Derivatives Venue"
+    PREDICTION_MARKET = "Prediction Market"
+    EVENT_MARKET = "Event Market"
     INTERNAL = "OracleIQ Internal"
 
 
@@ -148,33 +147,33 @@ FEE_SCHEDULES = {
     },
 }
 
-# Competitor fee estimates for comparison
+# Competitor fee estimates for comparison (generic categories)
 COMPETITOR_FEES = {
-    "IBKR": {
+    "Pro_Brokers": {
         AssetClass.EQUITY: 3.5,  # bps (very low)
         AssetClass.CRYPTO: 18,
         AssetClass.FOREX: 2,
         AssetClass.OPTIONS: 6.5,  # per contract equivalent
     },
-    "eToro": {
+    "Social_Trading": {
         AssetClass.EQUITY: 0,  # "free" but with spread markup
         AssetClass.CRYPTO: 100,  # 1% spread
         AssetClass.FOREX: 30,  # pip spreads
         AssetClass.OPTIONS: None,  # not offered
     },
-    "Trading212": {
+    "Free_Brokers": {
         AssetClass.EQUITY: 0,  # "free" PFOF model
         AssetClass.CRYPTO: 150,  # 1.5%
         AssetClass.FOREX: 25,
         AssetClass.OPTIONS: None,
     },
-    "Binance": {
+    "Crypto_Exchanges": {
         AssetClass.EQUITY: None,
         AssetClass.CRYPTO: 10,  # 0.1% maker/taker
         AssetClass.FOREX: None,
         AssetClass.OPTIONS: 3,
     },
-    "Coinbase": {
+    "Retail_Crypto": {
         AssetClass.EQUITY: None,
         AssetClass.CRYPTO: 60,  # ~0.6% for retail
         AssetClass.FOREX: None,
