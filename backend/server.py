@@ -4909,6 +4909,10 @@ async def startup_event():
     asyncio.create_task(trade_crawler_task())
     logger.info("Trade crawler started")
     
+    # Start copy trading simulation for demo
+    asyncio.create_task(simulate_master_trades(copy_trading_ws_manager))
+    logger.info("Copy trading simulation started")
+    
     # Load social media credentials
     await social_manager.load_credentials()
     logger.info("Social manager initialized")
