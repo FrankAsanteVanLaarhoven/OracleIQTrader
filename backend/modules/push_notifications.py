@@ -85,7 +85,7 @@ class PushNotificationService:
                 self._user_devices[registration.user_id].append(token)
         
         # Persist to MongoDB
-        if self.db:
+        if self.db is not None:
             await self.db.push_devices.update_one(
                 {"token": token},
                 {"$set": {
@@ -111,7 +111,7 @@ class PushNotificationService:
                 ]
             del self._device_registry[token]
         
-        if self.db:
+        if self.db is not None:
             await self.db.push_devices.delete_one({"token": token})
         
         return True
@@ -120,7 +120,7 @@ class PushNotificationService:
         """Update notification preferences for a user"""
         self._preferences[user_id] = preferences
         
-        if self.db:
+        if self.db is not None:
             await self.db.notification_preferences.update_one(
                 {"user_id": user_id},
                 {"$set": {
