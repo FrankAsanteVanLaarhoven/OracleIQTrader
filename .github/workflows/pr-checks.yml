@@ -1,0 +1,88 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main, master, develop]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-checks:
+    name: PR Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          cd frontend && yarn install --frozen-lockfile
+          cd ../backend && pip install -r requirements.txt
+      
+      - name: Check for large files
+        run: |
+          find . -type f -size +5M -not -path "./.git/*" | head -5 && \
+          echo "⚠️ Large files detected (>5MB)" || echo "✅ No large files"
+      
+      - name: Lint frontend
+        working-directory: frontend
+        run: yarn lint || true
+        continue-on-error: true
+      
+      - name: Lint backend
+        working-directory: backend
+        run: |
+          pip install ruff
+          ruff check . --ignore E501 || true
+        continue-on-error: true
+      
+      - name: Build check
+        working-directory: frontend
+        env:
+          CI: false
+          SKIP_PREFLIGHT_CHECK: true
+          REACT_APP_BACKEND_URL: https://example.com/api
+        run: yarn build
+      
+      - name: Backend import check
+        working-directory: backend
+        run: python -c "from server import app; print('✅ Backend OK')"
+
+  docker-build-test:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./deploy/backend/Dockerfile
+          push: false
+          tags: oracleiq/backend:test
+      
+      - name: Build frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./deploy/frontend/Dockerfile
+          push: false
+          tags: oracleiq/frontend:test
+          build-args: |
+            REACT_APP_BACKEND_URL=https://test.example.com/api

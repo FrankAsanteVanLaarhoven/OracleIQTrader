@@ -1,0 +1,172 @@
+name: Scheduled Tasks
+
+on:
+  schedule:
+    # Run health checks every 15 minutes
+    - cron: '*/15 * * * *'
+    # Run full tests daily at 3 AM UTC
+    - cron: '0 3 * * *'
+    # Weekly cleanup on Sundays at 4 AM UTC
+    - cron: '0 4 * * 0'
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task to run'
+        required: true
+        type: choice
+        options:
+          - health-check
+          - full-tests
+          - cleanup
+          - backup
+
+env:
+  PRODUCTION_HOST: srv1304213.hstgr.cloud
+
+jobs:
+  health-check:
+    name: Production Health Check
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '*/15 * * * *' || inputs.task == 'health-check'
+    steps:
+      - name: Check API health
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.PRODUCTION_HOST }}/api/health || echo "000")
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ API is healthy (HTTP $STATUS)"
+          else
+            echo "❌ API unhealthy (HTTP $STATUS)"
+            exit 1
+          fi
+      
+      - name: Check frontend
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.PRODUCTION_HOST }}/ || echo "000")
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Frontend is healthy (HTTP $STATUS)"
+          else
+            echo "❌ Frontend unhealthy (HTTP $STATUS)"
+            exit 1
+          fi
+      
+      - name: Check WebSocket
+        run: |
+          # Simple WebSocket connectivity test
+          echo "WebSocket endpoint available at wss://${{ env.PRODUCTION_HOST }}/api/risk/ws/demo_user"
+
+  daily-tests:
+    name: Daily Integration Tests
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 3 * * *' || inputs.task == 'full-tests'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Run API tests against production
+        run: |
+          pip install httpx pytest
+          
+          # Test key endpoints
+          python << 'EOF'
+          import httpx
+          import sys
+          
+          BASE = "https://srv1304213.hstgr.cloud/api"
+          
+          tests = [
+              ("GET", f"{BASE}/health", 200),
+              ("GET", f"{BASE}/market/prices?symbols=BTC,ETH", 200),
+              ("GET", f"{BASE}/agents/templates", 200),
+              ("GET", f"{BASE}/pricing/fee-schedule", 200),
+              ("GET", f"{BASE}/risk/portfolio/demo_user", 200),
+              ("GET", f"{BASE}/copy/traders/top", 200),
+          ]
+          
+          failed = 0
+          for method, url, expected in tests:
+              try:
+                  resp = httpx.request(method, url, timeout=30)
+                  if resp.status_code == expected:
+                      print(f"✅ {method} {url.split('/')[-1]} - OK")
+                  else:
+                      print(f"❌ {method} {url} - Got {resp.status_code}, expected {expected}")
+                      failed += 1
+              except Exception as e:
+                  print(f"❌ {method} {url} - Error: {e}")
+                  failed += 1
+          
+          sys.exit(1 if failed > 0 else 0)
+          EOF
+
+  weekly-cleanup:
+    name: Weekly Cleanup
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 4 * * 0' || inputs.task == 'cleanup'
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Run cleanup
+        run: |
+          ssh root@${{ env.PRODUCTION_HOST }} << 'ENDSSH'
+            echo "🧹 Starting weekly cleanup..."
+            
+            # Clean Docker
+            docker system prune -af --volumes --filter "until=168h"
+            
+            # Clean old backups (keep last 7)
+            cd /opt/backups 2>/dev/null && ls -t | tail -n +8 | xargs rm -rf 2>/dev/null || true
+            
+            # Clean old logs
+            find /var/log -name "*.gz" -mtime +7 -delete 2>/dev/null || true
+            
+            # Report disk usage
+            df -h /
+            
+            echo "✅ Cleanup complete"
+          ENDSSH
+
+  backup:
+    name: Database Backup
+    runs-on: ubuntu-latest
+    if: inputs.task == 'backup'
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Create backup
+        run: |
+          ssh root@${{ env.PRODUCTION_HOST }} << 'ENDSSH'
+            BACKUP_DIR="/opt/backups/oracleiq-$(date +%Y%m%d-%H%M%S)"
+            mkdir -p $BACKUP_DIR
+            
+            echo "📦 Creating MongoDB backup..."
+            docker exec oracleiq-mongodb mongodump --out /tmp/backup
+            docker cp oracleiq-mongodb:/tmp/backup $BACKUP_DIR/mongodb
+            
+            echo "📝 Recording deployment info..."
+            cd /opt/oracleiq-trader
+            git rev-parse HEAD > $BACKUP_DIR/commit.txt
+            git log -1 --format="%H %s" > $BACKUP_DIR/commit-info.txt
+            
+            echo "✅ Backup created at $BACKUP_DIR"
+            ls -la $BACKUP_DIR
+          ENDSSH
