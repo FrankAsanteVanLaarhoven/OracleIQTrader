@@ -4312,6 +4312,18 @@ app.include_router(audit_router, prefix="/api")
 init_risk_db(db)
 
 
+# ==================== ALPHA VANTAGE INTEGRATION ====================
+# Real stock market data from Alpha Vantage
+from routes.alpha_vantage_routes import alpha_vantage_router
+app.include_router(alpha_vantage_router, prefix="/api")
+
+
+# ==================== ALPACA TRADING INTEGRATION ====================
+# Commission-free stock trading via Alpaca
+from routes.alpaca_routes import alpaca_router
+app.include_router(alpaca_router, prefix="/api")
+
+
 # Include the router
 app.include_router(api_router)
 
