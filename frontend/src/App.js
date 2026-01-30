@@ -62,36 +62,43 @@ import {
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
   Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings,
-  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale, Target, Copy, Ship
+  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale, Target, Copy, Ship, MoreHorizontal
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// Navigation Tabs
-const NAV_TABS = [
-  { id: 'dashboard', label: 'Trading', icon: LayoutDashboard, labelKey: 'nav.trading' },
-  { id: 'playground', label: 'Playground', icon: Banknote, labelKey: 'Playground' },
-  { id: 'copy-trading', label: 'Copy', icon: Copy, labelKey: 'Copy Trading' },
-  { id: 'prediction-markets', label: 'Predict', icon: Target, labelKey: 'Prediction Markets' },
-  { id: 'supply-chain', label: 'Supply', icon: Ship, labelKey: 'Supply Chain' },
-  { id: 'quantitative', label: 'Quant', icon: Scale, labelKey: 'Quant Research' },
-  { id: 'bot', label: 'AI Bot', icon: Bot, labelKey: 'AI Bot' },
-  { id: 'training', label: 'Training', icon: GraduationCap, labelKey: 'Training' },
-  { id: 'ml-predictions', label: 'ML Predict', icon: Sparkles, labelKey: 'ML Predict' },
-  { id: 'tournament', label: 'Tournament', icon: Trophy, labelKey: 'Tournament' },
-  { id: 'competitions', label: 'Compete', icon: Medal, labelKey: 'Compete' },
-  { id: 'avatar', label: 'Avatar', icon: User, labelKey: 'Avatar' },
-  { id: 'crawler', label: 'Signals', icon: Radar, labelKey: 'crawler.title' },
-  { id: 'journal', label: 'Journal', icon: BookOpen, labelKey: 'Journal' },
-  { id: 'leaderboard', label: 'Leaders', icon: Users, labelKey: 'Leaderboard' },
-  { id: 'sentiment', label: 'Sentiment', icon: MessageCircle, labelKey: 'Sentiment' },
-  { id: 'benzinga', label: 'Benzinga', icon: Newspaper, labelKey: 'Benzinga' },
-  { id: 'orders', label: 'Orders', icon: Layers, labelKey: 'nav.orders' },
-  { id: 'alerts', label: 'Alerts', icon: Bell, labelKey: 'nav.alerts' },
-  { id: 'portfolio', label: 'Portfolio', icon: PieChart, labelKey: 'nav.portfolio' },
-  { id: 'wallet', label: 'Wallet', icon: Wallet, labelKey: 'nav.wallet' },
-  { id: 'settings', label: 'Settings', icon: Settings, labelKey: 'common.settings' },
+// Primary Navigation Tabs (always visible)
+const PRIMARY_TABS = [
+  { id: 'dashboard', label: 'Trading', icon: LayoutDashboard },
+  { id: 'portfolio', label: 'Portfolio', icon: PieChart },
+  { id: 'wallet', label: 'Wallet', icon: Wallet },
+  { id: 'copy-trading', label: 'Copy', icon: Copy },
+  { id: 'bot', label: 'AI Bot', icon: Bot },
+  { id: 'orders', label: 'Orders', icon: Layers },
+  { id: 'alerts', label: 'Alerts', icon: Bell },
 ];
+
+// Secondary Navigation Tabs (in "More" dropdown)
+const SECONDARY_TABS = [
+  { id: 'playground', label: 'Playground', icon: Banknote },
+  { id: 'prediction-markets', label: 'Predictions', icon: Target },
+  { id: 'supply-chain', label: 'Supply Chain', icon: Ship },
+  { id: 'quantitative', label: 'Quant Research', icon: Scale },
+  { id: 'training', label: 'Training', icon: GraduationCap },
+  { id: 'ml-predictions', label: 'ML Predict', icon: Sparkles },
+  { id: 'tournament', label: 'Tournament', icon: Trophy },
+  { id: 'competitions', label: 'Compete', icon: Medal },
+  { id: 'avatar', label: 'Avatar', icon: User },
+  { id: 'crawler', label: 'Signals', icon: Radar },
+  { id: 'journal', label: 'Journal', icon: BookOpen },
+  { id: 'leaderboard', label: 'Leaders', icon: Users },
+  { id: 'sentiment', label: 'Sentiment', icon: MessageCircle },
+  { id: 'benzinga', label: 'Benzinga', icon: Newspaper },
+  { id: 'settings', label: 'Settings', icon: Settings },
+];
+
+// All tabs combined for mobile menu
+const NAV_TABS = [...PRIMARY_TABS, ...SECONDARY_TABS];
 
 // Main Dashboard Component
 const Dashboard = () => {
