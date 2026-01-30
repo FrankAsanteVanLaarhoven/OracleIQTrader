@@ -183,16 +183,20 @@ const LandingPage = ({ onGetStarted }) => {
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
+            <motion.img 
+              src={LOGO_3D} 
+              alt="OracleIQ" 
+              className="w-12 h-12 rounded-xl"
+              animate={{ rotateY: [0, 360] }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            />
             <span className="text-xl font-bold tracking-wider">OracleIQ</span>
           </div>
           
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm text-slate-400 hover:text-white transition-colors">Features</a>
-            <a href="#pricing" className="text-sm text-slate-400 hover:text-white transition-colors">Pricing</a>
-            <a href="#testimonials" className="text-sm text-slate-400 hover:text-white transition-colors">Reviews</a>
+            <a href="#mobile" className="text-sm text-slate-400 hover:text-white transition-colors">Mobile App</a>
+            <a href="#sdk" className="text-sm text-slate-400 hover:text-white transition-colors">SDK</a>
           </div>
 
           <div className="flex items-center gap-4">
