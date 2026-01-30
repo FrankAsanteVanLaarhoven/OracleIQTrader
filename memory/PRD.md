@@ -1,10 +1,46 @@
 # OracleIQTrader.com - PRD
 
-## Status: P31 Complete ✅ | Full CI/CD Pipeline Automated
+## Status: P32 Complete ✅ | Real Data Integrations Added
 
-Comprehensive GitHub Actions CI/CD with multi-environment deployments.
+Alpha Vantage + Alpaca trading integrations implemented.
 
-## Latest Updates (January 30, 2026 - P31)
+## Latest Updates (January 30, 2026 - P32)
+
+### Alpha Vantage Integration
+Created `/modules/alpha_vantage.py` with:
+- Real-time stock quotes (`GET /api/stocks/quote/{symbol}`)
+- Intraday data (`GET /api/stocks/intraday/{symbol}`)
+- Daily historical data (`GET /api/stocks/daily/{symbol}`)
+- Company fundamentals (`GET /api/stocks/overview/{symbol}`)
+- RSI indicator (`GET /api/stocks/rsi/{symbol}`)
+- Symbol search (`GET /api/stocks/search`)
+- Built-in caching (60s TTL)
+- Rate limiting (12s between requests)
+
+**API Key:** `6CNLW423QCA3FYXZ` (configured in backend/.env)
+**Note:** Free tier = 25 requests/day. Currently rate limited.
+
+### Alpaca Trading Integration
+Created `/modules/alpaca_trading.py` with:
+- Account info (`GET /api/alpaca/account`)
+- Positions (`GET /api/alpaca/positions`)
+- Market orders (`POST /api/alpaca/orders/market`)
+- Limit orders (`POST /api/alpaca/orders/limit`)
+- Stop orders (`POST /api/alpaca/orders/stop`)
+- Order management (`GET/DELETE /api/alpaca/orders`)
+- Historical bars (`GET /api/alpaca/bars/{symbol}`)
+
+**Status:** Mock mode (no credentials provided)
+**To activate:** Add `ALPACA_API_KEY` and `ALPACA_SECRET_KEY` to backend/.env
+
+### Dependencies Added
+```bash
+pip install httpx alpaca-py
+```
+
+---
+
+## Previous Updates (January 30, 2026 - P31)
 
 ### Fully Automated CI/CD Pipeline
 
