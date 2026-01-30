@@ -1,10 +1,59 @@
 # OracleIQTrader.com - PRD
 
-## Status: P19 Complete ✅ | Supply Chain Alerts + Real-time Copy Trading
+## Status: P20 Complete ✅ | AI Trading Agent Builder
 
 All features implemented and production-ready.
 
-## Latest Updates (January 29, 2026 - P19)
+## Latest Updates (January 30, 2026 - P20)
+
+### AI Trading Agent Builder (`/app/backend/modules/ai_trading_agents.py`)
+Create, customize, and deploy specialized AI trading agents through natural language prompts and parameter sliders.
+
+#### Features:
+- **6 Pre-built Templates:** Momentum Hunter, Mean Reversion Bot, Trend Surfer, Contrarian Alpha, News Sentinel, Quant Analyzer
+- **Custom Agent Creation:** Name, description, avatar, strategy selection
+- **Risk Parameters via Sliders:** Risk tolerance, position size, stop loss, take profit, confidence threshold
+- **Asset Selection:** Choose from BTC, ETH, SOL, XRP, DOGE, ADA, AVAX, LINK
+- **Agent Status Management:** Idle, Active, Paused states
+- **Market Analysis:** AI-powered trading decisions with confidence scores
+- **Agent Chat:** Interactive chat with agents about their strategy
+
+#### Backend APIs (10 endpoints):
+- `GET /api/agents/templates` - 6 pre-built agent templates
+- `GET /api/agents?user_id=` - List user's agents
+- `POST /api/agents` - Create custom agent
+- `POST /api/agents/from-template` - Create from template
+- `GET /api/agents/{id}` - Get single agent
+- `PUT /api/agents/{id}` - Update agent
+- `DELETE /api/agents/{id}` - Delete agent
+- `POST /api/agents/{id}/activate` - Activate agent
+- `POST /api/agents/{id}/pause` - Pause agent
+- `POST /api/agents/{id}/analyze` - Analyze market
+- `POST /api/agents/{id}/chat` - Chat with agent
+- `GET /api/agents/{id}/decisions` - Get agent decisions
+
+#### Frontend Component (`AgentBuilder.jsx`):
+- **3 Tab Interface:**
+  1. My Agents - View/manage created agents with status badges
+  2. Templates - Browse 6 templates with "Use Template" buttons
+  3. Agent Chat - Interactive chat with selected agent
+- **Create Agent Modal:** Full customization with sliders
+- **Agent Cards:** Status, strategy, risk metrics at a glance
+
+### Testing Results (Iteration 16)
+- Backend: 20/22 tests passed (91%)
+- Frontend: 100% - All UI components working
+- Full lifecycle tested: create→activate→analyze→chat→pause→delete
+
+### ⚠️ MOCKED Data Note
+AI Trading Agent functionality uses IN-MEMORY storage (not persisted to MongoDB):
+- Agent data resets on server restart
+- Chat responses are rule-based, not AI-powered
+- Market analysis uses simulated decision logic
+
+---
+
+## Previous Updates (January 29, 2026 - P19)
 
 ### Supply Chain Alert Notifications (`/app/backend/modules/supply_chain_alerts.py`)
 Real-time alerts for supply chain risk events.
