@@ -1,10 +1,10 @@
 {
-  "name": "Cognitive Oracle Trading Platform",
-  "short_name": "Cognitive Oracle",
-  "description": "AI-powered trading platform with voice commands, real-time signals, and portfolio analytics",
+  "name": "OracleIQTrader - AI Trading Platform",
+  "short_name": "OracleIQ",
+  "description": "Next-Gen Algorithmic Trading Platform with AI-powered analysis, autonomous bots, and real-time market data",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#050505",
   "theme_color": "#14b8a6",
   "orientation": "portrait-primary",
   "icons": [
@@ -21,22 +21,26 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["finance", "business"],
+  "categories": ["finance", "business", "productivity"],
   "screenshots": [],
   "shortcuts": [
     {
       "name": "Trading Dashboard",
       "short_name": "Dashboard",
       "description": "View live market data",
-      "url": "/?tab=dashboard",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+      "url": "/?tab=dashboard"
     },
     {
-      "name": "Trade Signals",
-      "short_name": "Signals",
-      "description": "Real-time whale and news alerts",
-      "url": "/?tab=crawler",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+      "name": "AI Bot",
+      "short_name": "Bot",
+      "description": "Autonomous trading bot",
+      "url": "/?tab=bot"
+    },
+    {
+      "name": "Portfolio",
+      "short_name": "Portfolio",
+      "description": "Your portfolio overview",
+      "url": "/?tab=portfolio"
     }
   ]
 }
