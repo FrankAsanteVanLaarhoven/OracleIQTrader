@@ -87,6 +87,8 @@ const PRIMARY_TABS = [
 const SECONDARY_TABS = [
   { id: 'orders', label: 'Orders', icon: Layers },
   { id: 'pricing', label: 'Pricing', icon: DollarSign },
+  { id: 'audit-trail', label: 'Execution', icon: Receipt },
+  { id: 'risk', label: 'Risk', icon: Shield },
   { id: 'playground', label: 'Playground', icon: Banknote },
   { id: 'prediction-markets', label: 'Predictions', icon: Target },
   { id: 'supply-chain', label: 'Supply Chain', icon: Ship },
