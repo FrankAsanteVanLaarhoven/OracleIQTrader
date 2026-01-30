@@ -141,3 +141,34 @@ async def get_execution_summary(user_id: str = "demo_user"):
         "best_execution_rate": 0.95,  # 95% of trades executed at NBBO or better
         "venues_used": list(set(e.get("execution_venue", "Unknown") for e in executions))
     }
+
+
+# WebSocket endpoints for real-time risk updates
+@risk_router.websocket("/ws/{user_id}")
+async def risk_websocket(websocket: WebSocket, user_id: str = "demo_user"):
+    """
+    WebSocket endpoint for real-time risk updates.
+    Connects to receive live portfolio risk metrics every 10 seconds.
+    """
+    await risk_ws_manager.connect(websocket, user_id)
+    try:
+        while True:
+            # Keep connection alive and handle incoming messages
+            data = await websocket.receive_text()
+            
+            # Handle client commands
+            if data == "refresh":
+                # Immediate refresh requested
+                await risk_ws_manager.send_risk_update(websocket, user_id)
+            elif data == "ping":
+                await websocket.send_json({"type": "pong"})
+                
+    except WebSocketDisconnect:
+        risk_ws_manager.disconnect(websocket, user_id)
+
+
+@risk_router.get("/ws/stats")
+async def get_risk_ws_stats():
+    """Get WebSocket connection statistics"""
+    return risk_ws_manager.get_stats()
+
