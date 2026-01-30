@@ -483,20 +483,189 @@ const LandingPage = ({ onGetStarted }) => {
         </div>
       </section>
 
+      {/* Mobile App Section */}
+      <section id="mobile" className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-teal-500/5" />
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* 3D Phone Mockup */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative flex justify-center"
+            >
+              <motion.img
+                src={MOBILE_SHOWCASE}
+                alt="OracleIQ Mobile App"
+                className="w-80 md:w-96 drop-shadow-2xl"
+                animate={{ y: [0, -20, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              />
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-purple-500/20 blur-3xl -z-10" />
+            </motion.div>
+
+            {/* Mobile App Info */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="text-center lg:text-left"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-teal-400 to-purple-400 bg-clip-text text-transparent">
+                  Trade On The Go
+                </span>
+              </h2>
+              <p className="text-lg text-slate-400 mb-8">
+                Download our mobile app and access real-time trading, AI predictions, 
+                and portfolio analytics from anywhere in the world.
+              </p>
+              
+              {/* App Features */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {[
+                  { icon: Activity, text: 'Real-time Prices' },
+                  { icon: Bell, text: 'Push Alerts' },
+                  { icon: Shield, text: 'Biometric Login' },
+                  { icon: Smartphone, text: 'PWA Support' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm text-slate-300">
+                    <item.icon size={16} className="text-teal-400" />
+                    {item.text}
+                  </div>
+                ))}
+              </div>
+
+              {/* Download Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <a 
+                  href="#"
+                  className="flex items-center gap-3 px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all"
+                >
+                  <Apple size={24} />
+                  <div className="text-left">
+                    <div className="text-xs text-slate-400">Download on</div>
+                    <div className="font-semibold">App Store</div>
+                  </div>
+                </a>
+                <a 
+                  href="#"
+                  className="flex items-center gap-3 px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all"
+                >
+                  <Play size={24} />
+                  <div className="text-left">
+                    <div className="text-xs text-slate-400">Get it on</div>
+                    <div className="font-semibold">Google Play</div>
+                  </div>
+                </a>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* SDK Section */}
+      <section id="sdk" className="relative py-24">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Developer SDK
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              Build custom trading applications with our powerful SDK
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* SDK Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="p-6 rounded-2xl bg-gradient-to-br from-white/5 to-white/0 border border-white/10"
+            >
+              <img src={APP_ICON} alt="SDK Icon" className="w-16 h-16 rounded-xl mb-4" />
+              <h3 className="text-xl font-bold mb-2">OracleIQ SDK</h3>
+              <p className="text-slate-400 text-sm mb-4">
+                Full-featured SDK with REST APIs, WebSocket streams, and trading utilities.
+              </p>
+              <a 
+                href="/sdk/oracleiq-sdk.zip" 
+                download
+                className="inline-flex items-center gap-2 text-teal-400 hover:text-teal-300 text-sm"
+              >
+                <Download size={16} /> Download SDK
+              </a>
+            </motion.div>
+
+            {/* API Docs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="p-6 rounded-2xl bg-gradient-to-br from-white/5 to-white/0 border border-white/10"
+            >
+              <div className="w-16 h-16 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
+                <Layers size={32} className="text-purple-400" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">API Documentation</h3>
+              <p className="text-slate-400 text-sm mb-4">
+                Comprehensive docs with examples for REST API, WebSocket, and authentication.
+              </p>
+              <a 
+                href="/api/docs"
+                className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm"
+              >
+                <ArrowRight size={16} /> View Docs
+              </a>
+            </motion.div>
+
+            {/* Logo Assets */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="p-6 rounded-2xl bg-gradient-to-br from-white/5 to-white/0 border border-white/10"
+            >
+              <img src={LOGO_3D} alt="Logo" className="w-16 h-16 rounded-xl mb-4" />
+              <h3 className="text-xl font-bold mb-2">Brand Assets</h3>
+              <p className="text-slate-400 text-sm mb-4">
+                Download logos, icons, and brand guidelines for your integrations.
+              </p>
+              <a 
+                href={LOGO_3D}
+                download="oracleiq-logo.png"
+                className="inline-flex items-center gap-2 text-teal-400 hover:text-teal-300 text-sm"
+              >
+                <Download size={16} /> Download Logo
+              </a>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="relative py-12 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
+              <img src={LOGO_3D} alt="OracleIQ" className="w-8 h-8 rounded-lg" />
               <span className="font-bold">OracleIQTrader</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-slate-500">
               <a href="#" className="hover:text-white transition-colors">Privacy</a>
               <a href="#" className="hover:text-white transition-colors">Terms</a>
               <a href="#" className="hover:text-white transition-colors">Support</a>
+              <a href="#sdk" className="hover:text-white transition-colors">SDK</a>
             </div>
             <div className="text-sm text-slate-500">
               © 2026 OracleIQTrader.com. All rights reserved.
