@@ -488,81 +488,96 @@ const LandingPage = ({ onGetStarted }) => {
       <section id="mobile" className="relative py-24 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-teal-500/5" />
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* 3D Phone Mockup */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="relative flex justify-center"
-            >
-              <motion.img
-                src={MOBILE_SHOWCASE}
-                alt="OracleIQ Mobile App"
-                className="w-80 md:w-96 drop-shadow-2xl"
-                animate={{ y: [0, -20, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              />
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-purple-500/20 blur-3xl -z-10" />
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-teal-400 to-purple-400 bg-clip-text text-transparent">
+                Trade Anywhere, On Any Device
+              </span>
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              Access OracleIQTrader on iPhone, iPad, Desktop, or immersive VR/AR headsets. 
+              Your portfolio syncs seamlessly across all platforms.
+            </p>
+          </motion.div>
 
-            {/* Mobile App Info */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="text-center lg:text-left"
-            >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                <span className="bg-gradient-to-r from-teal-400 to-purple-400 bg-clip-text text-transparent">
-                  Trade On The Go
-                </span>
-              </h2>
-              <p className="text-lg text-slate-400 mb-8">
-                Download our mobile app and access real-time trading, AI predictions, 
-                and portfolio analytics from anywhere in the world.
-              </p>
-              
-              {/* App Features */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {[
-                  { icon: Activity, text: 'Real-time Prices' },
-                  { icon: Bell, text: 'Push Alerts' },
-                  { icon: Shield, text: 'Biometric Login' },
-                  { icon: Smartphone, text: 'PWA Support' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-slate-300">
-                    <item.icon size={16} className="text-teal-400" />
-                    {item.text}
-                  </div>
-                ))}
-              </div>
+          {/* Multi-Device Showcase Image */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="relative mb-16"
+          >
+            <motion.img
+              src={MULTI_DEVICE_SHOWCASE}
+              alt="OracleIQ on iPhone, iPad, and VR Headset"
+              className="w-full max-w-5xl mx-auto rounded-2xl shadow-2xl"
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            />
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-purple-500/10 to-teal-500/10 blur-3xl -z-10 scale-110" />
+          </motion.div>
 
-              {/* Download Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <a 
-                  href="#"
-                  className="flex items-center gap-3 px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all"
-                >
-                  <Apple size={24} />
-                  <div className="text-left">
-                    <div className="text-xs text-slate-400">Download on</div>
-                    <div className="font-semibold">App Store</div>
-                  </div>
-                </a>
-                <a 
-                  href="#"
-                  className="flex items-center gap-3 px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all"
-                >
-                  <Play size={24} />
-                  <div className="text-left">
-                    <div className="text-xs text-slate-400">Get it on</div>
-                    <div className="font-semibold">Google Play</div>
-                  </div>
-                </a>
+          {/* Platform Cards */}
+          <div className="grid md:grid-cols-4 gap-6 mb-12">
+            {[
+              { icon: Smartphone, name: 'iPhone', desc: 'iOS App Store' },
+              { icon: Layers, name: 'iPad', desc: 'Tablet Optimized' },
+              { icon: Globe, name: 'Web', desc: 'Any Browser' },
+              { icon: Cpu, name: 'VR/AR', desc: 'Immersive Trading' },
+            ].map((platform, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="p-6 rounded-xl bg-white/5 border border-white/10 text-center hover:bg-white/10 transition-all"
+              >
+                <platform.icon size={32} className="text-teal-400 mx-auto mb-3" />
+                <h3 className="font-bold text-white">{platform.name}</h3>
+                <p className="text-sm text-slate-400">{platform.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Download Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a 
+              href="#"
+              className="flex items-center gap-3 px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all"
+            >
+              <Apple size={24} />
+              <div className="text-left">
+                <div className="text-xs text-slate-400">Download on</div>
+                <div className="font-semibold">App Store</div>
               </div>
-            </motion.div>
+            </a>
+            <a 
+              href="#"
+              className="flex items-center gap-3 px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all"
+            >
+              <Play size={24} />
+              <div className="text-left">
+                <div className="text-xs text-slate-400">Get it on</div>
+                <div className="font-semibold">Google Play</div>
+              </div>
+            </a>
+            <a 
+              href="#"
+              className="flex items-center gap-3 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500/20 to-teal-500/20 border border-purple-500/30 hover:from-purple-500/30 hover:to-teal-500/30 transition-all"
+            >
+              <Cpu size={24} className="text-purple-400" />
+              <div className="text-left">
+                <div className="text-xs text-slate-400">Coming Soon</div>
+                <div className="font-semibold">VR/AR App</div>
+              </div>
+            </a>
           </div>
         </div>
       </section>
