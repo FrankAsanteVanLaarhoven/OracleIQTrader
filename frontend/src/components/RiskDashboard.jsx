@@ -1,54 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, AlertTriangle, TrendingDown, Activity, 
-  Gauge, BarChart2, PieChart, Zap, RefreshCw
+  Gauge, BarChart2, PieChart, Zap, RefreshCw, Wifi, WifiOff
 } from 'lucide-react';
 import GlassCard from './GlassCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const WS_URL = process.env.REACT_APP_BACKEND_URL?.replace('https://', 'wss://').replace('http://', 'ws://');
 
 const RiskDashboard = () => {
   const [portfolioRisk, setPortfolioRisk] = useState(null);
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [wsConnected, setWsConnected] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState(null);
+  const [riskAlert, setRiskAlert] = useState(null);
+  const wsRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    fetchRiskData();
+  // Parse risk data from API/WebSocket response
+  const parseRiskData = useCallback((data) => {
+    setPortfolioRisk({
+      totalValue: data.total_value,
+      dailyVaR: data.daily_var95,
+      weeklyVaR: data.weekly_var95,
+      monthlyVaR: data.monthly_var95,
+      currentDrawdown: data.current_drawdown,
+      maxDrawdown: data.max_drawdown,
+      sharpeRatio: data.sharpe_ratio,
+      sortinoRatio: data.sortino_ratio,
+      beta: data.beta,
+      correlation: data.correlation_to_market,
+      volatility: data.volatility_annual,
+      riskScore: data.risk_score,
+      stressScenarios: data.stress_scenarios,
+    });
+    
+    setPositions(data.positions.map(p => ({
+      symbol: p.symbol,
+      allocation: p.allocation,
+      value: p.value,
+      var95: p.var95,
+      heat: p.heat,
+      beta: p.beta,
+      drawdown: p.drawdown,
+      volatility: p.volatility,
+    })));
+    
+    setLastUpdate(new Date());
+    setLoading(false);
   }, []);
 
+  // WebSocket connection
+  const connectWebSocket = useCallback(() => {
+    if (!WS_URL) return;
+    
+    try {
+      const ws = new WebSocket(`${WS_URL}/api/risk/ws/demo_user`);
+      
+      ws.onopen = () => {
+        console.log('Risk WebSocket connected');
+        setWsConnected(true);
+      };
+      
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          
+          if (message.type === 'risk_update') {
+            parseRiskData(message.data);
+          } else if (message.type === 'risk_alert') {
+            setRiskAlert({
+              type: message.alert_type,
+              message: message.message,
+              timestamp: new Date(message.timestamp)
+            });
+            // Auto-dismiss alert after 10 seconds
+            setTimeout(() => setRiskAlert(null), 10000);
+          }
+        } catch (e) {
+          console.error('Error parsing WebSocket message:', e);
+        }
+      };
+      
+      ws.onclose = () => {
+        console.log('Risk WebSocket disconnected');
+        setWsConnected(false);
+        // Attempt reconnect after 5 seconds
+        reconnectTimeoutRef.current = setTimeout(connectWebSocket, 5000);
+      };
+      
+      ws.onerror = (error) => {
+        console.error('Risk WebSocket error:', error);
+      };
+      
+      wsRef.current = ws;
+    } catch (e) {
+      console.error('Failed to connect WebSocket:', e);
+      // Fallback to REST API
+      fetchRiskData();
+    }
+  }, [parseRiskData]);
+
+  // REST API fallback
   const fetchRiskData = async () => {
     setLoading(true);
     try {
       const response = await fetch(`${API}/risk/portfolio/demo_user`);
       const data = await response.json();
-      
-      setPortfolioRisk({
-        totalValue: data.total_value,
-        dailyVaR: data.daily_var95,
-        weeklyVaR: data.weekly_var95,
-        monthlyVaR: data.monthly_var95,
-        currentDrawdown: data.current_drawdown,
-        maxDrawdown: data.max_drawdown,
-        sharpeRatio: data.sharpe_ratio,
-        sortinoRatio: data.sortino_ratio,
-        beta: data.beta,
-        correlation: data.correlation_to_market,
-        volatility: data.volatility_annual,
-        riskScore: data.risk_score,
-        stressScenarios: data.stress_scenarios,
-      });
-      
-      setPositions(data.positions.map(p => ({
-        symbol: p.symbol,
-        allocation: p.allocation,
-        value: p.value,
-        var95: p.var95,
-        heat: p.heat,
-        beta: p.beta,
-        drawdown: p.drawdown,
-        volatility: p.volatility,
-      })));
+      parseRiskData(data);
     } catch (error) {
       console.error('Error fetching risk data:', error);
       // Fallback to mock data
@@ -69,9 +130,33 @@ const RiskDashboard = () => {
         { symbol: 'BTC', allocation: 35, value: 44601.38, var95: 1784.06, heat: 85, beta: 1.4, drawdown: -5.2 },
         { symbol: 'ETH', allocation: 25, value: 31858.13, var95: 1274.33, heat: 72, beta: 1.3, drawdown: -4.1 },
       ]);
+      setLoading(false);
     }
-    setLoading(false);
   };
+
+  // Request immediate refresh via WebSocket
+  const requestRefresh = () => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send('refresh');
+    } else {
+      fetchRiskData();
+    }
+  };
+
+  useEffect(() => {
+    // Try WebSocket first, fallback to REST
+    connectWebSocket();
+    
+    // Cleanup on unmount
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+    };
+  }, [connectWebSocket]);
 
   const getHeatColor = (heat) => {
     if (heat >= 80) return 'text-red-400 bg-red-500/20';
