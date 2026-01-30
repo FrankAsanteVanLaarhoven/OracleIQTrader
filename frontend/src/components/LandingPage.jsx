@@ -353,6 +353,9 @@ const LandingPage = ({ onGetStarted }) => {
         </div>
       </section>
 
+      {/* Device Showcase Section - Interactive Multi-device Preview */}
+      <DeviceShowcase onGetStarted={onGetStarted} />
+
       {/* Why You'll Never Leave Section */}
       <section id="features" className="relative py-24">
         <div className="max-w-7xl mx-auto px-6">
