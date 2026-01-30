@@ -56,6 +56,7 @@ import PredictionHub from './components/PredictionHub';
 import CopyTradingHub from './components/CopyTradingHub';
 import SupplyChainHub from './components/SupplyChainHub';
 import AgentBuilder from './components/AgentBuilder';
+import GlassBoxPricing from './components/GlassBoxPricing';
 import axios from 'axios';
 
 // Icons
