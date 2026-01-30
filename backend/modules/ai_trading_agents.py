@@ -211,9 +211,13 @@ class AITradingAgentEngine:
         """Set MongoDB database connection"""
         self.db = db
     
+    def _has_db(self) -> bool:
+        """Check if database is configured"""
+        return self.db is not None
+    
     async def _save_agent_to_db(self, agent: TradingAgentConfig):
         """Save agent to MongoDB"""
-        if self.db:
+        if self._has_db():
             agent_dict = agent.model_dump()
             agent_dict["created_at"] = agent.created_at.isoformat()
             if agent.last_active:
@@ -226,7 +230,7 @@ class AITradingAgentEngine:
     
     async def _load_agents_from_db(self, user_id: str) -> List[TradingAgentConfig]:
         """Load agents from MongoDB"""
-        if self.db:
+        if self._has_db():
             agents = []
             cursor = self.db.trading_agents.find({"created_by": user_id})
             async for doc in cursor:
@@ -243,7 +247,7 @@ class AITradingAgentEngine:
     
     async def _load_agent_from_db(self, agent_id: str) -> Optional[TradingAgentConfig]:
         """Load single agent from MongoDB"""
-        if self.db:
+        if self._has_db():
             doc = await self.db.trading_agents.find_one({"agent_id": agent_id})
             if doc:
                 doc.pop("_id", None)
@@ -258,13 +262,13 @@ class AITradingAgentEngine:
     
     async def _delete_agent_from_db(self, agent_id: str):
         """Delete agent from MongoDB"""
-        if self.db:
+        if self._has_db():
             await self.db.trading_agents.delete_one({"agent_id": agent_id})
             await self.db.agent_decisions.delete_many({"agent_id": agent_id})
     
     async def _save_decision_to_db(self, decision: AgentDecision):
         """Save decision to MongoDB"""
-        if self.db:
+        if self._has_db():
             decision_dict = decision.model_dump()
             decision_dict["timestamp"] = decision.timestamp.isoformat()
             await self.db.agent_decisions.insert_one(decision_dict)
