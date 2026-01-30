@@ -70,6 +70,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 // Primary Navigation Tabs (always visible)
 const PRIMARY_TABS = [
   { id: 'dashboard', label: 'Trading', icon: LayoutDashboard },
+  { id: 'agents', label: 'AI Agents', icon: Brain },
   { id: 'portfolio', label: 'Portfolio', icon: PieChart },
   { id: 'wallet', label: 'Wallet', icon: Wallet },
   { id: 'copy-trading', label: 'Copy', icon: Copy },
