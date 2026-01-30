@@ -62,6 +62,7 @@ import RiskDashboard from './components/RiskDashboard';
 import TradingViewIntegration from './components/TradingViewIntegration';
 import HowWeMakeMoney from './components/HowWeMakeMoney';
 import UXModeToggle from './components/UXModeToggle';
+import DeveloperPortal from './components/DeveloperPortal';
 import { UXModeProvider, useUXMode } from './contexts/UXModeContext';
 import axios from 'axios';
 
