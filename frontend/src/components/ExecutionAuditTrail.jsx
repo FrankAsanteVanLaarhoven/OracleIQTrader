@@ -41,7 +41,7 @@ const ExecutionAuditTrail = () => {
               ...sample,
               order_id: `ORD-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
               asset_class: ['BTC', 'ETH', 'SOL'].includes(sample.asset) ? 'crypto' : 'equity',
-              venue: ['Binance', 'Coinbase', 'NYSE', 'NASDAQ'][Math.floor(Math.random() * 4)],
+              venue: ['Crypto Exchange', 'DeFi Venue', 'NYSE', 'NASDAQ'][Math.floor(Math.random() * 4)],
               latency_ms: 5 + Math.random() * 20,
               tier: 'pro'
             })
