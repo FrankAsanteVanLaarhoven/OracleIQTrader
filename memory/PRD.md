@@ -1,10 +1,47 @@
 # OracleIQTrader.com - PRD
 
-## Status: P26 Complete ✅ | IP Compliance + Copy Trading Real-Time Logic
+## Status: P27 Complete ✅ | Device Showcase + Refactoring Started
 
-All competitor brand names removed, Copy Trading simulation activated.
+DeviceShowcase integrated, server.py refactoring in progress.
 
-## Latest Updates (January 30, 2026 - P26)
+## Latest Updates (January 30, 2026 - P27)
+
+### Draggable Device Showcase Integration
+Integrated the interactive device showcase into the landing page:
+- Displays 3 draggable devices: iPad Pro, iPhone Pro, Vision Pro (VR)
+- Each device shows realistic trading UI mockups
+- Framer Motion drag-and-drop functionality
+- Click to expand device view
+- "Try on Your Device" CTA button
+
+### Server.py Refactoring (In Progress)
+Started extracting routes from the monolithic server.py (4921 → 4798 lines):
+
+**New Route Files Created:**
+1. `/app/backend/routes/pricing_routes.py` - Glass-Box Pricing endpoints
+   - `/api/pricing/fee-schedule`
+   - `/api/pricing/estimate`
+   - `/api/pricing/execution-receipt`
+   - `/api/pricing/monthly-report/{user_id}`
+   - `/api/pricing/competitor-comparison`
+
+2. `/app/backend/routes/notification_routes.py` - Push Notification endpoints
+   - `/api/notifications/register`
+   - `/api/notifications/unregister`
+   - `/api/notifications/preferences`
+   - `/api/notifications/send`
+   - `/api/notifications/stats`
+
+**Remaining refactoring targets:**
+- Trading routes (~400 lines)
+- Alert routes (~200 lines)
+- Copy trading routes (~150 lines)
+- Supply chain routes (~200 lines)
+- AI agent routes (~200 lines)
+
+---
+
+## Previous Updates (January 30, 2026 - P26)
 
 ### IP Compliance - Competitor Brand Removal
 Removed all mentions of competitor brokers to avoid IP issues:
