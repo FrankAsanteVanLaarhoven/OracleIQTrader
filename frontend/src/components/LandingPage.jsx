@@ -12,6 +12,7 @@ import DemoMode from './DemoMode';
 const LOGO_3D = "https://static.prod-images.emergentagent.com/jobs/a0a82ecc-3e60-429c-be59-f5b8a7b8a45e/images/9e4794f327719e73fa1fbd376c7f3d287a8340f4814b1f897ccd5f1707647dac.png";
 const APP_ICON = "https://static.prod-images.emergentagent.com/jobs/a0a82ecc-3e60-429c-be59-f5b8a7b8a45e/images/653d226f2322b94bff1192591a7d424f8e1c1195b3d6252b24fd5abd673418ae.png";
 const MOBILE_SHOWCASE = "https://static.prod-images.emergentagent.com/jobs/a0a82ecc-3e60-429c-be59-f5b8a7b8a45e/images/bbab24837b9ec28101f89ac2b84616cf5edf6c43ed34bfa4cf1a9478be334e01.png";
+const MULTI_DEVICE_SHOWCASE = "https://static.prod-images.emergentagent.com/jobs/a0a82ecc-3e60-429c-be59-f5b8a7b8a45e/images/43aa43e74aeb15e241b9bb8ff165d73cc6674ad421bde1276fa2da0512d5890f.png";
 
 const LandingPage = ({ onGetStarted }) => {
   const [activeFeature, setActiveFeature] = useState(0);
