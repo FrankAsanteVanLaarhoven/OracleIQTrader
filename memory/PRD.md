@@ -1,10 +1,63 @@
 # OracleIQTrader.com - PRD
 
-## Status: P30 Complete ✅ | WebSocket Integration + API Docs Ready
+## Status: P31 Complete ✅ | Full CI/CD Pipeline Automated
 
-Real-time Risk WebSocket connected, API documentation deployed.
+Comprehensive GitHub Actions CI/CD with multi-environment deployments.
 
-## Latest Updates (January 30, 2026 - P30)
+## Latest Updates (January 30, 2026 - P31)
+
+### Fully Automated CI/CD Pipeline
+
+Created 3 GitHub Actions workflow files:
+
+**1. Main Deploy Pipeline (`deploy.yml`)**
+- Lint & security scanning (ESLint, Ruff, npm audit, pip-audit)
+- Backend tests with MongoDB service
+- Frontend tests with build verification
+- Docker image builds pushed to GitHub Container Registry
+- Multi-environment: Staging (develop/staging) + Production (main/master)
+- Automatic backup before deployment
+- Health checks post-deployment
+- Auto-tagging releases
+- Rollback on failure
+
+**2. PR Checks (`pr-checks.yml`)**
+- Large file detection
+- Lint checks for frontend/backend
+- Build verification
+- Docker build test (no push)
+
+**3. Scheduled Tasks (`scheduled.yml`)**
+- Health checks every 15 minutes
+- Daily integration tests (3 AM UTC)
+- Weekly cleanup (Sunday 4 AM)
+- Manual backup trigger
+
+### Deployment Files Created
+- `/deploy/deploy.sh` - Quick deploy script with backup/rollback
+- `/.github/CI_CD_SETUP.md` - Complete setup documentation
+
+### Required GitHub Secrets
+```
+SSH_PRIVATE_KEY    - Server SSH access
+EMERGENT_LLM_KEY   - AI API key (optional)
+```
+
+### Manual Deployment Commands
+```bash
+# Deploy to production
+gh workflow run deploy.yml -f environment=production
+
+# Emergency deploy (skip tests)
+gh workflow run deploy.yml -f environment=production -f skip_tests=true
+
+# Manual backup
+gh workflow run scheduled.yml -f task=backup
+```
+
+---
+
+## Previous Updates (January 30, 2026 - P30)
 
 ### Frontend WebSocket Integration Complete
 Updated `/frontend/src/components/RiskDashboard.jsx`:
