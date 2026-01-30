@@ -399,6 +399,20 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* TradingView Charts */}
+              {activeTab === 'charts' && (
+                <motion.div key="charts" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-7xl mx-auto">
+                  <TradingViewIntegration />
+                </motion.div>
+              )}
+
+              {/* How We Make Money - Transparency Dashboard */}
+              {activeTab === 'transparency' && (
+                <motion.div key="transparency" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-6xl mx-auto">
+                  <HowWeMakeMoney />
+                </motion.div>
+              )}
+
               {/* Price Alerts */}
               {activeTab === 'alerts' && (
                 <motion.div key="alerts" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
