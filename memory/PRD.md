@@ -1,10 +1,40 @@
 # OracleIQTrader.com - PRD
 
-## Status: P25 Complete ✅ | Developer Portal + Full Testing Passed
+## Status: P26 Complete ✅ | IP Compliance + Copy Trading Real-Time Logic
 
-All features implemented, tested, and production-ready.
+All competitor brand names removed, Copy Trading simulation activated.
 
-## Latest Updates (January 30, 2026 - P25)
+## Latest Updates (January 30, 2026 - P26)
+
+### IP Compliance - Competitor Brand Removal
+Removed all mentions of competitor brokers to avoid IP issues:
+
+#### Frontend Changes (`LandingPage.jsx`):
+- Comparison table headers changed from "Interactive Brokers, Trading 212, eToro, Binance" to "Pro Brokers, Free Brokers, Social Trading, Crypto Exchanges"
+- CTA text changed from "Interactive Brokers for the serious investor..." to "Professional-grade power. Intuitive simplicity. And radical transparency the industry has never seen."
+- Button text changed from "Join 50,000+ Traders" to "Start Trading Now"
+- Subtitle changed to "Built for every trader. Powerful tools, radical transparency."
+- Cost Tracker description updated to use "industry benchmarks" instead of specific broker names
+
+#### Backend Changes (`glass_box_pricing.py`):
+- `ExecutionVenue` enum updated to use generic venue types
+- `COMPETITOR_FEES` dictionary keys changed to generic categories
+- `ExecutionReceipt` model fields renamed from broker-specific to category-based
+- Monthly cost report uses generic competitor categories
+
+#### Other Files:
+- `ExecutionAuditTrail.jsx`: Mock venues updated to generic names
+
+### Copy Trading Real-Time Logic Activation
+Enabled the background simulation for live copy trading:
+- Added `simulate_master_trades` to startup event in `server.py`
+- Real-time trade propagation now active when WebSocket clients connect
+- Simulates trades every 30-120 seconds from 5 demo master traders
+- Automatically propagates to all subscribed followers via WebSocket
+
+---
+
+## Previous Updates (January 30, 2026 - P25)
 
 ### Developer Portal (`/app/frontend/src/components/DeveloperPortal.jsx`)
 Full-featured developer interface for API management:
