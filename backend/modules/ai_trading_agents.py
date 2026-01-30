@@ -218,15 +218,19 @@ class AITradingAgentEngine:
     async def _save_agent_to_db(self, agent: TradingAgentConfig):
         """Save agent to MongoDB"""
         if self._has_db():
-            agent_dict = agent.model_dump()
-            agent_dict["created_at"] = agent.created_at.isoformat()
-            if agent.last_active:
-                agent_dict["last_active"] = agent.last_active.isoformat()
-            await self.db.trading_agents.update_one(
-                {"agent_id": agent.agent_id},
-                {"$set": agent_dict},
-                upsert=True
-            )
+            try:
+                agent_dict = agent.model_dump()
+                agent_dict["created_at"] = agent.created_at.isoformat()
+                if agent.last_active:
+                    agent_dict["last_active"] = agent.last_active.isoformat()
+                result = await self.db.trading_agents.update_one(
+                    {"agent_id": agent.agent_id},
+                    {"$set": agent_dict},
+                    upsert=True
+                )
+                logger.info(f"Saved agent {agent.agent_id} to MongoDB: matched={result.matched_count}, modified={result.modified_count}, upserted={result.upserted_id}")
+            except Exception as e:
+                logger.error(f"Failed to save agent to MongoDB: {e}")
     
     async def _load_agents_from_db(self, user_id: str) -> List[TradingAgentConfig]:
         """Load agents from MongoDB"""
