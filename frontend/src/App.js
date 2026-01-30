@@ -96,6 +96,7 @@ const SECONDARY_TABS = [
   { id: 'risk', label: 'Risk', icon: Shield },
   { id: 'charts', label: 'Charts', icon: BarChart2 },
   { id: 'transparency', label: 'Transparency', icon: Eye },
+  { id: 'developers', label: 'Developers', icon: Code },
   { id: 'playground', label: 'Playground', icon: Banknote },
   { id: 'prediction-markets', label: 'Predictions', icon: Target },
   { id: 'supply-chain', label: 'Supply Chain', icon: Ship },
