@@ -184,22 +184,56 @@ const RiskDashboard = () => {
 
   return (
     <div className="space-y-6" data-testid="risk-dashboard">
+      {/* Risk Alert Banner */}
+      <AnimatePresence>
+        {riskAlert && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-4 rounded-xl bg-red-500/20 border border-red-500/50 flex items-center gap-3"
+          >
+            <AlertTriangle className="text-red-400 w-6 h-6 flex-shrink-0" />
+            <div className="flex-1">
+              <div className="text-red-400 font-semibold">{riskAlert.type}</div>
+              <div className="text-red-300 text-sm">{riskAlert.message}</div>
+            </div>
+            <button 
+              onClick={() => setRiskAlert(null)}
+              className="text-red-400 hover:text-red-300"
+            >×</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h2 className="font-heading text-xl md:text-2xl font-bold text-white flex items-center gap-3">
             <Shield className="text-purple-400" />
             Risk Dashboard
+            {/* Live indicator */}
+            <span className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded-full ${
+              wsConnected ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-500/20 text-slate-400'
+            }`}>
+              {wsConnected ? <Wifi size={12} /> : <WifiOff size={12} />}
+              {wsConnected ? 'LIVE' : 'OFFLINE'}
+            </span>
           </h2>
           <p className="text-slate-500 text-sm font-mono mt-1">
             Visual VaR • Portfolio Heat • Drawdown Projections
+            {lastUpdate && (
+              <span className="ml-2 text-slate-600">
+                • Updated {lastUpdate.toLocaleTimeString()}
+              </span>
+            )}
           </p>
         </div>
         <button 
-          onClick={generateRiskData}
+          onClick={requestRefresh}
           className="px-4 py-2 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-all flex items-center gap-2"
         >
-          <RefreshCw size={16} /> Refresh
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
         </button>
       </div>
 
