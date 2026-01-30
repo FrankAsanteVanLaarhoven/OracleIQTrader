@@ -1,9 +1,11 @@
 # OracleIQTrader - Risk Analysis Routes
 # Portfolio risk metrics, VaR, stress testing, and execution audit trail
 
-from fastapi import APIRouter
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+import asyncio
 
 from modules.risk_analysis import risk_engine
+from modules.risk_websocket import risk_ws_manager
 
 risk_router = APIRouter(prefix="/risk", tags=["risk"])
 
@@ -11,6 +13,11 @@ risk_router = APIRouter(prefix="/risk", tags=["risk"])
 def init_risk_db(db):
     """Initialize the risk engine with database"""
     risk_engine.set_db(db)
+
+
+def start_risk_broadcast():
+    """Start the risk WebSocket broadcast loop"""
+    asyncio.create_task(risk_ws_manager.run_broadcast_loop())
 
 
 @risk_router.get("/portfolio/{user_id}")
