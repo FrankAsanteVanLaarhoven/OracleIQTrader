@@ -93,6 +93,8 @@ const SECONDARY_TABS = [
   { id: 'pricing', label: 'Pricing', icon: DollarSign },
   { id: 'audit-trail', label: 'Execution', icon: Receipt },
   { id: 'risk', label: 'Risk', icon: Shield },
+  { id: 'charts', label: 'Charts', icon: BarChart2 },
+  { id: 'transparency', label: 'Transparency', icon: Eye },
   { id: 'playground', label: 'Playground', icon: Banknote },
   { id: 'prediction-markets', label: 'Predictions', icon: Target },
   { id: 'supply-chain', label: 'Supply Chain', icon: Ship },
