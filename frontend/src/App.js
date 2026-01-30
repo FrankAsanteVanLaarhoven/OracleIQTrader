@@ -470,6 +470,13 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* AI Agent Builder */}
+              {activeTab === 'agent-builder' && (
+                <motion.div key="agent-builder" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-6xl mx-auto">
+                  <AgentBuilder />
+                </motion.div>
+              )}
+
               {/* Trading Competitions */}
               {activeTab === 'competitions' && (
                 <motion.div key="competitions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-5xl mx-auto">
