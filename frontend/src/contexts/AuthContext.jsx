@@ -21,6 +21,15 @@ export const AuthProvider = ({ children }) => {
   // Check if user is authenticated on mount
   const checkAuth = useCallback(async () => {
     try {
+      // Check for guest mode first
+      const guestMode = localStorage.getItem('oracleiq_guest_mode');
+      if (guestMode === 'true') {
+        setUser({ id: 'guest', name: 'Guest User', email: 'guest@oracleiqtrader.com', isGuest: true });
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return;
+      }
+
       const response = await axios.get(`${API}/auth/me`, {
         withCredentials: true
       });
@@ -56,16 +65,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login with Google
+  // Login with Google - for self-hosted, use guest mode
   const loginWithGoogle = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-    const redirectUrl = window.location.origin + '/auth/callback';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+    // For self-hosted deployment, use guest mode
+    localStorage.setItem('oracleiq_guest_mode', 'true');
+    setUser({ id: 'guest', name: 'Guest User', email: 'guest@oracleiqtrader.com', isGuest: true });
+    setIsAuthenticated(true);
+  };
+
+  // Guest login
+  const loginAsGuest = () => {
+    localStorage.setItem('oracleiq_guest_mode', 'true');
+    setUser({ id: 'guest', name: 'Guest User', email: 'guest@oracleiqtrader.com', isGuest: true });
+    setIsAuthenticated(true);
   };
 
   // Logout
   const logout = async () => {
     try {
+      localStorage.removeItem('oracleiq_guest_mode');
       await axios.post(`${API}/auth/logout`, {}, {
         withCredentials: true
       });
@@ -82,6 +100,7 @@ export const AuthProvider = ({ children }) => {
     isLoading,
     isAuthenticated,
     loginWithGoogle,
+    loginAsGuest,
     logout,
     handleAuthCallback,
     checkAuth
