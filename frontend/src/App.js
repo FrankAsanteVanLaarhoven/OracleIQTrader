@@ -55,6 +55,7 @@ import QuantitativeCenter from './components/QuantitativeCenter';
 import PredictionHub from './components/PredictionHub';
 import CopyTradingHub from './components/CopyTradingHub';
 import SupplyChainHub from './components/SupplyChainHub';
+import AgentBuilder from './components/AgentBuilder';
 import axios from 'axios';
 
 // Icons
@@ -62,7 +63,7 @@ import {
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
   Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings,
-  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale, Target, Copy, Ship, MoreHorizontal
+  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale, Target, Copy, Ship, MoreHorizontal, Cpu
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -71,11 +72,11 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const PRIMARY_TABS = [
   { id: 'dashboard', label: 'Trading', icon: LayoutDashboard },
   { id: 'agents', label: 'AI Agents', icon: Brain },
+  { id: 'agent-builder', label: 'Agent Builder', icon: Cpu },
   { id: 'portfolio', label: 'Portfolio', icon: PieChart },
   { id: 'wallet', label: 'Wallet', icon: Wallet },
   { id: 'copy-trading', label: 'Copy', icon: Copy },
   { id: 'bot', label: 'AI Bot', icon: Bot },
-  { id: 'orders', label: 'Orders', icon: Layers },
   { id: 'alerts', label: 'Alerts', icon: Bell },
 ];
 
