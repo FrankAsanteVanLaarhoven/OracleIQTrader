@@ -416,6 +416,13 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* Developer Portal */}
+              {activeTab === 'developers' && (
+                <motion.div key="developers" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-6xl mx-auto">
+                  <DeveloperPortal />
+                </motion.div>
+              )}
+
               {/* Price Alerts */}
               {activeTab === 'alerts' && (
                 <motion.div key="alerts" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
