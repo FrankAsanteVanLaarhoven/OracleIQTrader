@@ -379,6 +379,20 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* Execution Audit Trail */}
+              {activeTab === 'audit-trail' && (
+                <motion.div key="audit-trail" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-6xl mx-auto">
+                  <ExecutionAuditTrail />
+                </motion.div>
+              )}
+
+              {/* Risk Dashboard */}
+              {activeTab === 'risk' && (
+                <motion.div key="risk" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-6xl mx-auto">
+                  <RiskDashboard />
+                </motion.div>
+              )}
+
               {/* Price Alerts */}
               {activeTab === 'alerts' && (
                 <motion.div key="alerts" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
