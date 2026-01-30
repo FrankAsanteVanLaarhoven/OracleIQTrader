@@ -695,7 +695,9 @@ function App() {
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <div className="App"><AppRouter /></div>
+          <UXModeProvider>
+            <div className="App"><AppRouter /></div>
+          </UXModeProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
