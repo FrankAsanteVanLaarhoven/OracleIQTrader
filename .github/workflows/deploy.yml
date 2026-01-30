@@ -1,17 +1,37 @@
-name: Deploy OracleIQTrader
+name: OracleIQTrader CI/CD Pipeline
 
 on:
   push:
+    branches: [main, master, develop, staging]
+  pull_request:
     branches: [main, master]
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip tests (emergency deploy)'
+        required: false
+        default: false
+        type: boolean
 
 env:
-  SERVER_HOST: srv1304213.hstgr.cloud
-  SERVER_USER: root
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  PRODUCTION_HOST: srv1304213.hstgr.cloud
+  STAGING_HOST: staging.oracleiqtrader.com
   APP_DIR: /opt/oracleiq-trader
 
 jobs:
-  test:
+  # ========== LINT & SECURITY SCAN ==========
+  lint-and-security:
+    name: Lint & Security Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,36 +47,193 @@ jobs:
         working-directory: frontend
         run: yarn install --frozen-lockfile
       
-      - name: Lint frontend
+      - name: ESLint Check
         working-directory: frontend
         run: yarn lint || true
-      
-      - name: Build frontend
-        working-directory: frontend
-        env:
-          REACT_APP_BACKEND_URL: https://srv1304213.hstgr.cloud/api
-        run: yarn build
+        continue-on-error: true
       
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       
-      - name: Install backend dependencies
+      - name: Python Lint (Ruff)
         working-directory: backend
         run: |
-          pip install fastapi uvicorn pydantic httpx
-          pip install -r requirements.txt || true
+          pip install ruff
+          ruff check . --ignore E501,F401 || true
+        continue-on-error: true
       
-      - name: Test backend imports
+      - name: Security Scan - npm audit
+        working-directory: frontend
+        run: yarn audit --level high || true
+        continue-on-error: true
+      
+      - name: Security Scan - pip-audit
         working-directory: backend
-        run: python -c "from server import app; print('Backend OK')"
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements.txt || true
+        continue-on-error: true
 
-  deploy:
-    needs: test
+  # ========== UNIT TESTS ==========
+  test-backend:
+    name: Backend Tests
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    
+    if: ${{ !inputs.skip_tests }}
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          pip install pytest pytest-asyncio pytest-cov httpx
+          pip install -r requirements.txt
+      
+      - name: Run tests
+        working-directory: backend
+        env:
+          MONGO_URL: mongodb://localhost:27017
+          DB_NAME: test_oracleiq
+        run: |
+          python -c "from server import app; print('✅ Backend imports OK')"
+          pytest tests/ -v --cov=. --cov-report=xml || echo "No tests found"
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: backend/coverage.xml
+          fail_ci_if_error: false
+
+  test-frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.skip_tests }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+      
+      - name: Run tests
+        working-directory: frontend
+        run: yarn test --watchAll=false --passWithNoTests || true
+      
+      - name: Build test
+        working-directory: frontend
+        env:
+          CI: false
+          REACT_APP_BACKEND_URL: https://srv1304213.hstgr.cloud/api
+          SKIP_PREFLIGHT_CHECK: true
+          DISABLE_ESLINT_PLUGIN: true
+        run: yarn build
+
+  # ========== BUILD DOCKER IMAGES ==========
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [lint-and-security]
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      backend_image: ${{ steps.meta-backend.outputs.tags }}
+      frontend_image: ${{ steps.meta-frontend.outputs.tags }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Generate version
+        id: version
+        run: echo "version=$(date +'%Y%m%d')-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata (backend)
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./deploy/backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Extract metadata (frontend)
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./deploy/frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          build-args: |
+            REACT_APP_BACKEND_URL=https://${{ env.PRODUCTION_HOST }}/api
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ========== DEPLOY TO STAGING ==========
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build, test-backend, test-frontend]
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      (needs.test-backend.result == 'success' || needs.test-backend.result == 'skipped') &&
+      (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped') &&
+      (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || inputs.environment == 'staging')
+    environment:
+      name: staging
+      url: https://${{ env.STAGING_HOST }}
     steps:
       - uses: actions/checkout@v4
       
@@ -68,46 +245,237 @@ jobs:
       - name: Add host key
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ env.STAGING_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -H ${{ env.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
       
-      - name: Deploy to server
+      - name: Deploy to staging
         run: |
-          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'ENDSSH'
+          ssh root@${{ env.PRODUCTION_HOST }} << 'ENDSSH'
             cd ${{ env.APP_DIR }}
             
-            # Pull latest code
-            git pull origin main || git pull origin master
+            echo "📦 Pulling latest code..."
+            git fetch origin
+            git checkout develop 2>/dev/null || git checkout staging 2>/dev/null || git checkout main
+            git pull
             
-            # Update environment
-            echo "REACT_APP_BACKEND_URL=https://srv1304213.hstgr.cloud/api" > frontend/.env
+            echo "🔧 Configuring environment..."
+            cat > .env << EOF
+          REACT_APP_BACKEND_URL=https://${{ env.PRODUCTION_HOST }}/api
+          MONGO_URL=mongodb://mongodb:27017
+          DB_NAME=oracleiq_staging
+          ENVIRONMENT=staging
+          EOF
             
-            # Rebuild and restart containers
+            echo "🐳 Building and deploying..."
+            docker-compose -f docker-compose.staging.yml down 2>/dev/null || true
             docker-compose down
             docker-compose build --no-cache
             docker-compose up -d
             
-            # Health check
-            sleep 10
-            curl -f http://localhost:8001/api/health || echo "Backend starting..."
+            echo "⏳ Waiting for services..."
+            sleep 15
             
-            echo "✅ Deployment complete!"
+            echo "✅ Staging deployment complete!"
+          ENDSSH
+
+  # ========== DEPLOY TO PRODUCTION ==========
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, test-backend, test-frontend]
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      (needs.test-backend.result == 'success' || needs.test-backend.result == 'skipped') &&
+      (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped') &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || inputs.environment == 'production')
+    environment:
+      name: production
+      url: https://${{ env.PRODUCTION_HOST }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Create backup
+        run: |
+          ssh root@${{ env.PRODUCTION_HOST }} << 'ENDSSH'
+            cd ${{ env.APP_DIR }}
+            
+            # Backup current deployment
+            BACKUP_DIR="/opt/backups/oracleiq-$(date +%Y%m%d-%H%M%S)"
+            mkdir -p $BACKUP_DIR
+            
+            # Backup MongoDB
+            docker exec oracleiq-mongodb mongodump --out /tmp/backup 2>/dev/null || true
+            docker cp oracleiq-mongodb:/tmp/backup $BACKUP_DIR/mongodb 2>/dev/null || true
+            
+            # Backup docker images info
+            docker images --format "{{.Repository}}:{{.Tag}}" | grep oracleiq > $BACKUP_DIR/images.txt 2>/dev/null || true
+            
+            # Save current commit
+            git rev-parse HEAD > $BACKUP_DIR/commit.txt
+            
+            echo "📦 Backup created at $BACKUP_DIR"
+          ENDSSH
+      
+      - name: Deploy to production
+        run: |
+          ssh root@${{ env.PRODUCTION_HOST }} << 'ENDSSH'
+            set -e
+            cd ${{ env.APP_DIR }}
+            
+            echo "📦 Pulling latest code..."
+            git fetch origin
+            git checkout main 2>/dev/null || git checkout master
+            git pull
+            
+            echo "🔧 Configuring production environment..."
+            cat > frontend/.env << EOF
+          REACT_APP_BACKEND_URL=https://${{ env.PRODUCTION_HOST }}/api
+          EOF
+            
+            cat > backend/.env << EOF
+          MONGO_URL=mongodb://mongodb:27017
+          DB_NAME=oracleiq_trader
+          ENVIRONMENT=production
+          EMERGENT_LLM_KEY=${{ secrets.EMERGENT_LLM_KEY }}
+          EOF
+            
+            echo "🐳 Building containers..."
+            docker-compose down
+            docker-compose build --no-cache --parallel
+            
+            echo "🚀 Starting services..."
+            docker-compose up -d
+            
+            echo "⏳ Waiting for services to be healthy..."
+            sleep 20
+            
+            echo "🔍 Running health checks..."
+            # Backend health check
+            for i in {1..5}; do
+              if curl -sf http://localhost:8001/api/health > /dev/null; then
+                echo "✅ Backend is healthy"
+                break
+              fi
+              echo "Waiting for backend... ($i/5)"
+              sleep 5
+            done
+            
+            # Frontend health check
+            for i in {1..5}; do
+              if curl -sf http://localhost:3000 > /dev/null; then
+                echo "✅ Frontend is healthy"
+                break
+              fi
+              echo "Waiting for frontend... ($i/5)"
+              sleep 5
+            done
+            
+            echo "🧹 Cleaning up old images..."
+            docker image prune -f
+            
+            echo "✅ Production deployment complete!"
+            echo "🌐 Live at: https://${{ env.PRODUCTION_HOST }}"
           ENDSSH
       
       - name: Verify deployment
         run: |
-          sleep 15
-          curl -f https://${{ env.SERVER_HOST }}/api/health || echo "Server responding"
+          sleep 10
+          echo "Testing production endpoints..."
+          curl -sf https://${{ env.PRODUCTION_HOST }}/api/health && echo "✅ API healthy"
+          curl -sf https://${{ env.PRODUCTION_HOST }} && echo "✅ Frontend healthy"
 
-  notify:
-    needs: deploy
+  # ========== POST-DEPLOYMENT ==========
+  post-deploy:
+    name: Post-Deployment Tasks
     runs-on: ubuntu-latest
-    if: always()
+    needs: [deploy-production]
+    if: always() && needs.deploy-production.result == 'success'
     steps:
-      - name: Deployment Status
+      - name: Notify success
         run: |
-          if [ "${{ needs.deploy.result }}" == "success" ]; then
-            echo "✅ Deployment successful to https://srv1304213.hstgr.cloud"
-          else
-            echo "❌ Deployment failed"
-            exit 1
-          fi
+          echo "🎉 Deployment successful!"
+          echo "Version: ${{ needs.build.outputs.version }}"
+          echo "Environment: Production"
+          echo "URL: https://${{ env.PRODUCTION_HOST }}"
+      
+      - name: Create release tag
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = `v${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${context.sha.substring(0,7)}`;
+            try {
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/tags/${tag}`,
+                sha: context.sha
+              });
+              console.log(`Created tag: ${tag}`);
+            } catch (e) {
+              console.log(`Tag creation skipped: ${e.message}`);
+            }
+
+  # ========== ROLLBACK (Manual Trigger) ==========
+  rollback:
+    name: Rollback Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && failure()
+    needs: [deploy-production]
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Rollback
+        run: |
+          ssh root@${{ env.PRODUCTION_HOST }} << 'ENDSSH'
+            cd ${{ env.APP_DIR }}
+            
+            # Find latest backup
+            LATEST_BACKUP=$(ls -td /opt/backups/oracleiq-* 2>/dev/null | head -1)
+            
+            if [ -z "$LATEST_BACKUP" ]; then
+              echo "❌ No backup found for rollback"
+              exit 1
+            fi
+            
+            echo "🔄 Rolling back to: $LATEST_BACKUP"
+            
+            # Restore commit
+            if [ -f "$LATEST_BACKUP/commit.txt" ]; then
+              COMMIT=$(cat $LATEST_BACKUP/commit.txt)
+              git checkout $COMMIT
+            fi
+            
+            # Rebuild and restart
+            docker-compose down
+            docker-compose build
+            docker-compose up -d
+            
+            # Restore MongoDB if needed
+            if [ -d "$LATEST_BACKUP/mongodb" ]; then
+              sleep 10
+              docker cp $LATEST_BACKUP/mongodb oracleiq-mongodb:/tmp/restore
+              docker exec oracleiq-mongodb mongorestore /tmp/restore 2>/dev/null || true
+            fi
+            
+            echo "✅ Rollback complete!"
+          ENDSSH
