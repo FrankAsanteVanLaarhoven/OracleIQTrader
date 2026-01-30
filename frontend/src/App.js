@@ -368,6 +368,13 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* Glass-Box Pricing */}
+              {activeTab === 'pricing' && (
+                <motion.div key="pricing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-6xl mx-auto">
+                  <GlassBoxPricing />
+                </motion.div>
+              )}
+
               {/* Price Alerts */}
               {activeTab === 'alerts' && (
                 <motion.div key="alerts" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
