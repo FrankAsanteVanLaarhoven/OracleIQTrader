@@ -4644,6 +4644,9 @@ async def check_sc_alerts_now():
 # ============ AI TRADING AGENTS ============
 from modules.ai_trading_agents import ai_trading_engine, AgentStatus
 
+# Initialize AI Trading Engine with MongoDB
+ai_trading_engine.set_db(db)
+
 @api_router.get("/agents/templates")
 async def get_agent_templates():
     """Get all available agent templates"""
@@ -4652,13 +4655,13 @@ async def get_agent_templates():
 @api_router.get("/agents")
 async def get_user_agents(user_id: str = "demo_user"):
     """Get all agents for a user"""
-    agents = ai_trading_engine.get_user_agents(user_id)
+    agents = await ai_trading_engine.get_user_agents(user_id)
     return [a.model_dump() for a in agents]
 
 @api_router.get("/agents/{agent_id}")
 async def get_agent(agent_id: str):
     """Get agent by ID"""
-    agent = ai_trading_engine.get_agent(agent_id)
+    agent = await ai_trading_engine.get_agent(agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
     return agent.model_dump()
@@ -4668,7 +4671,7 @@ async def create_agent(data: dict):
     """Create a new trading agent"""
     try:
         user_id = data.pop("user_id", "demo_user")
-        agent = ai_trading_engine.create_agent(user_id, data)
+        agent = await ai_trading_engine.create_agent(user_id, data)
         return {"success": True, "agent": agent.model_dump()}
     except Exception as e:
         return {"success": False, "error": str(e)}
@@ -4680,7 +4683,7 @@ async def create_agent_from_template(data: dict):
         user_id = data.get("user_id", "demo_user")
         template_id = data.get("template_id")
         overrides = data.get("overrides", {})
-        agent = ai_trading_engine.create_from_template(user_id, template_id, overrides)
+        agent = await ai_trading_engine.create_from_template(user_id, template_id, overrides)
         return {"success": True, "agent": agent.model_dump()}
     except Exception as e:
         return {"success": False, "error": str(e)}
@@ -4688,7 +4691,7 @@ async def create_agent_from_template(data: dict):
 @api_router.put("/agents/{agent_id}")
 async def update_agent(agent_id: str, data: dict):
     """Update agent configuration"""
-    agent = ai_trading_engine.update_agent(agent_id, data)
+    agent = await ai_trading_engine.update_agent(agent_id, data)
     if agent:
         return {"success": True, "agent": agent.model_dump()}
     return {"success": False, "error": "Agent not found"}
@@ -4696,19 +4699,19 @@ async def update_agent(agent_id: str, data: dict):
 @api_router.delete("/agents/{agent_id}")
 async def delete_agent(agent_id: str):
     """Delete an agent"""
-    success = ai_trading_engine.delete_agent(agent_id)
+    success = await ai_trading_engine.delete_agent(agent_id)
     return {"success": success}
 
 @api_router.post("/agents/{agent_id}/activate")
 async def activate_agent(agent_id: str):
     """Activate agent for trading"""
-    success = ai_trading_engine.activate_agent(agent_id)
+    success = await ai_trading_engine.activate_agent(agent_id)
     return {"success": success, "status": "active" if success else "error"}
 
 @api_router.post("/agents/{agent_id}/pause")
 async def pause_agent(agent_id: str):
     """Pause an agent"""
-    success = ai_trading_engine.pause_agent(agent_id)
+    success = await ai_trading_engine.pause_agent(agent_id)
     return {"success": success, "status": "paused" if success else "error"}
 
 @api_router.post("/agents/{agent_id}/analyze")
