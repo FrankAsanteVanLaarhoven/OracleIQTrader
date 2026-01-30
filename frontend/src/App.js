@@ -82,6 +82,7 @@ const PRIMARY_TABS = [
 
 // Secondary Navigation Tabs (in "More" dropdown)
 const SECONDARY_TABS = [
+  { id: 'orders', label: 'Orders', icon: Layers },
   { id: 'playground', label: 'Playground', icon: Banknote },
   { id: 'prediction-markets', label: 'Predictions', icon: Target },
   { id: 'supply-chain', label: 'Supply Chain', icon: Ship },
