@@ -4343,6 +4343,10 @@ async def startup_event():
     asyncio.create_task(simulate_master_trades(copy_trading_ws_manager))
     logger.info("Copy trading simulation started")
     
+    # Start risk WebSocket broadcast loop
+    start_risk_broadcast()
+    logger.info("Risk WebSocket broadcast started")
+    
     # Load social media credentials
     await social_manager.load_credentials()
     logger.info("Social manager initialized")
