@@ -1,0 +1,659 @@
+openapi: 3.0.3
+info:
+  title: OracleIQTrader API
+  description: |
+    Institutional-grade trading API with glass-box pricing, AI agents, and multi-asset support.
+    
+    ## Features
+    - Multi-asset trading (Stocks, Crypto, Forex, Options, Futures, Prediction Markets)
+    - AI Trading Agents with customizable strategies
+    - Copy Trading with real-time propagation
+    - Glass-box transparent pricing
+    - Risk analytics and VaR calculation
+    
+    ## Authentication
+    All authenticated endpoints require Bearer token authentication.
+  version: 2.0.0
+  contact:
+    email: api-support@oracleiqtrader.com
+    url: https://oracleiqtrader.com/developers
+  license:
+    name: Proprietary
+    url: https://oracleiqtrader.com/terms
+    
+servers:
+  - url: https://api.oracleiqtrader.com/api
+    description: Production
+  - url: https://sandbox.oracleiqtrader.com/api
+    description: Sandbox (Paper Trading)
+    
+tags:
+  - name: Market Data
+    description: Real-time and historical market data
+  - name: Trading
+    description: Order management and execution
+  - name: Portfolio
+    description: Positions and portfolio analytics
+  - name: AI Agents
+    description: AI trading agent management
+  - name: Copy Trading
+    description: Copy trading functionality
+  - name: Pricing
+    description: Fee schedules and cost estimation
+  - name: Notifications
+    description: Push notification management
+  - name: Account
+    description: Account management
+
+security:
+  - BearerAuth: []
+
+paths:
+  /market/prices:
+    get:
+      tags: [Market Data]
+      summary: Get real-time prices
+      parameters:
+        - name: symbols
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "BTC,ETH,SOL"
+      responses:
+        '200':
+          description: Price data
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/PriceData'
+                  
+  /market/history:
+    get:
+      tags: [Market Data]
+      summary: Get historical OHLCV data
+      parameters:
+        - name: symbol
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: interval
+          in: query
+          schema:
+            type: string
+            enum: [1m, 5m, 15m, 1h, 4h, 1d, 1w]
+            default: 1d
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 1000
+            default: 100
+      responses:
+        '200':
+          description: Historical candle data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candle'
+
+  /orders:
+    get:
+      tags: [Trading]
+      summary: List orders
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, filled, cancelled, all]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Order list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+                  
+    post:
+      tags: [Trading]
+      summary: Place new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /orders/{order_id}:
+    get:
+      tags: [Trading]
+      summary: Get order details
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+                
+    delete:
+      tags: [Trading]
+      summary: Cancel order
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order cancelled
+
+  /portfolio/positions:
+    get:
+      tags: [Portfolio]
+      summary: Get current positions
+      responses:
+        '200':
+          description: Position list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioPositions'
+
+  /agents:
+    get:
+      tags: [AI Agents]
+      summary: List user's agents
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Agent list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TradingAgent'
+                  
+    post:
+      tags: [AI Agents]
+      summary: Create new agent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAgentRequest'
+      responses:
+        '201':
+          description: Agent created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradingAgent'
+
+  /agents/templates:
+    get:
+      tags: [AI Agents]
+      summary: Get available agent templates
+      responses:
+        '200':
+          description: Template list
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/AgentTemplate'
+
+  /agents/{agent_id}/activate:
+    post:
+      tags: [AI Agents]
+      summary: Activate agent
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Agent activated
+
+  /agents/{agent_id}/analyze:
+    post:
+      tags: [AI Agents]
+      summary: Request market analysis
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketData'
+      responses:
+        '200':
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDecision'
+
+  /copy-trading/traders:
+    get:
+      tags: [Copy Trading]
+      summary: Get available traders to copy
+      responses:
+        '200':
+          description: Trader list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MasterTrader'
+
+  /copy-trading/follow:
+    post:
+      tags: [Copy Trading]
+      summary: Start following a trader
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowRequest'
+      responses:
+        '200':
+          description: Now following trader
+
+  /pricing/fee-schedule:
+    get:
+      tags: [Pricing]
+      summary: Get complete fee schedule
+      responses:
+        '200':
+          description: Fee schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeeSchedule'
+
+  /pricing/estimate:
+    post:
+      tags: [Pricing]
+      summary: Estimate order costs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CostEstimateRequest'
+      responses:
+        '200':
+          description: Cost estimate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostEstimate'
+
+  /notifications/register:
+    post:
+      tags: [Notifications]
+      summary: Register device for push notifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegistration'
+      responses:
+        '200':
+          description: Device registered
+
+  /notifications/preferences:
+    get:
+      tags: [Notifications]
+      summary: Get notification preferences
+      responses:
+        '200':
+          description: Preferences
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+    post:
+      tags: [Notifications]
+      summary: Update notification preferences
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationPreferences'
+      responses:
+        '200':
+          description: Preferences updated
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      
+  schemas:
+    PriceData:
+      type: object
+      properties:
+        price:
+          type: number
+        change_24h:
+          type: number
+        volume:
+          type: number
+        high_24h:
+          type: number
+        low_24h:
+          type: number
+          
+    Candle:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        open:
+          type: number
+        high:
+          type: number
+        low:
+          type: number
+        close:
+          type: number
+        volume:
+          type: number
+          
+    Order:
+      type: object
+      properties:
+        order_id:
+          type: string
+        symbol:
+          type: string
+        side:
+          type: string
+          enum: [buy, sell]
+        type:
+          type: string
+          enum: [market, limit, stop, stop_limit]
+        quantity:
+          type: number
+        price:
+          type: number
+        status:
+          type: string
+          enum: [pending, open, filled, cancelled]
+        created_at:
+          type: string
+          format: date-time
+          
+    CreateOrderRequest:
+      type: object
+      required: [symbol, side, type, quantity]
+      properties:
+        symbol:
+          type: string
+        side:
+          type: string
+          enum: [buy, sell]
+        type:
+          type: string
+          enum: [market, limit, stop, stop_limit]
+        quantity:
+          type: number
+        price:
+          type: number
+        stop_loss:
+          type: number
+        take_profit:
+          type: number
+        time_in_force:
+          type: string
+          enum: [GTC, IOC, FOK]
+          default: GTC
+          
+    PortfolioPositions:
+      type: object
+      properties:
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Position'
+        total_value:
+          type: number
+        total_pnl:
+          type: number
+        total_pnl_pct:
+          type: number
+          
+    Position:
+      type: object
+      properties:
+        symbol:
+          type: string
+        quantity:
+          type: number
+        entry_price:
+          type: number
+        current_price:
+          type: number
+        unrealized_pnl:
+          type: number
+        unrealized_pnl_pct:
+          type: number
+          
+    TradingAgent:
+      type: object
+      properties:
+        agent_id:
+          type: string
+        name:
+          type: string
+        strategy:
+          type: string
+        status:
+          type: string
+          enum: [idle, active, paused]
+        risk_tolerance:
+          type: integer
+        position_size_pct:
+          type: integer
+          
+    CreateAgentRequest:
+      type: object
+      required: [name, strategy]
+      properties:
+        name:
+          type: string
+        strategy:
+          type: string
+        risk_tolerance:
+          type: integer
+          default: 50
+        position_size_pct:
+          type: integer
+          default: 10
+        allowed_assets:
+          type: array
+          items:
+            type: string
+            
+    AgentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        strategy:
+          type: string
+        default_settings:
+          type: object
+          
+    MarketData:
+      type: object
+      properties:
+        symbol:
+          type: string
+        price:
+          type: number
+        change_percent:
+          type: number
+        volume:
+          type: number
+        rsi:
+          type: number
+          
+    AgentDecision:
+      type: object
+      properties:
+        decision_id:
+          type: string
+        action:
+          type: string
+          enum: [buy, sell, hold]
+        confidence:
+          type: number
+        reasoning:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+          
+    MasterTrader:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        win_rate:
+          type: number
+        total_return_ytd:
+          type: number
+        followers:
+          type: integer
+          
+    FollowRequest:
+      type: object
+      required: [trader_id]
+      properties:
+        trader_id:
+          type: string
+        copy_ratio:
+          type: number
+          default: 1.0
+        max_trade_size:
+          type: number
+          
+    FeeSchedule:
+      type: object
+      properties:
+        version:
+          type: string
+        tiers:
+          type: object
+        asset_classes:
+          type: object
+        cost_caps:
+          type: object
+          
+    CostEstimateRequest:
+      type: object
+      properties:
+        asset:
+          type: string
+        asset_class:
+          type: string
+        side:
+          type: string
+        quantity:
+          type: number
+        current_price:
+          type: number
+        tier:
+          type: string
+          
+    CostEstimate:
+      type: object
+      properties:
+        notional_value:
+          type: number
+        estimated_fees:
+          type: array
+          items:
+            type: object
+        total_estimated_cost_bps:
+          type: number
+        competitor_costs:
+          type: object
+          
+    DeviceRegistration:
+      type: object
+      required: [token, platform]
+      properties:
+        token:
+          type: string
+        platform:
+          type: string
+          enum: [ios, android]
+        device:
+          type: string
+          
+    NotificationPreferences:
+      type: object
+      properties:
+        trades:
+          type: boolean
+        alerts:
+          type: boolean
+        copyTrading:
+          type: boolean
+        agents:
+          type: boolean
+        news:
+          type: boolean
