@@ -70,7 +70,7 @@ import {
   Brain, Activity, TrendingUp, TrendingDown, Zap, LogIn,
   LayoutDashboard, Users, PieChart, Banknote, Bell, Layers,
   Newspaper, Bot, Wallet, Menu, X, Radar, Download, User, Settings,
-  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale, Target, Copy, Ship, MoreHorizontal, Cpu, DollarSign, Receipt, Shield
+  BookOpen, Trophy, MessageCircle, GraduationCap, Sparkles, Medal, Scale, Target, Copy, Ship, MoreHorizontal, Cpu, DollarSign, Receipt, Shield, BarChart2, Eye
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
