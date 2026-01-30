@@ -1,10 +1,46 @@
 # OracleIQTrader.com - PRD
 
-## Status: P28 Complete ✅ | Full Refactoring + Backend Logic Implemented
+## Status: P29 Complete ✅ | Full Refactoring + Real-Time Risk WebSocket
 
-Server.py reduced by 220+ lines, Risk & Audit APIs live.
+Server.py reduced by 566 lines, real-time risk streaming operational.
 
-## Latest Updates (January 30, 2026 - P28)
+## Latest Updates (January 30, 2026 - P29)
+
+### Server.py Refactoring Complete
+Reduced from 4921 → 4355 lines (566 lines extracted = 11.5% reduction):
+
+**All Route Files Created:**
+1. `/routes/pricing_routes.py` - Glass-Box Pricing (5 endpoints)
+2. `/routes/notification_routes.py` - Push Notifications (6 endpoints)
+3. `/routes/agent_routes.py` - AI Trading Agents (12 endpoints)
+4. `/routes/risk_routes.py` - Risk Analysis + WebSocket (9 endpoints)
+5. `/routes/alert_routes.py` - Price Alerts & Crawler (8 endpoints)
+6. `/routes/copy_trading_routes.py` - Copy Trading (10 endpoints)
+7. `/routes/supply_chain_routes.py` - Supply Chain Trading (21 endpoints)
+
+### Real-Time Risk WebSocket
+Created `/modules/risk_websocket.py` with:
+- WebSocket endpoint: `ws://[host]/api/risk/ws/{user_id}`
+- Automatic broadcast every 10 seconds to all connected clients
+- Commands: "refresh" for immediate update, "ping" for keepalive
+- Stats endpoint: `GET /api/risk/ws/stats`
+
+### Mobile App Expo Setup
+Updated `/app/mobile/app.json`:
+- Project ID: `oracleiq-trader-mobile`
+- Owner: `oracleiqtrader`
+- API URL configured in extras
+
+**To test mobile app:**
+```bash
+cd /app/mobile
+npx expo start
+```
+Scan QR code with Expo Go app on iOS/Android.
+
+---
+
+## Previous Updates (January 30, 2026 - P28)
 
 ### Server.py Refactoring Progress
 Reduced from 4921 → 4709 lines (212+ lines extracted to separate route files):
