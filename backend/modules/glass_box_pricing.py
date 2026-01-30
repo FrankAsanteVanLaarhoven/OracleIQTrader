@@ -87,9 +87,9 @@ class ExecutionReceipt(BaseModel):
     
     # Comparison
     effective_cost_bps: float  # Total cost including spread
-    ibkr_estimated_cost_bps: float
-    etoro_estimated_cost_bps: float
-    binance_estimated_cost_bps: float
+    pro_broker_estimated_cost_bps: float
+    social_trading_estimated_cost_bps: float
+    crypto_exchange_estimated_cost_bps: float
     savings_vs_competitors: Dict[str, float]
 
 
@@ -451,9 +451,9 @@ class GlassBoxPricingEngine:
             total_fees_usd=(total_bps / 10000) * notional,
             total_fees_bps=total_bps,
             effective_cost_bps=total_bps,
-            ibkr_estimated_cost_bps=competitor_estimates.get("IBKR", 0),
-            etoro_estimated_cost_bps=competitor_estimates.get("eToro", 0),
-            binance_estimated_cost_bps=competitor_estimates.get("Binance", 0),
+            pro_broker_estimated_cost_bps=competitor_estimates.get("Pro_Brokers", 0),
+            social_trading_estimated_cost_bps=competitor_estimates.get("Social_Trading", 0),
+            crypto_exchange_estimated_cost_bps=competitor_estimates.get("Crypto_Exchanges", 0),
             savings_vs_competitors=savings
         )
         
@@ -473,10 +473,10 @@ class GlassBoxPricingEngine:
                 "effective_rate_bps": 12.5,
             },
             "vs_competitors": {
-                "IBKR": {"their_estimated_cost": 18.75, "your_savings": 3.13},
-                "eToro": {"their_estimated_cost": 125.00, "your_savings": 109.38},
-                "Trading212": {"their_estimated_cost": 93.75, "your_savings": 78.13},
-                "Coinbase": {"their_estimated_cost": 75.00, "your_savings": 59.38}
+                "Pro_Brokers": {"their_estimated_cost": 18.75, "your_savings": 3.13},
+                "Social_Trading": {"their_estimated_cost": 125.00, "your_savings": 109.38},
+                "Free_Brokers": {"their_estimated_cost": 93.75, "your_savings": 78.13},
+                "Crypto_Exchanges": {"their_estimated_cost": 75.00, "your_savings": 59.38}
             },
             "breakdown_by_asset": {
                 "crypto": {"trades": 25, "volume": 75000, "fees": 9.38, "rate_bps": 12.5},
