@@ -59,6 +59,10 @@ import AgentBuilder from './components/AgentBuilder';
 import GlassBoxPricing from './components/GlassBoxPricing';
 import ExecutionAuditTrail from './components/ExecutionAuditTrail';
 import RiskDashboard from './components/RiskDashboard';
+import TradingViewIntegration from './components/TradingViewIntegration';
+import HowWeMakeMoney from './components/HowWeMakeMoney';
+import UXModeToggle from './components/UXModeToggle';
+import { UXModeProvider, useUXMode } from './contexts/UXModeContext';
 import axios from 'axios';
 
 // Icons
