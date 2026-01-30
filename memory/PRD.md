@@ -1,10 +1,59 @@
 # OracleIQTrader.com - PRD
 
-## Status: P27 Complete ✅ | Device Showcase + Refactoring Started
+## Status: P28 Complete ✅ | Full Refactoring + Backend Logic Implemented
 
-DeviceShowcase integrated, server.py refactoring in progress.
+Server.py reduced by 220+ lines, Risk & Audit APIs live.
 
-## Latest Updates (January 30, 2026 - P27)
+## Latest Updates (January 30, 2026 - P28)
+
+### Server.py Refactoring Progress
+Reduced from 4921 → 4709 lines (212+ lines extracted to separate route files):
+
+**Route Files Created:**
+1. `/routes/pricing_routes.py` - Glass-Box Pricing (5 endpoints)
+2. `/routes/notification_routes.py` - Push Notifications (6 endpoints)
+3. `/routes/agent_routes.py` - AI Trading Agents (12 endpoints)
+4. `/routes/risk_routes.py` - Risk Analysis & Audit Trail (7 endpoints)
+5. `/routes/alert_routes.py` - Price Alerts & Crawler (ready but not integrated)
+
+### New Backend Modules Created
+1. **`/modules/risk_analysis.py`** - Portfolio risk analytics engine:
+   - VaR calculations (95% and 99% confidence)
+   - Position-level risk heat mapping
+   - Stress test scenarios
+   - Demo execution audit trail generation
+
+### New API Endpoints
+**Risk Analysis:**
+- `GET /api/risk/portfolio/{user_id}` - Full portfolio risk metrics
+- `GET /api/risk/positions/{user_id}` - Position-level risks
+- `GET /api/risk/var/{user_id}` - Value at Risk calculator
+- `GET /api/risk/stress-test/{user_id}` - Stress scenarios
+- `GET /api/risk/heat-map/{user_id}` - Risk heat map
+
+**Execution Audit:**
+- `GET /api/audit/executions/{user_id}` - Execution audit trail
+- `GET /api/audit/executions/{user_id}/summary` - Execution quality summary
+
+### Frontend Updates
+- `RiskDashboard.jsx` - Now fetches live data from `/api/risk/portfolio`
+- `ExecutionAuditTrail.jsx` - Now fetches from `/api/audit/executions`
+
+---
+
+## Mobile App (Expo) Setup
+
+The mobile app is located at `/app/mobile/` and uses Expo. To test on a device:
+
+1. **Install Expo Go** on your iOS/Android device
+2. Run `cd /app/mobile && npx expo start`
+3. Scan the QR code with Expo Go
+
+**Note:** The app.json needs valid Expo credentials (projectId, owner) for production builds.
+
+---
+
+## Previous Updates (January 30, 2026 - P27)
 
 ### Draggable Device Showcase Integration
 Integrated the interactive device showcase into the landing page:
