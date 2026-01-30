@@ -16,17 +16,30 @@ const ExecutionAuditTrail = () => {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    // Generate sample execution receipts
-    generateSampleReceipts();
+    // Fetch execution audit trail from backend
+    fetchExecutionTrail();
   }, []);
 
-  const generateSampleReceipts = async () => {
+  const fetchExecutionTrail = async () => {
     setLoading(true);
     try {
-      // Generate a few sample receipts
+      const response = await fetch(`${API}/audit/executions/demo_user?limit=20`);
+      const data = await response.json();
+      setReceipts(data);
+    } catch (e) {
+      console.error('Error fetching execution trail:', e);
+      // Fallback: generate sample receipts if API fails
+      generateSampleReceipts();
+    }
+    setLoading(false);
+  };
+
+  const generateSampleReceipts = async () => {
+    try {
+      // Generate a few sample receipts using pricing API
       const samples = [
-        { asset: 'BTC', side: 'buy', quantity: 0.5, fill_price: 45123.45, nbbo_bid: 45100, nbbo_ask: 45150 },
-        { asset: 'ETH', side: 'sell', quantity: 2.0, fill_price: 2456.78, nbbo_bid: 2450, nbbo_ask: 2465 },
+        { asset: 'BTC', side: 'buy', quantity: 0.5, fill_price: 72245.50, nbbo_bid: 72200, nbbo_ask: 72290 },
+        { asset: 'ETH', side: 'sell', quantity: 2.0, fill_price: 2748.90, nbbo_bid: 2745, nbbo_ask: 2755 },
         { asset: 'AAPL', side: 'buy', quantity: 100, fill_price: 189.23, nbbo_bid: 189.10, nbbo_ask: 189.35 },
         { asset: 'TSLA', side: 'buy', quantity: 50, fill_price: 245.67, nbbo_bid: 245.50, nbbo_ask: 246.00 },
         { asset: 'SOL', side: 'sell', quantity: 25, fill_price: 98.45, nbbo_bid: 98.30, nbbo_ask: 98.60 },
@@ -54,7 +67,6 @@ const ExecutionAuditTrail = () => {
     } catch (e) {
       console.error('Error generating receipts:', e);
     }
-    setLoading(false);
   };
 
   const formatPrice = (price) => `$${price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
