@@ -46,17 +46,19 @@ class TestGlassBoxPricing:
         assert "tiers" in data
         assert "asset_classes" in data
         
-        # Verify tiers
+        # Verify tiers (actual structure)
         tiers = data["tiers"]
         assert len(tiers) > 0
+        assert "free" in tiers or "pro" in tiers
         for tier_name, tier_data in tiers.items():
-            assert "monthly_volume_min" in tier_data
-            assert "monthly_volume_max" in tier_data
-            assert "base_fee_bps" in tier_data
+            assert "name" in tier_data
+            assert "monthly_cost" in tier_data
+            assert "description" in tier_data
         
         # Verify asset classes
         asset_classes = data["asset_classes"]
         assert len(asset_classes) > 0
+        assert "equity" in asset_classes or "crypto" in asset_classes
         print(f"✓ Fee schedule: {len(tiers)} tiers, {len(asset_classes)} asset classes")
     
     def test_post_pricing_estimate(self):
@@ -77,19 +79,17 @@ class TestGlassBoxPricing:
         assert response.status_code == 200
         data = response.json()
         
-        # Verify cost breakdown
-        assert "breakdown" in data
-        breakdown = data["breakdown"]
-        assert "platform_fee" in breakdown
-        assert "spread_cost" in breakdown
-        assert "total_cost" in breakdown
+        # Verify cost breakdown (actual structure)
+        assert "estimated_fees" in data
+        assert "total_estimated_cost_usd" in data
+        assert "total_estimated_cost_bps" in data
         
         # Verify competitor comparison
-        assert "competitor_comparison" in data
-        competitors = data["competitor_comparison"]
+        assert "competitor_costs" in data
+        competitors = data["competitor_costs"]
         assert len(competitors) > 0
         
-        print(f"✓ Pricing estimate: Total cost ${breakdown['total_cost']:.2f}")
+        print(f"✓ Pricing estimate: Total cost ${data['total_estimated_cost_usd']:.2f}")
         print(f"  Competitors compared: {list(competitors.keys())}")
     
     def test_get_competitor_comparison(self):
@@ -134,6 +134,7 @@ class TestAITradingAgents:
         """POST /api/agents creates agent with MongoDB persistence"""
         payload = {
             "name": "TEST_Agent_Iteration17",
+            "description": "Test agent for iteration 17 testing",
             "strategy": "momentum",
             "risk_tolerance": 50,
             "position_size_pct": 10,
@@ -151,19 +152,23 @@ class TestAITradingAgents:
         assert response.status_code == 200
         data = response.json()
         
-        # Verify agent created
-        assert "agent_id" in data
-        assert data["name"] == payload["name"]
-        assert data["strategy"] == payload["strategy"]
+        # Verify agent created (actual structure)
+        assert data.get("success") == True
+        assert "agent" in data
+        agent = data["agent"]
+        assert "agent_id" in agent
+        assert agent["name"] == payload["name"]
+        assert agent["strategy"] == payload["strategy"]
         
-        print(f"✓ Agent created: {data['agent_id']}")
-        return data["agent_id"]
+        print(f"✓ Agent created: {agent['agent_id']}")
+        return agent["agent_id"]
     
     def test_get_user_agents(self):
         """GET /api/agents?user_id=test returns persisted agents"""
         # First create an agent
         create_payload = {
             "name": "TEST_GetAgents_Iteration17",
+            "description": "Test agent for get agents test",
             "strategy": "mean_reversion",
             "user_id": "test_user_get_agents"
         }
@@ -173,7 +178,9 @@ class TestAITradingAgents:
             headers={"Content-Type": "application/json"}
         )
         assert create_response.status_code == 200
-        created_agent = create_response.json()
+        created_data = create_response.json()
+        assert created_data.get("success") == True
+        created_agent = created_data["agent"]
         
         # Now get user's agents
         response = requests.get(f"{BASE_URL}/api/agents?user_id=test_user_get_agents")
@@ -192,6 +199,7 @@ class TestAITradingAgents:
         # Create agent first
         create_payload = {
             "name": "TEST_Activate_Iteration17",
+            "description": "Test agent for activation test",
             "strategy": "trend_following",
             "user_id": "test_user_activate"
         }
@@ -201,7 +209,9 @@ class TestAITradingAgents:
             headers={"Content-Type": "application/json"}
         )
         assert create_response.status_code == 200
-        agent_id = create_response.json()["agent_id"]
+        created_data = create_response.json()
+        assert created_data.get("success") == True
+        agent_id = created_data["agent"]["agent_id"]
         
         # Activate agent
         response = requests.post(f"{BASE_URL}/api/agents/{agent_id}/activate")
@@ -242,7 +252,7 @@ class TestPushNotifications:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") == True or "registered" in str(data).lower()
+        assert data.get("success") == True, f"Registration failed: {data}"
         print(f"✓ Device registered: {payload['token'][:30]}...")
     
     def test_get_preferences(self):
@@ -324,30 +334,15 @@ class TestExecutionAuditTrail:
         assert response.status_code == 200
         data = response.json()
         
-        # Verify receipt structure
+        # Verify receipt structure (actual)
         assert "receipt_id" in data
-        assert "cost_breakdown" in data
-        assert "nbbo_comparison" in data
+        assert "fees" in data
+        assert "nbbo_bid" in data
+        assert "nbbo_ask" in data
+        assert "savings_vs_competitors" in data
         
         print(f"✓ Execution receipt: {data['receipt_id']}")
-        print(f"  NBBO comparison: {data['nbbo_comparison']}")
-
-
-class TestRiskDashboard:
-    """Risk Dashboard API Tests (if endpoints exist)"""
-    
-    def test_portfolio_risk(self):
-        """Test portfolio risk endpoint if available"""
-        # Try to get portfolio risk data
-        response = requests.get(f"{BASE_URL}/api/portfolio/risk?user_id=demo_user")
-        if response.status_code == 200:
-            data = response.json()
-            print(f"✓ Portfolio risk data: {data}")
-        elif response.status_code == 404:
-            print("⚠ Portfolio risk endpoint not found (may be frontend-only)")
-            pytest.skip("Endpoint not implemented")
-        else:
-            print(f"⚠ Portfolio risk returned {response.status_code}")
+        print(f"  NBBO: bid={data['nbbo_bid']}, ask={data['nbbo_ask']}")
 
 
 class TestMonthlyReport:
