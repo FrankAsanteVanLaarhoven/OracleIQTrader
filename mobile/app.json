@@ -71,9 +71,10 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID"
-      }
+        "projectId": "oracleiq-trader-mobile"
+      },
+      "apiUrl": "https://smart-trade-app-10.preview.emergentagent.com/api"
     },
-    "owner": "YOUR_EXPO_ACCOUNT"
+    "owner": "oracleiqtrader"
   }
 }
