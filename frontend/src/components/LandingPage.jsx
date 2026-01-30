@@ -49,7 +49,7 @@ const LandingPage = ({ onGetStarted }) => {
     {
       num: '2',
       title: 'Cost Tracker',
-      desc: 'Monthly "cost of trading" report vs. IBKR, Binance, and eToro. See exactly what you saved this month.',
+      desc: 'Monthly "cost of trading" report vs. industry benchmarks. See exactly what you saved this month.',
       icon: DollarSign,
       color: 'from-emerald-500/20'
     },
@@ -109,6 +109,7 @@ const LandingPage = ({ onGetStarted }) => {
     { feature: 'Beginner-Friendly UX', oracleiq: true, ibkr: false, t212: true, etoro: true, binance: true },
     { feature: 'Public Fee Breakdown', oracleiq: true, ibkr: false, t212: false, etoro: false, binance: true },
   ];
+  // Note: ibkr=Pro Brokers, t212=Free Brokers, etoro=Social Trading, binance=Crypto Exchanges
 
   // Value propositions
   const valueProps = [
@@ -414,10 +415,10 @@ const LandingPage = ({ onGetStarted }) => {
                   <th className="py-4 px-4 text-center">
                     <span className="text-teal-400 font-bold">Oracle IQ</span>
                   </th>
-                  <th className="py-4 px-4 text-center text-slate-400">Interactive Brokers</th>
-                  <th className="py-4 px-4 text-center text-slate-400">Trading 212</th>
-                  <th className="py-4 px-4 text-center text-slate-400">eToro</th>
-                  <th className="py-4 px-4 text-center text-slate-400">Binance</th>
+                  <th className="py-4 px-4 text-center text-slate-400">Pro Brokers</th>
+                  <th className="py-4 px-4 text-center text-slate-400">Free Brokers</th>
+                  <th className="py-4 px-4 text-center text-slate-400">Social Trading</th>
+                  <th className="py-4 px-4 text-center text-slate-400">Crypto Exchanges</th>
                 </tr>
               </thead>
               <tbody>
@@ -447,7 +448,7 @@ const LandingPage = ({ onGetStarted }) => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Why Oracle IQ Trader?</h2>
-            <p className="text-xl text-slate-400">Built for young traders and serious investors. Finally.</p>
+            <p className="text-xl text-slate-400">Built for every trader. Powerful tools, radical transparency.</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -481,15 +482,15 @@ const LandingPage = ({ onGetStarted }) => {
               Stop Overpaying for Mediocrity
             </h2>
             <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
-              Interactive Brokers for the serious investor. Trading 212 simplicity for the young trader. 
-              And transparency nobody else offers.
+              Professional-grade power. Intuitive simplicity. 
+              And radical transparency the industry has never seen.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button 
                 onClick={onGetStarted}
                 className="px-10 py-5 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold text-xl hover:shadow-2xl hover:shadow-teal-500/30 transition-all"
               >
-                Join 50,000+ Traders
+                Start Trading Now
               </button>
               <button className="px-10 py-5 rounded-2xl bg-white/5 border border-white/10 text-white font-semibold text-lg hover:bg-white/10 transition-all">
                 Read Our Whitepaper
