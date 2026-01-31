@@ -1,7 +1,7 @@
 # OracleIQTrader - Hostinger VPS Deployment Guide
 
 ## Server Details
-- **Server:** srv1304213.hstgr.cloud
+- **Server:** oracleiqtrader.com
 - **IP:** 72.62.211.165
 - **OS:** Ubuntu 24.04 LTS
 
@@ -11,7 +11,7 @@
 
 ### Step 1: SSH into your server
 ```bash
-ssh root@srv1304213.hstgr.cloud
+ssh root@oracleiqtrader.com
 ```
 
 ### Step 2: Run this ONE command to set up everything
@@ -49,7 +49,7 @@ EMERGENT_LLM_KEY=sk-emergent-your-key-here
 ### Step 6: Update frontend URL
 Edit `frontend/.env`:
 ```bash
-echo "REACT_APP_BACKEND_URL=https://srv1304213.hstgr.cloud/api" > frontend/.env
+echo "REACT_APP_BACKEND_URL=https://oracleiqtrader.com/api" > frontend/.env
 ```
 
 ### Step 7: Build and start
@@ -125,9 +125,9 @@ docker-compose ps
 
 ## 🌐 URLs After Deployment
 
-- **Website:** https://srv1304213.hstgr.cloud
-- **API:** https://srv1304213.hstgr.cloud/api
-- **WebSocket:** wss://srv1304213.hstgr.cloud/ws
+- **Website:** https://oracleiqtrader.com
+- **API:** https://oracleiqtrader.com/api
+- **WebSocket:** wss://oracleiqtrader.com/ws
 
 ---
 

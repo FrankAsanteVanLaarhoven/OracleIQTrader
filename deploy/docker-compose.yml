@@ -38,7 +38,7 @@ services:
       context: ../frontend
       dockerfile: ../deploy/frontend/Dockerfile
       args:
-        - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL:-https://srv1304213.hstgr.cloud/api}
+        - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL:-https://oracleiqtrader.com/api}
     container_name: oracleiq-frontend
     restart: always
     ports:

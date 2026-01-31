@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # OracleIQTrader Production Deployment Script
-# Run this on your production server: srv1304213.hstgr.cloud
+# Run this on your production server: oracleiqtrader.com
 #
 # Usage: curl -fsSL https://raw.githubusercontent.com/YOUR_REPO/main/deploy/production-deploy.sh | bash
 # Or: ./production-deploy.sh
@@ -15,7 +15,7 @@ echo "========================================"
 
 APP_DIR="/opt/oracleiq-trader"
 BACKUP_DIR="/opt/backups"
-DOMAIN="srv1304213.hstgr.cloud"
+DOMAIN="oracleiqtrader.com"
 
 # Colors
 RED='\033[0;31m'

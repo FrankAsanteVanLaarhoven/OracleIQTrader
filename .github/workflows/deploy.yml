@@ -24,7 +24,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  PRODUCTION_HOST: srv1304213.hstgr.cloud
+  PRODUCTION_HOST: oracleiqtrader.com
   STAGING_HOST: staging.oracleiqtrader.com
   APP_DIR: /opt/oracleiq-trader
 
@@ -142,7 +142,7 @@ jobs:
         working-directory: frontend
         env:
           CI: false
-          REACT_APP_BACKEND_URL: https://srv1304213.hstgr.cloud/api
+          REACT_APP_BACKEND_URL: https://oracleiqtrader.com/api
           SKIP_PREFLIGHT_CHECK: true
           DISABLE_ESLINT_PLUGIN: true
         run: yarn build

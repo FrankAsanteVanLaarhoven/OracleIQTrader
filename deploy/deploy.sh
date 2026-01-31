@@ -61,7 +61,7 @@ else
 fi
 
 cat > frontend/.env << EOF
-REACT_APP_BACKEND_URL=https://srv1304213.hstgr.cloud/api
+REACT_APP_BACKEND_URL=https://oracleiqtrader.com/api
 EOF
 
 cat > backend/.env << EOF
@@ -120,7 +120,7 @@ if [ "$BACKEND_OK" = true ] && [ "$FRONTEND_OK" = true ]; then
     echo "  - Frontend: http://localhost:3000"
     echo "  - MongoDB:  mongodb://localhost:27017"
     echo ""
-    echo "External URL: https://srv1304213.hstgr.cloud"
+    echo "External URL: https://oracleiqtrader.com"
 else
     log_error "❌ Deployment may have issues"
     [ "$BACKEND_OK" = false ] && log_error "Backend is not responding"

@@ -6,7 +6,7 @@
 
 set -e
 
-DOMAIN="srv1304213.hstgr.cloud"
+DOMAIN="oracleiqtrader.com"
 EMAIL="admin@oracleiqtrader.com"  # Change this!
 
 echo "🔒 Setting up SSL certificates for $DOMAIN..."

@@ -21,7 +21,7 @@ on:
           - backup
 
 env:
-  PRODUCTION_HOST: srv1304213.hstgr.cloud
+  PRODUCTION_HOST: oracleiqtrader.com
 
 jobs:
   health-check:
@@ -75,7 +75,7 @@ jobs:
           import httpx
           import sys
           
-          BASE = "https://srv1304213.hstgr.cloud/api"
+          BASE = "https://oracleiqtrader.com/api"
           
           tests = [
               ("GET", f"{BASE}/health", 200),

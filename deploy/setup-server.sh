@@ -2,7 +2,7 @@
 
 # ============================================
 # OracleIQTrader Deployment Script
-# Server: srv1304213.hstgr.cloud
+# Server: oracleiqtrader.com
 # ============================================
 
 set -e
@@ -16,7 +16,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-DOMAIN="srv1304213.hstgr.cloud"
+DOMAIN="oracleiqtrader.com"
 EMAIL="admin@$DOMAIN"  # Change this to your email
 APP_DIR="/opt/oracleiq-trader"
 
@@ -71,7 +71,7 @@ events {
 http {
     server {
         listen 80;
-        server_name srv1304213.hstgr.cloud;
+        server_name oracleiqtrader.com;
 
         location /.well-known/acme-challenge/ {
             root /var/www/certbot;
