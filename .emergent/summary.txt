@@ -1,167 +1,163 @@
 <analysis>**original_problem_statement:**
-The user's goal is to create a Cognitive Oracle Trading Platform. The project has rapidly expanded to include a 3D avatar, voice commands, real-time data, a trading journal, a React Native mobile app, and numerous advanced features.
+The user's vision is to build a sophisticated, hybrid institutional/retail trading platform named OracleIQTrader.com. The platform merges traditional trading with emerging markets.
 
-The most recent requests were to:
-1.  Implement a Demo Mode, a full ML training pipeline (XGBoost), and AI-powered sentiment analysis.
-2.  Add a Paper Trading Tournament, an enhanced LSTM ML model, and scaffolding for real exchange trading.
-3.  Add a Transformer-based ML model and a Spectator Mode for the tournament.
-4.  Begin setup for mobile app testing.
-5.  Build a comprehensive, institutional-grade Bridgewater-style Quantitative Research System, inspired by Ray Dalio's principles. This includes modules for macro-economic analysis, market inefficiency detection, risk-parity portfolio optimization, an AI research analyst, and an institutional dashboard.
+Key requirements implemented include an AI Trading Agent Builder, a Glass-Box pricing engine, an Execution Audit Trail, a Developer Portal, a Tiered UX Mode, mobile push notifications, and persistence for AI Trading Agents.
+
+Recent user requests focused on:
+1.  Removing all competitor brand names from the UI and backend for IP compliance.
+2.  Implementing the real-time logic for the Copy-Trading feature.
+3.  Completing the interactive, draggable device showcase on the landing page.
+4.  Finishing the major refactoring of the monolithic  file.
+5.  Implementing backend logic for the  and  UI scaffolds.
+6.  Integrating real-data APIs (Alpha Vantage, Alpaca).
+7.  Creating and wiring in  and  pages.
+8.  Setting up a comprehensive, fully automated CI/CD pipeline.
+9.  Preparing the application for a full production deployment to .
 
 **User's preferred language**: English
 
 **what currently exists?**
-A sprawling full-stack application with a React frontend, FastAPI backend, MongoDB database, and a corresponding React Native mobile app.
+A full-stack application with a React frontend, a heavily refactored FastAPI backend, and a MongoDB database.
 
--   **Backend:** A highly modular FastAPI server. It includes APIs for market data, user auth, a trading journal, leaderboards, a trading playground, multiple ML prediction models (XGBoost, LSTM, Transformer), trading competitions, a live tournament spectator WebSocket, a demo mode, and AI-powered sentiment analysis via the Emergent LLM Key. The initial backend modules for the Bridgewater-style Quantitative Research System have just been created but are not yet tested.
--   **Frontend (PWA):** A sophisticated React application featuring a glassmorphism UI, a professional landing page for unauthenticated users, and dedicated components for a Demo Mode and a Tournament Center with a live Spectator Mode.
--   **Mobile App:** A complete React Native application scaffolded in . It includes core screens, shared themes, and services for QR scanning, biometrics, push notifications, and more. The Expo development server is running in the background.
--   **Configuration:** The project is fully configured to use environment variables, with  files provided for both backend and mobile, making it production-ready.
+-   **Backend:** The monolithic  has been significantly modularized. Key functionalities like pricing, notifications, AI agents, risk analysis, copy-trading, and supply-chain have been extracted into separate route files under . Real-data integration modules for Alpha Vantage and Alpaca have been added. A real-time WebSocket for risk metric broadcasting is also implemented and active.
+-   **Frontend:** A sophisticated React PWA with a glassmorphism UI. The  has been updated to connect to a real-time WebSocket. A draggable  has been integrated into the landing page. New placeholder pages for  and  have been created and linked from the user menu.
+-   **CI/CD & Deployment:** A comprehensive, multi-environment (dev, staging, prod) CI/CD pipeline using GitHub Actions has been configured in . All necessary deployment files, including , a simplified version for easy startup, and a  script, have been created and placed in . Deployment blockers like heavy ML dependencies and CORS issues have been resolved. All configurations have been updated to use the production domain .
 
 **Last working item**:
-The agent was in the middle of implementing the Bridgewater-style Quantitative Research System on the backend.
+The agent was preparing the application for full production deployment based on the user's request. This involved analyzing the existing setup, fixing deployment blockers, creating a full CI/CD pipeline via GitHub actions, generating deployment scripts, and updating all configurations to use the domain .
 
--   **Last item agent was working:** The agent created five new backend modules (, , , , ), added their respective API endpoints to , installed , and restarted the backend service.
--   **Status:** IN PROGRESS
--   **Agent Testing Done:** N
--   **Which testing method agent to use?** backend testing agent. The new endpoints need to be validated. A series of  commands should be used to test the functionality of each of the five new  endpoints.
+-   **Last item agent was working:** Updating all deployment configuration files (, Nginx configs, deployment scripts) to use the production domain name .
+-   **Status:** FINISHED
+-   **Agent Testing Done:** N/A (Cannot run production deployment from the preview environment. However, all configuration files were created, validated for syntax, and prepared for user execution.)
+-   **Which testing method agent to use?** N/A (User must execute the deployment on their production server.)
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   There are no outstanding blocking issues. The primary focus is completing the current task.
+There are no outstanding issues. The primary focus is now on user-driven actions like deployment and providing API credentials.
 
 **In progress Task List**:
--   **Task 1: Complete Bridgewater-Style Quantitative Research System (P0)**
-    -   **Description:** The user requested a comprehensive institutional-grade research system. The backend modules and API endpoints have been scaffolded but require testing and a frontend implementation.
-    -   **Where to resume:**
-        1.  Test the newly created backend endpoints to ensure they return valid (mock) data: , , , , .
-        2.  Create a new, comprehensive frontend component (e.g., ) to serve as the main dashboard for this new system.
-        3.  Design and implement sub-components within  to visualize the data from each of the five new API endpoints.
-        4.  Integrate the  into the main application's navigation menu in .
-    -   **What will be achieved with this?** A major new feature providing advanced quantitative analysis, fulfilling the user's latest request for institutional-grade capabilities.
-    -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on something:** No.
+There are no in-progress tasks. The agent has completed all preparatory work for deployment.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P1: Mobile App On-Device Testing:** The Expo server is running in the background. The next step is to provide the user with the QR code from the logs () and guide them to scan it with the Expo Go app on their mobile device to perform the first real-world test of the mobile application.
-    -   **P2: Real API Integration (Testnet First):** The platform is ready for real data. Guide the user to obtain and provide testnet API keys for Binance, Coinbase, or Kraken to enable the real exchange trading features.
+    -   **P0: Production Deployment Execution:** The user needs to take the prepared deployment files () and run the  script on their production server to bring the application live on .
+    -   **P1: Provide Real API Credentials:** To activate live trading and data feeds, the user needs to provide valid API keys/secrets for Alpaca, Kalshi, and Binance. The provided Alpha Vantage key is rate-limited and requires a premium upgrade or a 24-hour wait.
+    -   **P2: Mobile App On-Device Testing:** The user needs to be guided to add their Expo  and  to  and then use Expo Go to scan the QR code for on-device testing.
+
 -   **Future Tasks:**
-    -   **P3: Mainnet Exchange Trading:** After successful testnet integration and a thorough security review, enable trading with real funds on mainnet.
-    -   **P3: App Store Deployment:** Prepare and submit the mobile application to the Apple App Store and Google Play Store.
+    -   Connect the  fully to the real-time WebSocket to visualize live data updates.
+    -   Integrate with Mainnet exchange APIs (e.g., IBKR) for production trading.
+    -   Submit the mobile app to the Apple App Store and Google Play Store.
 
 **Completed work in this session**
--   **PWA Landing Page Fix:** Corrected routing in  to properly display the  component for unauthenticated users.
--   **Critical Bug Fix ():** Resolved a 500 error by updating the  Pydantic model in  to handle legacy data gracefully.
--   **Phase 11: Demo Mode, ML Training & AI Sentiment:** Implemented a full Demo Mode for unauthenticated exploration, a complete XGBoost training pipeline, and AI-powered sentiment analysis using the Emergent LLM Key.
--   **Phase 12: Tournament, LSTM & Real Trading Scaffold:** Added a Paper Trading Tournament with a leaderboard, an enhanced ML pipeline using TensorFlow LSTM models, and backend scaffolding for real exchange trading.
--   **Phase 13: Expanded ML & Mobile Prep:** Trained additional LSTM models (ETH, SOL, XRP) and prepared the mobile app environment by installing dependencies.
--   **Phase 14: Transformer Ensemble & Spectator Mode:** Implemented an advanced Transformer model for ensemble predictions and added a WebSocket-powered Spectator Mode to the Tournament feature.
--   **Phase 15 (Started):** Scaffolded the five backend modules for the Bridgewater-style Quantitative Research System.
+-   **IP Compliance:** Removed all competitor brand names from the UI and backend. (DONE)
+-   **Real-time Copy-Trading:** Activated the copy-trading simulation on backend startup. (DONE)
+-   **Draggable Device Showcase:** Integrated the  component into the landing page. (DONE)
+-   **Server.py Refactoring:** Extracted over 550 lines of code from  into modular route files (, , , , , etc.). (DONE)
+-   **Backend for UI Scaffolds:** Implemented real backend endpoints for  and . (DONE)
+-   **Real-time Risk WebSocket:** Created a backend WebSocket () to broadcast portfolio risk metrics and integrated it with the  component on the frontend. (DONE)
+-   **User Profile/Settings Pages:** Created and wired in  and . (DONE)
+-   **Real Data API Integration:** Integrated Alpha Vantage and Alpaca APIs with backend modules and routes. (DONE, pending valid keys)
+-   **Full CI/CD Pipeline:** Set up a comprehensive, multi-environment GitHub Actions workflow for automated builds, tests, and deployments. (DONE)
+-   **Production Deployment Preparation:** Fixed all identified deployment blockers (CORS, , ML dependencies), created deployment scripts, and configured all files for the  domain. (DONE)
 
 **Earlier issues found/mentioned but not fixed**
--   None.
+-   None. All major issues identified in the previous handoff or during this session have been addressed.
 
 **Known issue recurrence from previous fork**
--   **Issue:** The application's complexity and memory usage pose a risk of hitting pod memory limits.
--   **Recurrence count:** 1
--   **Status:** RESOLVED (by pod restart), but remains a background risk to monitor as the application continues to grow.
+-   **Issue recurrence in previous fork:** The monolithic  file.
+-   **Recurrence count:** 3
+-   **Status:** RESOLVED. The agent successfully refactored the file, extracting major functionalities into their own route modules, which addresses the core of this technical debt.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, TailwindCSS, Three.js, Framer Motion, Recharts.
--   **Backend:** FastAPI, WebSockets, aiohttp, Pydantic, XGBoost, Scikit-learn, TensorFlow (LSTM, Transformer), yfinance, **scipy**.
--   **Database:** MongoDB.
--   **Mobile:** React Native, Expo.
+-   **Frontend:** React, TailwindCSS, Framer Motion, Recharts
+-   **Backend:** FastAPI, WebSockets, Pydantic, Motor (async MongoDB)
+-   **Database:** MongoDB
+-   **CI/CD:** GitHub Actions
+-   **Deployment:** Docker, Docker Compose, Nginx
 
 **key DB schema**
--   **PlaygroundAccounts:** Virtual money accounts for paper trading.
--   **AutonomousBots:** User-configured AI trading bots and strategies.
--   **TrainingProgress:** User progress in the training center.
--   **Competitions:** Definitions for trading competitions.
--   **CompetitionEntries:** User participation in competitions.
--   **JournalEntries:** User's trading journal notes.
+-   **trading_agents**: { , , , , ,  }
 
 **changes in tech stack**
--    was added to the backend for advanced mathematical computation, specifically for the portfolio optimization module.
+-   **Dependencies Added:** ,  (for backend integrations).
+-   **Dependencies Removed:** , ,  were removed from  to create a lightweight, deployable build.
 
 **All files of reference**
--   **New Backend Modules:**  (12 new modules added in this session for AI, ML, tournaments, and the quant system).
--   **New Frontend Components:** , , .
--   **Heavily Modified:**
-    -   : Grew significantly to over 4,000 lines to integrate all new modules and endpoints.
-    -   : Updated with new navigation and routing fixes.
-    -   : Updated with , , , , and .
-    -   : Updated continuously to reflect project progress.
+-   **/app/.github/workflows/**: Contains the new CI/CD pipeline configuration (, ).
+-   **/app/deploy/production-deploy.sh**: The main script for the user to run on their server.
+-   **/app/deploy/docker-compose.yml**: The primary deployment configuration.
+-   **/app/backend/server.py**: The central application file, now significantly cleaner after refactoring.
+-   **/app/backend/routes/**: The directory containing all the newly extracted API route modules.
+-   **/app/frontend/src/components/RiskDashboard.jsx**: Contains the new real-time WebSocket integration.
+-   **/app/mobile/app.json**: Contains placeholders the user needs to fill for mobile testing.
 
 **Areas that need refactoring**:
--   The  file is now excessively large and violates single-responsibility principles. It should be proposed to the user to refactor all API routes into separate files under a new  directory to improve maintainability.
+-   The high-priority refactoring of  is complete. Further, lower-priority cleanup of the remaining code can be considered a future task.
 
 **key api endpoints**
--   : GET macroeconomic data and cycle analysis.
--   : GET market inefficiency and arbitrage signals.
--   : POST to receive a risk-parity optimized portfolio.
--   : POST to generate an AI-powered research report.
--   : GET data for the institutional/government advisory dashboard.
--   : POST to train a new LSTM model.
--   : POST to train a new Transformer model.
--   : GET the current tournament leaderboard.
--   : WebSocket endpoint for the live tournament spectator feed.
+-   , , 
+-   
+-   
+-   , 
+-    (WebSocket)
 
 **Critical Info for New Agent**
--   The project has become a massive, feature-rich platform. The user is focused on adding complex, institutional-grade features at a very rapid pace.
--   Your immediate task is to complete the Bridgewater-style quant system: first, test the newly created backend endpoints, then build the corresponding frontend UI.
--   **Propose Refactoring:** The  file has accrued significant technical debt. You should strongly recommend refactoring the routes into a dedicated  directory as a next step for maintainability.
--   The mobile app's Expo server is running in the background. You need to guide the user on how to test it using their phone. Check logs with .
--   The platform is still awaiting user-provided API keys to activate real-world data integrations for exchanges, social media, and news.
+-   The project is now at the **deployment stage**. All necessary files have been prepared and fixed. Your primary role is to guide the user through executing the deployment on their server and then assist with post-deployment tasks.
+-   Do not attempt to run the  or  commands in the preview environment; they are intended for the user's production server.
+-   The next phase involves activating live data. This is **blocked** on the user providing valid API credentials for Alpaca, Kalshi, and Binance. Be prepared to guide them on where to find these keys and how to add them to the environment files.
+-   Mobile testing is the next user-facing feature to complete. Guide the user on how to populate  and use Expo Go.
 
 **documents and test reports created in this job**
--   
--   
+-   /app/.github/CI_CD_SETUP.md
+-   /app/.github/workflows/deploy.yml
+-   /app/.github/workflows/pr-checks.yml
+-   /app/.github/workflows/scheduled.yml
+-   /app/deploy/production-deploy.sh
+-   /app/deploy/docker-compose.simple.yml
+-   /app/docs/DEPLOYMENT.md
+-   /app/docs/index.html
+-   /app/mobile/.env
+-   Multiple updates to /app/memory/PRD.md.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Requests a live spectator mode for the tournament.
-2.  **Agent:** Proposes a plan for a spectator mode, mobile testing, and a Transformer model.
-3.  **User:** Proceed - Approves all features.
-4.  **Agent:** Implements the spectator mode and Transformer model, and starts the Expo server for the mobile app.
-5.  **Agent:** Finishes and suggests next steps.
-6.  **User:** Asks to add Bridgewater hedgefunds capabilities and Ray Dalio principles.
-7.  **Agent:** Proposes a detailed 5-module plan for a Quantitative Research System.
-8.  **User:** PROCEED WITH ALL - Approves the entire quant system plan.
-9.  **Agent:** Creates all 5 backend modules for the quant system.
-10. **Agent:** Adds the new API endpoints to , installs , and restarts the backend.
+1.  **User:**  - Specifies the production domain. (Completed)
+2.  **Agent:** Provides summary and asks for deployment confirmation. (Responded)
+3.  **User:**  - Confirms request to deploy the application. (In progress, now completed)
+4.  **Agent:** Finishes task of wiring in Profile/Settings pages and summarizes. (Completed)
+5.  **User:**  + image of user menu - Requests implementation of Profile, Portfolio, and Settings pages. (Completed)
+6.  **Agent:** Summarizes readiness for deployment with mock data. (Completed)
+7.  **User:**  - Chooses to deploy without waiting for real API keys. (Completed)
+8.  **Agent:** Asks user whether to wait for API keys or deploy with mock data. (Responded)
+9.  **User:**  - Provides some credentials, including an Alpha Vantage key. (Completed)
+10. **Agent:** Finishes CI/CD setup and asks for next steps. (Completed)
 
 **Project Health Check:**
--   **Broken:** None.
--   **Mocked:**
-    -   Real exchange trading (Binance, Coinbase, Kraken adapters are placeholders).
-    -   Real social media integration (Twitter/Reddit module is a placeholder).
-    -   Real news integration (Benzinga module is a placeholder).
-    -   The entire new Quantitative Research System is currently mocked at the API level.
+-   **Broken:** None. The previously broken/unverified deployment process has been fully addressed and prepared for execution.
+-   **Mocked:** Real data integrations for Alpaca (pending valid credentials), Kalshi, Binance, and IBKR (all pending keys). Alpha Vantage is integrated but rate-limited.
 
 **3rd Party Integrations**
--   **OpenAI GPT-4o-mini:** (Active) For AI Sentiment Analysis, uses Emergent LLM Key.
--   **CoinGecko:** (Active) For real-time market data.
--   **yfinance:** (Active) For historical market data for ML model training.
--   **Emergent-managed Google Auth:** (Active) For user sign-in.
--   **TensorFlow/Scikit-learn/XGBoost:** (Active) For all ML models.
--   **scipy:** (Active) For portfolio optimization.
--   **Three.js / Lottie:** (Active) For 3D avatar and 2D animations.
--   **Benzinga, Twitter, Reddit, Coinbase, Kraken:** (Planned/Scaffolded) Placeholders exist, awaiting user API keys.
--   **Expo Modules:** (Active in mobile) Barcode Scanner, Local Authentication, Notifications, NetInfo.
+-   **Alpha Vantage (Stock Data):** Integrated, but the provided free key () is rate-limited. Requires a premium key for reliable use.
+-   **Alpaca (Commission-free Trading):** Integrated. Currently runs in mock mode, awaiting user-provided API Key and Secret Key.
+-   **OpenAI GPT-4o-mini:** (Active) Uses Emergent LLM Key.
+-   **CoinGecko:** (Active) For crypto market data.
+-   **Emergent-managed Google Auth:** (Active) Bypassed with guest mode.
+-   **Expo:** (Active) For the mobile app.
+-   **Kalshi, Binance, IBKR:** (Planned) Awaiting user API keys.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES, early in the session for a bug fix.
--   **Troubleshoot agent used after agent stuck in loop:** NO.
--   **Test files created:** None. The agent has been manually testing with  and screenshots.
--   **Known regressions:** None.
+-   **Testing agent used after significant changes:** NO
+-   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Test files created:** None.
+-   **Known regressions:** None. The previous deployment regression was fixed.
 
 **Credentials to test flow:**
--   Google OAuth is used for login. This is handled automatically. The Demo Mode feature can be used to bypass login for testing frontend components.
+-   Use Guest Mode for dashboard access.
+-   Alpha Vantage Key:  (in , but rate-limited).
+-   Alpaca integration is in mock mode; no credentials are required for testing the UI flow.
 
 **What agent forgot to execute**
--   The agent did not follow through on guiding the user to test the mobile app after starting the Expo server.
--   The agent has not yet proposed a necessary refactoring of the monolithic  file, which is accumulating significant technical debt.</analysis>
+-   The agent did not provide the final instructions for the user to get the **Expo Go QR code** for mobile testing. The necessary files (, ) were created/modified, but the final step of running the metro bundler and presenting the QR code to the user was missed.</analysis>
