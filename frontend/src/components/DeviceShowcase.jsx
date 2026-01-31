@@ -1,54 +1,9 @@
-import React, { useState, useRef } from 'react';
-import { motion, useDragControls, AnimatePresence } from 'framer-motion';
-import { X, Maximize2, Minimize2, RotateCcw } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Smartphone, Tablet, Glasses, Zap, Bell, Fingerprint, Monitor } from 'lucide-react';
 
-// Device mockup URLs
-const DEVICES = {
-  tablet: {
-    id: 'tablet',
-    name: 'iPad Pro',
-    type: 'tablet',
-    defaultPosition: { x: -350, y: 50 },
-    size: { width: 320, height: 420 },
-    rotation: -5,
-    zIndex: 1,
-    screenContent: {
-      portfolio: '$3,299.20',
-      change: '+8.4%',
-      chart: true
-    }
-  },
-  phone: {
-    id: 'phone',
-    name: 'iPhone Pro',
-    type: 'phone',
-    defaultPosition: { x: 0, y: 0 },
-    size: { width: 200, height: 400 },
-    rotation: 0,
-    zIndex: 3,
-    screenContent: {
-      portfolio: '$3,299.20',
-      prices: [
-        { symbol: 'BTC', price: '$72,245', change: '+3.6%' },
-        { symbol: 'DOGE', price: '$0.384', change: '+50%' },
-        { symbol: 'DYDX', price: '$3.04', change: '+30%' }
-      ]
-    }
-  },
-  vr: {
-    id: 'vr',
-    name: 'Vision Pro',
-    type: 'vr',
-    defaultPosition: { x: 300, y: 80 },
-    size: { width: 350, height: 200 },
-    rotation: 5,
-    zIndex: 2,
-    screenContent: {
-      portfolio: '+$209.20',
-      holographic: true
-    }
-  }
-};
+// Multi-device showcase image
+const DEVICE_SHOWCASE_IMAGE = "https://customer-assets.emergentagent.com/job_tradehub-380/artifacts/0biltc25_%243299.20.png";
 
 const DraggableDevice = ({ device, onSelect, isSelected, onPositionChange, zIndex }) => {
   const dragControls = useDragControls();
