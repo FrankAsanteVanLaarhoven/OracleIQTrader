@@ -100,7 +100,7 @@ eas submit --platform android
 ## API Configuration
 
 The app connects to the same backend API as the web app:
-- API URL: `https://smart-trade-app-10.preview.emergentagent.com/api`
+- API URL: `https://tradehub-380.preview.emergentagent.com/api`
 
 ### Exchange API Keys
 

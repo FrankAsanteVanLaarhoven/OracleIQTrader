@@ -73,7 +73,7 @@
       "eas": {
         "projectId": "oracleiq-trader-mobile"
       },
-      "apiUrl": "https://smart-trade-app-10.preview.emergentagent.com/api"
+      "apiUrl": "https://tradehub-380.preview.emergentagent.com/api"
     },
     "owner": "oracleiqtrader"
   }

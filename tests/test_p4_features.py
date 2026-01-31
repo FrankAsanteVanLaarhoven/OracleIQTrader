@@ -7,7 +7,7 @@ import requests
 import os
 import json
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://smart-trade-app-10.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://tradehub-380.preview.emergentagent.com')
 
 class TestExportEndpoints:
     """Export functionality tests - CSV and PDF exports"""
